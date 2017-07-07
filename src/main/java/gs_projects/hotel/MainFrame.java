@@ -18,7 +18,7 @@ public class MainFrame extends JFrame {
     private static final JPanel statusPanel = new JPanel();
 
     private static final JLabel dateStatus = new JLabel(formattedDate());
-    private static final JLabel timeStatus = new JLabel(formattedTime(""));
+    private static final JLabel timeStatus = new JLabel(formattedTime(":"));
 
     {
         setContentPane(conPane);
@@ -45,7 +45,7 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         super("MainFrame");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setResizable(false);
+        setResizable(true);
         setSize(1024, 768);
         center();
 
