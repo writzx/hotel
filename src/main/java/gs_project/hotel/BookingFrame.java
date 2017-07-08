@@ -1,7 +1,7 @@
 package gs_project.hotel;
 
+import gs_project.hotel.types.RoomClass;
 import gs_project.hotel.types.Room;
-import gs_project.hotel.types.Stay;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -11,7 +11,7 @@ public class BookingFrame extends MainFrame {
     public String username;
     public String usertype; // ADMIN or OPERATOR
 
-    List<Room> rooms = new ArrayList<>(); // read first
+    List<RoomClass> rooms = new ArrayList<>(); // read first
 
     public BookingFrame(String username, String usertype) {
         super("Booking Frame");
@@ -36,9 +36,9 @@ public class BookingFrame extends MainFrame {
 
     int searchRoom(String type, LocalDate checkin, LocalDate checkout, int excludeRoom) {
         int result = -1;
-        for (Room room : rooms) {
+        for (RoomClass room : rooms) {
             if (room.getType().equals(type)) {
-                for (Stay s : room.getStays()) {
+                for (Room s : room.getRooms()) {
                     List<LocalDate> startdates = new ArrayList<>();
                     startdates.addAll(s.getDurations().keySet());
                     List<LocalDate> enddates = new ArrayList<>();
@@ -48,6 +48,7 @@ public class BookingFrame extends MainFrame {
                             if (startdates.get(i + 1).isBefore(checkout)) {
                                 result = searchRoom(type, startdates.get(i + 1), enddates.get(i + 1), s.getRoomNo());
                                 if (result != -1) {
+                                    // remove and add the room here
                                     break;
                                 }
                             }
@@ -57,7 +58,7 @@ public class BookingFrame extends MainFrame {
                         break;
                     }
                 }
-                room.getStay(result).getDurations().put(checkin, checkout); // add booking here;
+                // room.getStay(result).getDurations().put(checkin, checkout); // add booking here; *maybe*
             }
         }
         return result;

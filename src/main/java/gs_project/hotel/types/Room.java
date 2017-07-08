@@ -1,91 +1,35 @@
 package gs_project.hotel.types;
 
 import java.io.Serializable;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.Map;
 
 public class Room implements Serializable {
-    private static final long serialVersionUID = -5406400830796622677L;
+    private static final long serialVersionUID = 4551019941238523542L;
 
-    private String id;
-    private String type;
-    private int count;
-    private int price; // per day
-    private int adults;
-    private int children;
-    private List<Stay> stays;
+    private int roomNo;
+    private Map<LocalDate, LocalDate> durations;
 
-    public Room(String id, String type, int count, int price, List<Stay> stays, int adults, int children) {
-        this.id = id;
-        this.type = type;
-        this.count = count;
-        this.price = price;
-        this.stays = stays;
-        this.adults = adults;
-        this.children = children;
+    public Room(int roomNo, Map<LocalDate, LocalDate> durations) {
+        this.roomNo = roomNo;
+        this.durations = durations;
     }
 
     ///region getter and setter
-    public String getId() {
-        return id;
+    public int getRoomNo() {
+        return roomNo;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setRoomNo(int roomNo) {
+        this.roomNo = roomNo;
     }
 
-    public String getType() {
-        return type;
+    public Map<LocalDate, LocalDate> getDurations() {
+        return durations;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public List<Stay> getStays() {
-        return stays;
-    }
-
-    public void setStays(List<Stay> stays) {
-        this.stays = stays;
-    }
-
-    public int getChildren() {
-        return children;
-    }
-
-    public void setChildren(int children) {
-        this.children = children;
-    }
-
-    public int getAdults() {
-        return adults;
-    }
-
-    public void setAdults(int adults) {
-        this.adults = adults;
-    }
-
-    public Stay getStay(int roomNo) {
-        for (Stay s: stays) {
-            if (roomNo == s.getRoomNo()) return s;
-        }
-        return null;
+    public void setDurations(Map<LocalDate, LocalDate> durations) {
+        this.durations = durations;
     }
     ///endregion
 }
