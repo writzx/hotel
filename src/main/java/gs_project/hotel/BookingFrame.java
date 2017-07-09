@@ -1,7 +1,7 @@
 package gs_project.hotel;
 
-import gs_project.hotel.types.RoomClass;
 import gs_project.hotel.types.Room;
+import gs_project.hotel.types.RoomClass;
 
 import javax.swing.*;
 import java.time.LocalDate;

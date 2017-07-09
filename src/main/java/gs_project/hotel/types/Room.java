@@ -10,9 +10,8 @@ public class Room implements Serializable {
     private int roomNo;
     private Map<LocalDate, LocalDate> durations;
 
-    public Room(int roomNo, Map<LocalDate, LocalDate> durations) {
+    public Room(int roomNo) {
         this.roomNo = roomNo;
-        this.durations = durations;
     }
 
     ///region getter and setter

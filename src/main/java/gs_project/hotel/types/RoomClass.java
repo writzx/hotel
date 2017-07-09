@@ -1,52 +1,34 @@
 package gs_project.hotel.types;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RoomClass implements Serializable {
     private static final long serialVersionUID = -5406400830796622677L;
 
-    private String id;
     private String type;
-    private int count;
     private int price; // per day
     private int adults;
     private int children;
-    private List<Room> rooms;
+    private ArrayList<Room> rooms;
 
-    public RoomClass(String id, String type, int count, int price, List<Room> rooms, int adults, int children) {
-        this.id = id;
+    public RoomClass(String type, int price, int adults, int children, List<Room> rooms) {
         this.type = type;
-        this.count = count;
         this.price = price;
-        this.rooms = rooms;
         this.adults = adults;
         this.children = children;
+        this.rooms = new ArrayList<>();
+        this.rooms.addAll(rooms);
     }
 
     ///region getter and setter
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getType() {
         return type;
     }
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
     }
 
     public int getPrice() {
@@ -57,11 +39,11 @@ public class RoomClass implements Serializable {
         this.price = price;
     }
 
-    public List<Room> getRooms() {
+    public ArrayList<Room> getRooms() {
         return rooms;
     }
 
-    public void setRooms(List<Room> rooms) {
+    public void setRooms(ArrayList<Room> rooms) {
         this.rooms = rooms;
     }
 
