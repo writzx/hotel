@@ -2,7 +2,6 @@ package gs_project.hotel;
 import java.awt.EventQueue;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.Font;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
@@ -50,137 +49,167 @@ public class OperatorFrame extends MainFrame {
         rightPanel.setBounds(192, 11, 592, 549);
         contentPane.add(rightPanel);
 
+        /// region bookingPanel
+
+        /// endregion
+
         /// region checkoutpanel
         JPanel checkOutPanel = new JPanel();
         checkOutPanel.setBounds(1, 1, 590, 547);
-        // checkOutPanel.setVisible(false);
-        rightPanel.add(checkOutPanel);
+        checkOutPanel.setVisible(false);
         checkOutPanel.setLayout(null);
 
-        JLabel checkOutHeader = new JLabel("CHECK OUT ");
+        JPanel checkBookIdPanel = new JPanel();
+        checkBookIdPanel.setBounds(10, 11, 572, 97);
+        checkOutPanel.add(checkBookIdPanel);
+        checkBookIdPanel.setLayout(null);
+
+        JLabel checkOutHeader = new JLabel("CHECK OUT");
+        checkOutHeader.setBounds(0, 0, 572, 52);
+        checkBookIdPanel.add(checkOutHeader);
         checkOutHeader.setHorizontalAlignment(SwingConstants.CENTER);
         checkOutHeader.setFont(new Font("Tahoma", Font.BOLD, 24));
-        checkOutHeader.setBounds(10, 11, 572, 52);
-        checkOutPanel.add(checkOutHeader);
 
         JLabel bookIdLabel = new JLabel("BOOKING ID:*");
+        bookIdLabel.setBounds(0, 63, 119, 32);
+        checkBookIdPanel.add(bookIdLabel);
         bookIdLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        bookIdLabel.setBounds(10, 74, 119, 32);
-        checkOutPanel.add(bookIdLabel);
 
         bookId = new JTextField();
+        bookId.setBounds(129, 65, 309, 32);
+        checkBookIdPanel.add(bookId);
         bookId.setColumns(10);
-        bookId.setBounds(139, 76, 309, 32);
-        checkOutPanel.add(bookId);
 
         JButton checkButton = new JButton("CHECK");
+        checkButton.setBounds(448, 65, 124, 32);
+        checkBookIdPanel.add(checkButton);
         checkButton.setFont(new Font("Tahoma", Font.BOLD, 14));
-        checkButton.setBounds(458, 76, 124, 32);
-        checkOutPanel.add(checkButton);
 
-        JPanel custInfoPanel = new JPanel();
-        custInfoPanel.setLayout(null);
-        custInfoPanel.setBounds(10, 117, 572, 421);
-        custInfoPanel.setBorder(new LineBorder(Color.GRAY));
-        checkOutPanel.add(custInfoPanel);
+        JPanel billingPanel = new JPanel();
+        billingPanel.setLayout(null);
+        billingPanel.setBounds(10, 117, 572, 421);
+        checkOutPanel.add(billingPanel);
+
+        JPanel bookInfoPanel = new JPanel();
+        bookInfoPanel.setBounds(10, 11, 552, 271);
+        billingPanel.add(bookInfoPanel);
+        bookInfoPanel.setLayout(null);
 
         JLabel custNameLabel = new JLabel("CUSTOMER NAME:");
+        custNameLabel.setBounds(0, 0, 208, 32);
+        bookInfoPanel.add(custNameLabel);
         custNameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        custNameLabel.setBounds(10, 11, 208, 32);
-        custInfoPanel.add(custNameLabel);
 
         JLabel custName = new JLabel("New label");
+        custName.setBounds(218, 0, 334, 32);
+        bookInfoPanel.add(custName);
         custName.setFont(new Font("Tahoma", Font.BOLD, 14));
-        custName.setBounds(228, 11, 334, 32);
-        custInfoPanel.add(custName);
 
         JLabel roomNoLabel = new JLabel("ROOM NO:");
+        roomNoLabel.setBounds(0, 35, 208, 32);
+        bookInfoPanel.add(roomNoLabel);
         roomNoLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        roomNoLabel.setBounds(10, 46, 208, 32);
-        custInfoPanel.add(roomNoLabel);
 
         JLabel roomNo = new JLabel("New label");
+        roomNo.setBounds(218, 35, 334, 32);
+        bookInfoPanel.add(roomNo);
         roomNo.setFont(new Font("Tahoma", Font.BOLD, 14));
-        roomNo.setBounds(228, 46, 334, 32);
-        custInfoPanel.add(roomNo);
 
         JLabel checkInLabel = new JLabel("CHECK IN DATE:");
+        checkInLabel.setBounds(0, 78, 208, 32);
+        bookInfoPanel.add(checkInLabel);
         checkInLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        checkInLabel.setBounds(10, 89, 208, 32);
-        custInfoPanel.add(checkInLabel);
 
         JLabel checkInDate = new JLabel("New label");
+        checkInDate.setBounds(218, 78, 334, 32);
+        bookInfoPanel.add(checkInDate);
         checkInDate.setFont(new Font("Tahoma", Font.BOLD, 14));
-        checkInDate.setBounds(228, 89, 334, 32);
-        custInfoPanel.add(checkInDate);
 
         JLabel checkOutLabel = new JLabel("CHECK OUT DATE:");
+        checkOutLabel.setBounds(0, 121, 208, 32);
+        bookInfoPanel.add(checkOutLabel);
         checkOutLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        checkOutLabel.setBounds(10, 132, 208, 32);
-        custInfoPanel.add(checkOutLabel);
 
         JLabel checkOutDate = new JLabel("New label");
+        checkOutDate.setBounds(218, 121, 334, 32);
+        bookInfoPanel.add(checkOutDate);
         checkOutDate.setFont(new Font("Tahoma", Font.BOLD, 14));
-        checkOutDate.setBounds(228, 132, 334, 32);
-        custInfoPanel.add(checkOutDate);
 
         JLabel totalPriceLabel = new JLabel("TOTAL PRICE:");
+        totalPriceLabel.setBounds(0, 196, 208, 32);
+        bookInfoPanel.add(totalPriceLabel);
         totalPriceLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        totalPriceLabel.setBounds(10, 207, 208, 32);
-        custInfoPanel.add(totalPriceLabel);
 
         JLabel totalPrice = new JLabel("New label");
+        totalPrice.setBounds(218, 196, 334, 32);
+        bookInfoPanel.add(totalPrice);
         totalPrice.setFont(new Font("Tahoma", Font.BOLD, 14));
-        totalPrice.setBounds(228, 207, 334, 32);
-        custInfoPanel.add(totalPrice);
+
+        JLabel initPaymentLabel = new JLabel("INITIAL PAYMENT:");
+        initPaymentLabel.setBounds(0, 239, 208, 32);
+        bookInfoPanel.add(initPaymentLabel);
+        initPaymentLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+
+        initPaymentBox = new JTextField();
+        initPaymentBox.setBounds(218, 240, 334, 31);
+        bookInfoPanel.add(initPaymentBox);
+        initPaymentBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        initPaymentBox.setEditable(false);
+        initPaymentBox.setColumns(10);
 
         JLabel gstLabel = new JLabel("GST:");
         gstLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        gstLabel.setBounds(10, 250, 208, 32);
-        custInfoPanel.add(gstLabel);
+        gstLabel.setBounds(10, 292, 208, 32);
+        billingPanel.add(gstLabel);
 
         gstBox = new JTextField();
         gstBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         gstBox.setEditable(false);
         gstBox.setColumns(10);
-        gstBox.setBounds(228, 251, 334, 32);
-        custInfoPanel.add(gstBox);
-
-        JLabel initPaymentLabel = new JLabel("INITIAL PAYMENT:");
-        initPaymentLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        initPaymentLabel.setBounds(10, 293, 208, 32);
-        custInfoPanel.add(initPaymentLabel);
-
-        initPaymentBox = new JTextField();
-        initPaymentBox.setFont(new Font("Tahoma", Font.BOLD, 14));
-        initPaymentBox.setEditable(false);
-        initPaymentBox.setColumns(10);
-        initPaymentBox.setBounds(228, 294, 334, 31);
-        custInfoPanel.add(initPaymentBox);
+        gstBox.setBounds(228, 293, 334, 32);
+        billingPanel.add(gstBox);
 
         JLabel payAmountLabel = new JLabel("AMOUNT TO PAY:");
         payAmountLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         payAmountLabel.setBounds(10, 336, 208, 32);
-        custInfoPanel.add(payAmountLabel);
+        billingPanel.add(payAmountLabel);
 
         amountBox = new JTextField();
         amountBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         amountBox.setEditable(false);
         amountBox.setColumns(10);
         amountBox.setBounds(228, 337, 334, 32);
-        custInfoPanel.add(amountBox);
+        billingPanel.add(amountBox);
 
         JButton genBillButton = new JButton("GENERATE BILL");
         genBillButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         genBillButton.setBounds(288, 378, 274, 32);
-        custInfoPanel.add(genBillButton);
+        billingPanel.add(genBillButton);
 
         JButton backButton = new JButton("BACK");
         backButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         backButton.setBounds(10, 378, 129, 32);
-        custInfoPanel.add(backButton);
+        billingPanel.add(backButton);
         /// endregion
 
+        /// region checkInPanel
+        JPanel checkInPanel = new JPanel();
+        checkInPanel.setBounds(1, 1, 590, 547);
+        checkInPanel.setVisible(false);
+        checkInPanel.setLayout(null);
+
+        JPanel confirmCheckInPanel = new JPanel();
+        confirmCheckInPanel.setLayout(null);
+        confirmCheckInPanel.setBounds(10, 117, 572, 421);
+        checkInPanel.add(confirmCheckInPanel);
+
+        JButton confirmCheckInButton = new JButton("CONFIRM CHECK IN");
+        confirmCheckInButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCheckInButton.setBounds(288, 378, 274, 32);
+        confirmCheckInPanel.add(confirmCheckInButton);
+        /// endregion
+
+        /// region leftButtons
         JButton bookButton = new JButton("Booking");
         bookButton.setFont(new Font("Verdana", Font.BOLD, 14));
         bookButton.setBounds(10, 11, 172, 32);
@@ -201,14 +230,54 @@ public class OperatorFrame extends MainFrame {
         foodOrderButton.setBounds(10, 140, 172, 32);
         contentPane.add(foodOrderButton);
 
-        JButton cancelButton = new JButton("Cancel Booking");
-        cancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
-        cancelButton.setBounds(10, 183, 172, 32);
-        contentPane.add(cancelButton);
+        JButton cancelBookingButton = new JButton("Cancel Booking");
+        cancelBookingButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        cancelBookingButton.setBounds(10, 183, 172, 32);
+        contentPane.add(cancelBookingButton);
+
+        /// endregion
 
         addDateTimeToStatusBar();
 
         center();
+
+
+        /// region events
+        checkOutButton.addActionListener(e -> {
+            rightPanel.removeAll();
+
+            checkOutPanel.setVisible(true);
+
+            checkOutHeader.setText("CHECK OUT");
+            checkOutPanel.add(checkBookIdPanel);
+            billingPanel.add(backButton);
+            billingPanel.add(bookInfoPanel);
+            rightPanel.add(checkOutPanel);
+
+            // call set visible in checkButton method
+            billingPanel.setVisible(false);
+
+            rightPanel.repaint();
+            rightPanel.revalidate();
+        });
+        checkInButton.addActionListener(e -> {
+            rightPanel.removeAll();
+
+            checkInPanel.setVisible(true);
+
+            checkOutHeader.setText("CHECK IN");
+            checkInPanel.add(checkBookIdPanel);
+            confirmCheckInPanel.add(backButton);
+            confirmCheckInPanel.add(bookInfoPanel);
+            rightPanel.add(checkInPanel);
+
+            // call set visible in checkButton method
+            confirmCheckInPanel.setVisible(false);
+
+            rightPanel.repaint();
+            rightPanel.revalidate();
+        });
+        /// endregion
     }
 }
 
