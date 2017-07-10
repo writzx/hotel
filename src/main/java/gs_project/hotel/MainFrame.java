@@ -85,10 +85,8 @@ public class MainFrame extends JFrame {
         return LocalTime.now().toString(current.contains(".") ? "hh:mm:ss aa" : "hh.mm.ss aa" );
     }
 
-    protected void addDateTimeStatusBar() {
+    protected void addDateTimeToStatusBar() {
         statusPanel.add(Box.createHorizontalGlue());
-
-        //RIGHT PART OF STATUS BAR
         statusPanel.add(dateStatus);
         statusPanel.add(Box.createHorizontalStrut(4));
         statusPanel.add(timeStatus);

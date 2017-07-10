@@ -115,7 +115,7 @@ public class LoginFrame extends MainFrame {
             }
         });
 
-        addDateTimeStatusBar();
+        addDateTimeToStatusBar();
 
         center();
     }
