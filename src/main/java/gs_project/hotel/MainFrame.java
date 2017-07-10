@@ -13,7 +13,7 @@ public class MainFrame extends JFrame {
     private static JPanel conPane = new JPanel(new BorderLayout());
 
     // Main Pane // should be changed before calling **setVisible**
-    protected final JPanel mainConPanel;
+    protected Container mainConPanel;
 
     protected final JPanel statusPanel;
 
@@ -33,12 +33,10 @@ public class MainFrame extends JFrame {
 
         // default properties
         setResizable(true);
-        setSize(800, 600);
+        super.setSize(800, 600);
         center();
 
-        setContentPane(conPane);
-
-        mainConPanel = new JPanel(null);
+        super.setContentPane(conPane);
 
         statusPanel = new JPanel();
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.LINE_AXIS));
@@ -51,8 +49,14 @@ public class MainFrame extends JFrame {
             timeStatus.setText(formattedTime(timeStatus.getText()));
         }).start();
 
-        conPane.add(mainConPanel, BorderLayout.CENTER);
         conPane.add(statusPanel, BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void setContentPane(Container contentPane) {
+        mainConPanel = contentPane;
+        conPane.add(mainConPanel, BorderLayout.CENTER);
+        super.setContentPane(conPane);
     }
 
     public void close() { dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); }
@@ -61,6 +65,11 @@ public class MainFrame extends JFrame {
 
     public void showFrame() {
         setVisible(true);
+    }
+
+    @Override
+    public void setSize(int width, int height) {
+        super.setSize(width, height + dateStatus.getPreferredSize().height);
     }
 
     // should be called after setSize()
@@ -74,5 +83,15 @@ public class MainFrame extends JFrame {
 
     private static String formattedTime(String current) {
         return LocalTime.now().toString(current.contains(".") ? "hh:mm:ss aa" : "hh.mm.ss aa" );
+    }
+
+    protected void addDateTimeStatusBar() {
+        statusPanel.add(Box.createHorizontalGlue());
+
+        //RIGHT PART OF STATUS BAR
+        statusPanel.add(dateStatus);
+        statusPanel.add(Box.createHorizontalStrut(4));
+        statusPanel.add(timeStatus);
+        statusPanel.add(Box.createHorizontalStrut(4));
     }
 }
