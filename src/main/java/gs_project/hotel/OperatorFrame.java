@@ -1,10 +1,13 @@
 package gs_project.hotel;
-import java.awt.EventQueue;
+
+import com.github.lgooddatepicker.components.DatePicker;
+
+import java.awt.*;
 
 import javax.swing.*;
-import java.awt.Font;
 import javax.swing.border.LineBorder;
-import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class OperatorFrame extends MainFrame {
 
@@ -13,6 +16,12 @@ public class OperatorFrame extends MainFrame {
     private JTextField gstBox;
     private JTextField initPaymentBox;
     private JTextField amountBox;
+    private JTextField roomselPriceBox;
+    private JTextField roomSelRoomNoBox;
+    private JTextField detCardNumBox;
+    private JTextField detEmailBox;
+    private JTextField detVisitorNameBox;
+    private JTextField detPhoneNumBox;
 
     /**
      * Launch the application.
@@ -50,13 +59,269 @@ public class OperatorFrame extends MainFrame {
         contentPane.add(rightPanel);
 
         /// region bookingPanel
+        JPanel bookingPanel = new JPanel();
+        bookingPanel.setBounds(0, 0, 592, 549);
+        bookingPanel.setLayout(null);
+
+        /// region stepsPanel
+        JPanel stepsPanel = new JPanel();
+        stepsPanel.setBorder(new LineBorder(Color.GRAY));
+        stepsPanel.setBounds(0, 0, 592, 48);
+        bookingPanel.add(stepsPanel);
+        stepsPanel.setLayout(null);
+
+        JLabel datesPeopleStep = new JLabel("<html><center>DATES<br>PEOPLE</center></html>");
+        datesPeopleStep.setForeground(Color.BLUE);
+        datesPeopleStep.setFont(new Font("Tahoma", Font.BOLD, 20));
+        datesPeopleStep.setHorizontalAlignment(SwingConstants.CENTER);
+        datesPeopleStep.setBounds(0, 0, 141, 48);
+        datesPeopleStep.setBorder(new LineBorder(Color.GRAY));
+        stepsPanel.add(datesPeopleStep);
+
+        JLabel roomSelectStep = new JLabel("<html><center>ROOM<br>SELECTION</center></html>");
+        roomSelectStep.setEnabled(false);
+        roomSelectStep.setForeground(Color.BLUE);
+        roomSelectStep.setHorizontalAlignment(SwingConstants.CENTER);
+        roomSelectStep.setFont(new Font("Tahoma", Font.BOLD, 20));
+        roomSelectStep.setBounds(151, 0, 141, 48);
+        roomSelectStep.setBorder(new LineBorder(Color.GRAY));
+        stepsPanel.add(roomSelectStep);
+
+        JLabel detailsStep = new JLabel("<html><center>PROVIDE<br>DETAILS</center></html>");
+        detailsStep.setEnabled(false);
+        detailsStep.setForeground(Color.BLUE);
+        detailsStep.setHorizontalAlignment(SwingConstants.CENTER);
+        detailsStep.setFont(new Font("Tahoma", Font.BOLD, 20));
+        detailsStep.setBounds(302, 0, 141, 48);
+        detailsStep.setBorder(new LineBorder(Color.GRAY));
+        stepsPanel.add(detailsStep);
+
+        JLabel confirmStep = new JLabel("<html><center>CONFIRM</center></html>");
+        confirmStep.setEnabled(false);
+        confirmStep.setForeground(Color.BLUE);
+        confirmStep.setHorizontalAlignment(SwingConstants.CENTER);
+        confirmStep.setFont(new Font("Tahoma", Font.BOLD, 20));
+        confirmStep.setBounds(453, 0, 139, 48);
+        confirmStep.setBorder(new LineBorder(Color.GRAY));
+        stepsPanel.add(confirmStep);
+        /// endregion
+
+        /// region currentStepPanel
+        JPanel currentStepPanel = new JPanel();
+        currentStepPanel.setBorder(new LineBorder(Color.GRAY));
+        currentStepPanel.setBounds(0, 47, 592, 502);
+        bookingPanel.add(currentStepPanel);
+        currentStepPanel.setLayout(null);
+
+        JPanel confirmPanel = new JPanel();
+        confirmPanel.setLayout(null);
+        confirmPanel.setBounds(10, 11, 572, 437);
+        // currentStepPanel.add(confirmPanel);
+
+        /// region detailsPanel
+        JPanel detailsPanel = new JPanel();
+        detailsPanel.setBounds(10, 11, 572, 437);
+        // currentStepPanel.add(detailsPanel);
+        detailsPanel.setLayout(null);
+
+        JLabel detVerifyDocLabel = new JLabel("VERIFICATION DOCMENT:*");
+        detVerifyDocLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        detVerifyDocLabel.setBounds(10, 394, 216, 32);
+        detailsPanel.add(detVerifyDocLabel);
+
+        detCardNumBox = new JTextField();
+        detCardNumBox.setColumns(10);
+        detCardNumBox.setBounds(245, 76, 211, 32);
+        detailsPanel.add(detCardNumBox);
+
+        JLabel detVisitorNameLabel = new JLabel("VISITOR NAME:*");
+        detVisitorNameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        detVisitorNameLabel.setBounds(10, 128, 216, 32);
+        detailsPanel.add(detVisitorNameLabel);
+
+        JLabel detPhoneNumLabel = new JLabel("PHONE NUMBER:*");
+        detPhoneNumLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        detPhoneNumLabel.setBounds(10, 176, 216, 32);
+        detailsPanel.add(detPhoneNumLabel);
+
+        detVisitorNameBox = new JTextField();
+        detVisitorNameBox.setColumns(10);
+        detVisitorNameBox.setBounds(245, 128, 317, 32);
+        detailsPanel.add(detVisitorNameBox);
+
+        detEmailBox = new JTextField();
+        detEmailBox.setColumns(10);
+        detEmailBox.setBounds(245, 226, 317, 32);
+        detailsPanel.add(detEmailBox);
+
+        JLabel detEmailLabel = new JLabel("EMAIL ID:*");
+        detEmailLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        detEmailLabel.setBounds(10, 226, 216, 32);
+        detailsPanel.add(detEmailLabel);
+
+        JScrollPane detAdressScroller = new JScrollPane();
+        detAdressScroller.setBounds(245, 276, 317, 98);
+        detailsPanel.add(detAdressScroller);
+
+        JTextArea detAddressBox = new JTextArea();
+        detAdressScroller.setViewportView(detAddressBox);
+        detAddressBox.setLineWrap(true);
+
+        JLabel detAddressLabel = new JLabel("ADDRESS:");
+        detAddressLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        detAddressLabel.setBounds(10, 276, 216, 32);
+        detailsPanel.add(detAddressLabel);
+
+        detPhoneNumBox = new JTextField();
+        detPhoneNumBox.setColumns(10);
+        detPhoneNumBox.setBounds(245, 176, 317, 32);
+        detailsPanel.add(detPhoneNumBox);
+
+        JLabel detCardNumLabel = new JLabel("CARD NUMBER:");
+        detCardNumLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        detCardNumLabel.setBounds(10, 76, 216, 32);
+        detailsPanel.add(detCardNumLabel);
+
+        JLabel detHeader = new JLabel("PERSONAL DETAILS");
+        detHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        detHeader.setFont(new Font("Tahoma", Font.BOLD, 20));
+        detHeader.setBounds(0, 0, 562, 48);
+        detailsPanel.add(detHeader);
+
+        JComboBox detVerifyDocBox = new JComboBox();
+        detVerifyDocBox.setBounds(245, 394, 317, 32);
+        detailsPanel.add(detVerifyDocBox);
+
+        JButton detCardCheckButton = new JButton("CHECK");
+        detCardCheckButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        detCardCheckButton.setBounds(466, 76, 96, 32);
+        detailsPanel.add(detCardCheckButton);
+        /// endregion
+
+        /// region roomSelectionPanel
+        JPanel roomSelectionPanel = new JPanel();
+        roomSelectionPanel.setBounds(10, 11, 572, 437);
+        // currentStepPanel.add(roomSelectionPanel);
+        roomSelectionPanel.setLayout(null);
+
+        roomselPriceBox = new JTextField();
+        roomselPriceBox.setBounds(127, 313, 162, 32);
+        roomSelectionPanel.add(roomselPriceBox);
+        roomselPriceBox.setEditable(false);
+        roomselPriceBox.setColumns(10);
+
+        JLabel roomSelCheckInLabel = new JLabel("CHECK IN:");
+        roomSelCheckInLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        roomSelCheckInLabel.setBounds(10, 93, 108, 32);
+        roomSelectionPanel.add(roomSelCheckInLabel);
+
+        JLabel roomSelCheckOutLabel = new JLabel("CHECK OUT:");
+        roomSelCheckOutLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        roomSelCheckOutLabel.setBounds(9, 169, 108, 32);
+        roomSelectionPanel.add(roomSelCheckOutLabel);
+
+        JButton roomSelSearchBtn = new JButton("SEARCH");
+        roomSelSearchBtn.setFont(new Font("Tahoma", Font.BOLD, 18));
+        roomSelSearchBtn.setBounds(10, 394, 279, 32);
+        roomSelectionPanel.add(roomSelSearchBtn);
+
+        JLabel roomSelPriceLabel = new JLabel("PRICE:");
+        roomSelPriceLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        roomSelPriceLabel.setBounds(10, 313, 108, 32);
+        roomSelectionPanel.add(roomSelPriceLabel);
+
+        JLabel roomSelRoomNoLabel = new JLabel("ROOM NO:");
+        roomSelRoomNoLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        roomSelRoomNoLabel.setBounds(10, 240, 108, 32);
+        roomSelectionPanel.add(roomSelRoomNoLabel);
+
+        JLabel roomSelHeader = new JLabel("ROOM SELECTION");
+        roomSelHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        roomSelHeader.setBounds(0, 0, 562, 48);
+        roomSelectionPanel.add(roomSelHeader);
+        roomSelHeader.setFont(new Font("Tahoma", Font.BOLD, 20));
+
+        JScrollPane roomSelTreeScroller = new JScrollPane();
+        roomSelTreeScroller.setBounds(315, 81, 247, 345);
+        roomSelectionPanel.add(roomSelTreeScroller);
+
+        JTree roomSelRoomTypesTree = new JTree();
+        roomSelTreeScroller.setViewportView(roomSelRoomTypesTree);
+
+        roomSelRoomNoBox = new JTextField();
+        roomSelRoomNoBox.setBounds(127, 240, 162, 32);
+        roomSelectionPanel.add(roomSelRoomNoBox);
+        roomSelRoomNoBox.setEditable(false);
+        roomSelRoomNoBox.setColumns(10);
+
+        DatePicker roomSelCheckInBox = new DatePicker();
+        roomSelCheckInBox.setBounds(127, 93, 162, 32);
+        roomSelectionPanel.add(roomSelCheckInBox);
+
+        DatePicker roomSelCheckOutBox = new DatePicker();
+        roomSelCheckOutBox.setBounds(127, 169, 162, 32);
+        roomSelectionPanel.add(roomSelCheckOutBox);
+        /// endregion
+
+        /// region datesPeoplePanel
+        JPanel datesPeoplePanel = new JPanel();
+        datesPeoplePanel.setLayout(null);
+        datesPeoplePanel.setBounds(10, 11, 572, 437);
+        // currentStepPanel.add(datesPeoplePanel);
+
+        JLabel selectDatePeopleHeader = new JLabel("<html><center>SELECT: STAY PERIOD and <br> NUMBER OF ADULTS and CHILDREN</center></html>");
+        selectDatePeopleHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        selectDatePeopleHeader.setFont(new Font("Tahoma", Font.BOLD, 20));
+        selectDatePeopleHeader.setBounds(0, 0, 572, 49);
+        datesPeoplePanel.add(selectDatePeopleHeader);
+
+        JLabel dateCheckInLabel = new JLabel("CHECK IN:*");
+        dateCheckInLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        dateCheckInLabel.setBounds(56, 95, 170, 32);
+        datesPeoplePanel.add(dateCheckInLabel);
+
+        JLabel dateCheckOutLabel = new JLabel("CHECK OUT:*");
+        dateCheckOutLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        dateCheckOutLabel.setBounds(56, 178, 170, 32);
+        datesPeoplePanel.add(dateCheckOutLabel);
+
+        JLabel datekNumAdultsLabel = new JLabel("NUMBER OF ADULTS:*");
+        datekNumAdultsLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        datekNumAdultsLabel.setBounds(56, 265, 170, 32);
+        datesPeoplePanel.add(datekNumAdultsLabel);
+
+        JLabel dateNumChildLabel = new JLabel("NUMBER OF CHILDERN:");
+        dateNumChildLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        dateNumChildLabel.setBounds(56, 350, 170, 32);
+        datesPeoplePanel.add(dateNumChildLabel);
+
+        JSpinner dateAdults = new JSpinner();
+        dateAdults.setFont(new Font("Tahoma", Font.BOLD, 14));
+        dateAdults.setBounds(312, 266, 230, 32);
+        datesPeoplePanel.add(dateAdults);
+
+        JSpinner dateChildren = new JSpinner();
+        dateChildren.setFont(new Font("Tahoma", Font.BOLD, 14));
+        dateChildren.setBounds(312, 351, 230, 32);
+        datesPeoplePanel.add(dateChildren);
+
+        DatePicker dateCheckInPicker = new DatePicker();
+        dateCheckInPicker.setBounds(312, 95, 230, 32);
+        datesPeoplePanel.add(dateCheckInPicker);
+
+        DatePicker dateCheckoutPicker = new DatePicker();
+        dateCheckoutPicker.setBounds(312, 178, 230, 32);
+        datesPeoplePanel.add(dateCheckoutPicker);
+        /// endregion
+
+        /// endregion
 
         /// endregion
 
         /// region checkoutpanel
         JPanel checkOutPanel = new JPanel();
-        checkOutPanel.setBounds(1, 1, 590, 547);
-        checkOutPanel.setVisible(false);
+        checkOutPanel.setBounds(0, 0, 592, 549);
+        checkOutPanel.setBorder(new LineBorder(Color.GRAY));
         checkOutPanel.setLayout(null);
 
         JPanel checkBookIdPanel = new JPanel();
@@ -194,8 +459,8 @@ public class OperatorFrame extends MainFrame {
 
         /// region checkInPanel
         JPanel checkInPanel = new JPanel();
-        checkInPanel.setBounds(1, 1, 590, 547);
-        checkInPanel.setVisible(false);
+        checkInPanel.setBounds(0, 0, 592, 549);
+        checkInPanel.setBorder(new LineBorder(Color.GRAY));
         checkInPanel.setLayout(null);
 
         JPanel confirmCheckInPanel = new JPanel();
@@ -244,40 +509,114 @@ public class OperatorFrame extends MainFrame {
 
         /// region events
         checkOutButton.addActionListener(e -> {
-            rightPanel.removeAll();
-
-            checkOutPanel.setVisible(true);
 
             checkOutHeader.setText("CHECK OUT");
             checkOutPanel.add(checkBookIdPanel);
             billingPanel.add(backButton);
             billingPanel.add(bookInfoPanel);
-            rightPanel.add(checkOutPanel);
 
-            // call set visible in checkButton method
-            billingPanel.setVisible(false);
+            // todo call set visible in checkButton method
+            billingPanel.setVisible(true);
 
-            rightPanel.repaint();
-            rightPanel.revalidate();
+            setPanel(checkOutPanel, rightPanel);
         });
         checkInButton.addActionListener(e -> {
-            rightPanel.removeAll();
-
-            checkInPanel.setVisible(true);
 
             checkOutHeader.setText("CHECK IN");
             checkInPanel.add(checkBookIdPanel);
             confirmCheckInPanel.add(backButton);
             confirmCheckInPanel.add(bookInfoPanel);
-            rightPanel.add(checkInPanel);
 
-            // call set visible in checkButton method
-            confirmCheckInPanel.setVisible(false);
+            // todo call set visible in checkButton method
+            confirmCheckInPanel.setVisible(true);
 
-            rightPanel.repaint();
-            rightPanel.revalidate();
+            setPanel(checkInPanel, rightPanel);
+        });
+        bookButton.addActionListener(e -> {
+            setPanel(bookingPanel, rightPanel);
+
+            setStep(datesPeopleStep, stepsPanel);
+            setPanel(datesPeoplePanel, currentStepPanel);
+        });
+
+        /// region stepsEvents
+        datesPeopleStep.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                setStep(datesPeopleStep, stepsPanel);
+                setPanel(datesPeoplePanel, currentStepPanel);
+            }
+        });
+
+        roomSelectStep.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                for (Component comp : stepsPanel.getComponents()) {
+                    comp.setEnabled(false);
+                }
+                roomSelectStep.setEnabled(true);
+
+                currentStepPanel.removeAll();
+
+                currentStepPanel.add(roomSelectionPanel);
+
+                currentStepPanel.repaint();
+                currentStepPanel.revalidate();
+            }
+        });
+
+        detailsStep.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                for (Component comp : stepsPanel.getComponents()) {
+                    comp.setEnabled(false);
+                }
+                detailsStep.setEnabled(true);
+
+                currentStepPanel.removeAll();
+
+                currentStepPanel.add(detailsPanel);
+
+                currentStepPanel.repaint();
+                currentStepPanel.revalidate();
+            }
+        });
+
+        confirmStep.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                for (Component comp : stepsPanel.getComponents()) {
+                    comp.setEnabled(false);
+                }
+                confirmStep.setEnabled(true);
+
+                currentStepPanel.removeAll();
+
+                currentStepPanel.add(confirmPanel);
+
+                currentStepPanel.repaint();
+                currentStepPanel.revalidate();
+            }
         });
         /// endregion
+
+        /// endregion
+    }
+
+    public static void setStep(Container step, Container panel) {
+        for (Component comp : panel.getComponents()) {
+            comp.setEnabled(false);
+        }
+        step.setEnabled(true);
+    }
+
+    public static void setPanel(Container inner, Container outer) {
+        outer.removeAll();
+
+        outer.add(inner);
+
+        outer.repaint();
+        outer.revalidate();
     }
 }
 
