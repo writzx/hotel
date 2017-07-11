@@ -443,10 +443,10 @@ public class OperatorFrame extends MainFrame {
         bookingPanel.add(bookNextStepButton);
         bookNextStepButton.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JButton bookingCancelButton = new JButton("CANCEL");
-        bookingCancelButton.setBounds(296, 511, 96, 32);
-        bookingPanel.add(bookingCancelButton);
-        bookingCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        JButton bookCancelButton = new JButton("CANCEL");
+        bookCancelButton.setBounds(296, 511, 96, 32);
+        bookingPanel.add(bookCancelButton);
+        bookCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
 
         /// endregion
 
@@ -618,6 +618,23 @@ public class OperatorFrame extends MainFrame {
         confirmCheckInPanel.add(confirmCheckInButton);
         /// endregion
 
+        /// region cancelBookingPanel
+        JPanel cancelBookingPanel = new JPanel();
+        cancelBookingPanel.setBounds(0, 0, 592, 549);
+        cancelBookingPanel.setBorder(new LineBorder(Color.GRAY));
+        cancelBookingPanel.setLayout(null);
+
+        JPanel confirmCancelPanel = new JPanel();
+        confirmCancelPanel.setLayout(null);
+        confirmCancelPanel.setBounds(10, 117, 572, 421);
+        cancelBookingPanel.add(confirmCancelPanel);
+
+        JButton confirmCancelButton = new JButton("CONFIRM CHECK IN");
+        confirmCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCancelButton.setBounds(288, 378, 274, 32);
+        confirmCancelPanel.add(confirmCancelButton);
+        /// endregion
+
         /// region leftButtons
         JButton bookButton = new JButton("Booking");
         bookButton.setFont(new Font("Verdana", Font.BOLD, 14));
@@ -733,7 +750,21 @@ public class OperatorFrame extends MainFrame {
             }
         });
 
-        cancelBookingButton.addActionListener(e -> setPanel(null, rightPanel)); // clear right panel
+        bookCancelButton.addActionListener(e -> setPanel(null, rightPanel)); // clear right panel
+
+        cancelBookingButton.addActionListener(e -> {
+            checkOutHeader.setText("CANCEL BOOKING");
+            cancelBookingPanel.add(checkBookIdPanel);
+            confirmCancelPanel.add(bookInfoPanel);
+
+            backButton.setBounds(10, 378, 129, 32);
+            confirmCancelPanel.add(backButton);
+
+            // todo call set visible in checkButton method
+            confirmCancelPanel.setVisible(true);
+
+            setPanel(cancelBookingPanel, rightPanel);
+        });
 
         /// region stepsEvents
         datesPeopleStep.addMouseListener(new MouseAdapter() {
