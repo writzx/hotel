@@ -77,6 +77,7 @@ public class OperatorFrame extends MainFrame {
         /// region bookingPanel
         JPanel bookingPanel = new JPanel();
         bookingPanel.setBounds(0, 0, 592, 549);
+        bookingPanel.setBorder(new LineBorder(Color.GRAY));
         bookingPanel.setLayout(null);
 
         /// region stepsPanel
@@ -125,7 +126,7 @@ public class OperatorFrame extends MainFrame {
         /// region currentStepPanel
         JPanel currentStepPanel = new JPanel();
         currentStepPanel.setBorder(new LineBorder(Color.GRAY));
-        currentStepPanel.setBounds(0, 47, 592, 502);
+        currentStepPanel.setBounds(0, 47, 592, 458);
         bookingPanel.add(currentStepPanel);
         currentStepPanel.setLayout(null);
 
@@ -182,56 +183,56 @@ public class OperatorFrame extends MainFrame {
         confirmPanel.add(confirmHeader);
 
         confirmRoomPackageBox = new JTextField();
-        confirmRoomPackageBox.setEnabled(false);
+        confirmRoomPackageBox.setEditable(false);
         confirmRoomPackageBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmRoomPackageBox.setColumns(10);
         confirmRoomPackageBox.setBounds(250, 158, 312, 32);
         confirmPanel.add(confirmRoomPackageBox);
 
         confirmCardNumBox = new JTextField();
-        confirmCardNumBox.setEnabled(false);
+        confirmCardNumBox.setEditable(false);
         confirmCardNumBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCardNumBox.setColumns(10);
         confirmCardNumBox.setBounds(250, 102, 312, 32);
         confirmPanel.add(confirmCardNumBox);
 
         confirmCustNameBox = new JTextField();
-        confirmCustNameBox.setEnabled(false);
+        confirmCustNameBox.setEditable(false);
         confirmCustNameBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCustNameBox.setColumns(10);
         confirmCustNameBox.setBounds(250, 59, 312, 32);
         confirmPanel.add(confirmCustNameBox);
 
         confirmCheckInBox = new JTextField();
-        confirmCheckInBox.setEnabled(false);
+        confirmCheckInBox.setEditable(false);
         confirmCheckInBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCheckInBox.setColumns(10);
         confirmCheckInBox.setBounds(250, 201, 312, 32);
         confirmPanel.add(confirmCheckInBox);
 
         confirmCheckOutBox = new JTextField();
-        confirmCheckOutBox.setEnabled(false);
+        confirmCheckOutBox.setEditable(false);
         confirmCheckOutBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCheckOutBox.setColumns(10);
         confirmCheckOutBox.setBounds(250, 244, 312, 32);
         confirmPanel.add(confirmCheckOutBox);
 
         confirmAdultsBox = new JTextField();
-        confirmAdultsBox.setEnabled(false);
+        confirmAdultsBox.setEditable(false);
         confirmAdultsBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmAdultsBox.setColumns(10);
         confirmAdultsBox.setBounds(250, 298, 312, 32);
         confirmPanel.add(confirmAdultsBox);
 
         confirmChildrenBox = new JTextField();
-        confirmChildrenBox.setEnabled(false);
+        confirmChildrenBox.setEditable(false);
         confirmChildrenBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmChildrenBox.setColumns(10);
         confirmChildrenBox.setBounds(250, 341, 312, 32);
         confirmPanel.add(confirmChildrenBox);
 
         confirmPriceBox = new JTextField();
-        confirmPriceBox.setEnabled(false);
+        confirmPriceBox.setEditable(false);
         confirmPriceBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmPriceBox.setColumns(10);
         confirmPriceBox.setBounds(250, 394, 312, 32);
@@ -437,6 +438,16 @@ public class OperatorFrame extends MainFrame {
 
         /// endregion
 
+        JButton bookNextStepButton = new JButton("NEXT STEP");
+        bookNextStepButton.setBounds(402, 511, 180, 32);
+        bookingPanel.add(bookNextStepButton);
+        bookNextStepButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+
+        JButton bookingCancelButton = new JButton("CANCEL");
+        bookingCancelButton.setBounds(296, 511, 96, 32);
+        bookingPanel.add(bookingCancelButton);
+        bookingCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+
         /// endregion
 
         /// region checkoutpanel
@@ -641,40 +652,95 @@ public class OperatorFrame extends MainFrame {
 
         /// region events
         checkOutButton.addActionListener(e -> {
-
             checkOutHeader.setText("CHECK OUT");
             checkOutPanel.add(checkBookIdPanel);
-            billingPanel.add(backButton);
             billingPanel.add(bookInfoPanel);
+
+            backButton.setBounds(10, 378, 129, 32);
+            billingPanel.add(backButton);
 
             // todo call set visible in checkButton method
             billingPanel.setVisible(true);
 
             setPanel(checkOutPanel, rightPanel);
         });
-        checkInButton.addActionListener(e -> {
 
+        checkInButton.addActionListener(e -> {
             checkOutHeader.setText("CHECK IN");
             checkInPanel.add(checkBookIdPanel);
-            confirmCheckInPanel.add(backButton);
             confirmCheckInPanel.add(bookInfoPanel);
+
+            backButton.setBounds(10, 378, 129, 32);
+            confirmCheckInPanel.add(backButton);
 
             // todo call set visible in checkButton method
             confirmCheckInPanel.setVisible(true);
 
             setPanel(checkInPanel, rightPanel);
         });
+
         bookButton.addActionListener(e -> {
+            backButton.setBounds(10, 511, 129, 32);
+            bookingPanel.add(backButton);
+
             setPanel(bookingPanel, rightPanel);
 
             setStep(datesPeopleStep, stepsPanel);
             setPanel(datesPeoplePanel, currentStepPanel);
+
         });
+
+        bookNextStepButton.addActionListener(e -> {
+            if (datesPeopleStep.isEnabled()) {
+                bookNextStepButton.setText("NEXT STEP");
+                setStep(roomSelectStep, stepsPanel);
+                setPanel(roomSelectionPanel, currentStepPanel);
+            } else if (roomSelectStep.isEnabled()) {
+                bookNextStepButton.setText("NEXT STEP");
+                setStep(detailsStep, stepsPanel);
+                setPanel(detailsPanel, currentStepPanel);
+            } else if (detailsStep.isEnabled()) {
+                bookNextStepButton.setText("CONFIRM BOOKING");
+                setStep(confirmStep, stepsPanel);
+                setPanel(confirmPanel, currentStepPanel);
+            } else if (confirmStep.isEnabled()) {
+                // todo confirmBooking
+                JOptionPane.showMessageDialog(OperatorFrame.this, "Booking Confirmed", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                bookNextStepButton.setText("NEXT STEP");
+                setStep(datesPeopleStep, stepsPanel);
+                setPanel(datesPeoplePanel, currentStepPanel);
+
+            }
+        });
+
+        backButton.addActionListener(e -> {
+            if (detailsStep.isEnabled()) {
+                bookNextStepButton.setText("NEXT STEP");
+                setStep(roomSelectStep, stepsPanel);
+                setPanel(roomSelectionPanel, currentStepPanel);
+            } else if (confirmStep.isEnabled()) {
+                bookNextStepButton.setText("NEXT STEP");
+                setStep(detailsStep, stepsPanel);
+                setPanel(detailsPanel, currentStepPanel);
+            } else if (roomSelectStep.isEnabled()) {
+                bookNextStepButton.setText("NEXT STEP");
+                setStep(datesPeopleStep, stepsPanel);
+                setPanel(datesPeoplePanel, currentStepPanel);
+            } else {
+                // clear right panel
+                setPanel(null, rightPanel);
+            }
+        });
+
+        cancelBookingButton.addActionListener(e -> setPanel(null, rightPanel)); // clear right panel
 
         /// region stepsEvents
         datesPeopleStep.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                bookNextStepButton.setText("NEXT STEP");
+
                 setStep(datesPeopleStep, stepsPanel);
                 setPanel(datesPeoplePanel, currentStepPanel);
             }
@@ -683,6 +749,8 @@ public class OperatorFrame extends MainFrame {
         roomSelectStep.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                bookNextStepButton.setText("NEXT STEP");
+
                 setStep(roomSelectStep, stepsPanel);
                 setPanel(roomSelectionPanel, currentStepPanel);
             }
@@ -691,6 +759,8 @@ public class OperatorFrame extends MainFrame {
         detailsStep.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                bookNextStepButton.setText("NEXT STEP");
+
                 setStep(detailsStep, stepsPanel);
                 setPanel(detailsPanel, currentStepPanel);
             }
@@ -699,6 +769,8 @@ public class OperatorFrame extends MainFrame {
         confirmStep.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                bookNextStepButton.setText("CONFIRM BOOKING");
+
                 setStep(confirmStep, stepsPanel);
                 setPanel(confirmPanel, currentStepPanel);
             }
@@ -728,7 +800,9 @@ public class OperatorFrame extends MainFrame {
     public static void setPanel(Container inner, Container outer) {
         outer.removeAll();
 
-        outer.add(inner);
+        if (inner != null) {
+            outer.add(inner);
+        }
 
         outer.repaint();
         outer.revalidate();
