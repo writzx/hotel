@@ -26,8 +26,8 @@ public class RoomEditor extends JFrame {
 
     private boolean delete = false;
 
-    private void loadClassesInTree(JTree tree) {
-        for (RoomClass rc: roomClasses) {
+    public static void loadClassesInTree(JTree tree, List<RoomClass> classes) {
+        for (RoomClass rc: classes) {
             buildTreeFromType((DefaultTreeModel) tree.getModel(), rc.getType());
         }
         expandTree(tree);
@@ -156,7 +156,7 @@ public class RoomEditor extends JFrame {
             }
         });
 
-        loadClassesInTree(tree);
+        loadClassesInTree(tree, roomClasses);
 
         addBtn.addActionListener(e -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
@@ -257,7 +257,7 @@ public class RoomEditor extends JFrame {
             }
             expandTree(tree);
 
-            loadClassesInTree(tree);
+            loadClassesInTree(tree, roomClasses);
         });
     }
 

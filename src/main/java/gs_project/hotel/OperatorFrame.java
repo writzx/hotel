@@ -1,13 +1,18 @@
 package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import gs_project.hotel.types.RoomClass;
 
 import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class OperatorFrame extends MainFrame {
 
@@ -16,12 +21,21 @@ public class OperatorFrame extends MainFrame {
     private JTextField gstBox;
     private JTextField initPaymentBox;
     private JTextField amountBox;
+    private JTextField roomNumBox;
     private JTextField roomselPriceBox;
     private JTextField roomSelRoomNoBox;
     private JTextField detCardNumBox;
     private JTextField detEmailBox;
     private JTextField detVisitorNameBox;
     private JTextField detPhoneNumBox;
+    private JTextField confirmRoomPackageBox;
+    private JTextField confirmCardNumBox;
+    private JTextField confirmCustNameBox;
+    private JTextField confirmCheckInBox;
+    private JTextField confirmCheckOutBox;
+    private JTextField confirmAdultsBox;
+    private JTextField confirmChildrenBox;
+    private JTextField confirmPriceBox;
 
     /**
      * Launch the application.
@@ -38,6 +52,8 @@ public class OperatorFrame extends MainFrame {
             }
         });
     }
+
+    ArrayList<RoomClass> roomClasses = new ArrayList<>();
 
     /**
      * Create the frame.
@@ -113,10 +129,114 @@ public class OperatorFrame extends MainFrame {
         bookingPanel.add(currentStepPanel);
         currentStepPanel.setLayout(null);
 
+        /// region confirmPanel
         JPanel confirmPanel = new JPanel();
         confirmPanel.setLayout(null);
         confirmPanel.setBounds(10, 11, 572, 437);
         // currentStepPanel.add(confirmPanel);
+
+        JLabel confirmCustNameLabel = new JLabel("CUSTOMER NAME:");
+        confirmCustNameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCustNameLabel.setBounds(10, 59, 232, 32);
+        confirmPanel.add(confirmCustNameLabel);
+
+        JLabel confirmCardNumLabel = new JLabel("CARD NUMBER:");
+        confirmCardNumLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCardNumLabel.setBounds(10, 102, 232, 32);
+        confirmPanel.add(confirmCardNumLabel);
+
+        JLabel confirmCheckInLabel = new JLabel("CHECK IN DATE:");
+        confirmCheckInLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCheckInLabel.setBounds(10, 201, 232, 32);
+        confirmPanel.add(confirmCheckInLabel);
+
+        JLabel confirmCheckOutLabel = new JLabel("CHECK OUT DATE:");
+        confirmCheckOutLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCheckOutLabel.setBounds(10, 244, 232, 32);
+        confirmPanel.add(confirmCheckOutLabel);
+
+        JLabel confirmRoomPackageLabel = new JLabel("PACKAGE:");
+        confirmRoomPackageLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmRoomPackageLabel.setBounds(10, 158, 232, 32);
+        confirmPanel.add(confirmRoomPackageLabel);
+
+        JLabel confirmAdultsLabel = new JLabel("TOTAL ADULTS:");
+        confirmAdultsLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmAdultsLabel.setBounds(10, 298, 232, 32);
+        confirmPanel.add(confirmAdultsLabel);
+
+        JLabel confirmChildrenLabel = new JLabel("TOTAL CHILDREN:");
+        confirmChildrenLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmChildrenLabel.setBounds(10, 341, 232, 32);
+        confirmPanel.add(confirmChildrenLabel);
+
+        JLabel confirmPriceLabel = new JLabel("TOTAL PRICE (INCL. TAX):");
+        confirmPriceLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmPriceLabel.setBounds(10, 394, 232, 32);
+        confirmPanel.add(confirmPriceLabel);
+
+        JLabel confirmHeader = new JLabel("CONFIRM YOUR BOOKING");
+        confirmHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        confirmHeader.setFont(new Font("Tahoma", Font.BOLD, 20));
+        confirmHeader.setBounds(0, 0, 562, 48);
+        confirmPanel.add(confirmHeader);
+
+        confirmRoomPackageBox = new JTextField();
+        confirmRoomPackageBox.setEnabled(false);
+        confirmRoomPackageBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmRoomPackageBox.setColumns(10);
+        confirmRoomPackageBox.setBounds(250, 158, 312, 32);
+        confirmPanel.add(confirmRoomPackageBox);
+
+        confirmCardNumBox = new JTextField();
+        confirmCardNumBox.setEnabled(false);
+        confirmCardNumBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCardNumBox.setColumns(10);
+        confirmCardNumBox.setBounds(250, 102, 312, 32);
+        confirmPanel.add(confirmCardNumBox);
+
+        confirmCustNameBox = new JTextField();
+        confirmCustNameBox.setEnabled(false);
+        confirmCustNameBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCustNameBox.setColumns(10);
+        confirmCustNameBox.setBounds(250, 59, 312, 32);
+        confirmPanel.add(confirmCustNameBox);
+
+        confirmCheckInBox = new JTextField();
+        confirmCheckInBox.setEnabled(false);
+        confirmCheckInBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCheckInBox.setColumns(10);
+        confirmCheckInBox.setBounds(250, 201, 312, 32);
+        confirmPanel.add(confirmCheckInBox);
+
+        confirmCheckOutBox = new JTextField();
+        confirmCheckOutBox.setEnabled(false);
+        confirmCheckOutBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmCheckOutBox.setColumns(10);
+        confirmCheckOutBox.setBounds(250, 244, 312, 32);
+        confirmPanel.add(confirmCheckOutBox);
+
+        confirmAdultsBox = new JTextField();
+        confirmAdultsBox.setEnabled(false);
+        confirmAdultsBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmAdultsBox.setColumns(10);
+        confirmAdultsBox.setBounds(250, 298, 312, 32);
+        confirmPanel.add(confirmAdultsBox);
+
+        confirmChildrenBox = new JTextField();
+        confirmChildrenBox.setEnabled(false);
+        confirmChildrenBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmChildrenBox.setColumns(10);
+        confirmChildrenBox.setBounds(250, 341, 312, 32);
+        confirmPanel.add(confirmChildrenBox);
+
+        confirmPriceBox = new JTextField();
+        confirmPriceBox.setEnabled(false);
+        confirmPriceBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        confirmPriceBox.setColumns(10);
+        confirmPriceBox.setBounds(250, 394, 312, 32);
+        confirmPanel.add(confirmPriceBox);
+        /// endregion
 
         /// region detailsPanel
         JPanel detailsPanel = new JPanel();
@@ -245,7 +365,8 @@ public class OperatorFrame extends MainFrame {
         roomSelTreeScroller.setBounds(315, 81, 247, 345);
         roomSelectionPanel.add(roomSelTreeScroller);
 
-        JTree roomSelRoomTypesTree = new JTree();
+        DefaultTreeModel roomModel = new DefaultTreeModel(new DefaultMutableTreeNode("ROOMS"));
+        JTree roomSelRoomTypesTree = new JTree(roomModel);
         roomSelTreeScroller.setViewportView(roomSelRoomTypesTree);
 
         roomSelRoomNoBox = new JTextField();
@@ -370,15 +491,15 @@ public class OperatorFrame extends MainFrame {
         bookInfoPanel.add(custName);
         custName.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JLabel roomNoLabel = new JLabel("ROOM NO:");
-        roomNoLabel.setBounds(0, 35, 208, 32);
-        bookInfoPanel.add(roomNoLabel);
-        roomNoLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        JLabel roomPackageNumLabel = new JLabel("PACKAGE(with ROOM#):");
+        roomPackageNumLabel.setBounds(0, 35, 208, 32);
+        bookInfoPanel.add(roomPackageNumLabel);
+        roomPackageNumLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JLabel roomNo = new JLabel("New label");
-        roomNo.setBounds(218, 35, 334, 32);
-        bookInfoPanel.add(roomNo);
-        roomNo.setFont(new Font("Tahoma", Font.BOLD, 14));
+        JLabel roomPackageAndNum = new JLabel("New label");
+        roomPackageAndNum.setBounds(218, 35, 334, 32);
+        bookInfoPanel.add(roomPackageAndNum);
+        roomPackageAndNum.setFont(new Font("Tahoma", Font.BOLD, 14));
 
         JLabel checkInLabel = new JLabel("CHECK IN DATE:");
         checkInLabel.setBounds(0, 78, 208, 32);
@@ -468,6 +589,18 @@ public class OperatorFrame extends MainFrame {
         confirmCheckInPanel.setBounds(10, 117, 572, 421);
         checkInPanel.add(confirmCheckInPanel);
 
+        JLabel roomNumLabel = new JLabel("ROOM NUMBER:");
+        roomNumLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        roomNumLabel.setBounds(10, 322, 208, 32);
+        confirmCheckInPanel.add(roomNumLabel);
+
+        roomNumBox = new JTextField();
+        roomNumBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        roomNumBox.setEditable(false);
+        roomNumBox.setColumns(10);
+        roomNumBox.setBounds(228, 322, 334, 32);
+        confirmCheckInPanel.add(roomNumBox);
+
         JButton confirmCheckInButton = new JButton("CONFIRM CHECK IN");
         confirmCheckInButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCheckInButton.setBounds(288, 378, 274, 32);
@@ -505,7 +638,6 @@ public class OperatorFrame extends MainFrame {
         addDateTimeToStatusBar();
 
         center();
-
 
         /// region events
         checkOutButton.addActionListener(e -> {
@@ -551,56 +683,39 @@ public class OperatorFrame extends MainFrame {
         roomSelectStep.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                for (Component comp : stepsPanel.getComponents()) {
-                    comp.setEnabled(false);
-                }
-                roomSelectStep.setEnabled(true);
-
-                currentStepPanel.removeAll();
-
-                currentStepPanel.add(roomSelectionPanel);
-
-                currentStepPanel.repaint();
-                currentStepPanel.revalidate();
+                setStep(roomSelectStep, stepsPanel);
+                setPanel(roomSelectionPanel, currentStepPanel);
             }
         });
 
         detailsStep.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                for (Component comp : stepsPanel.getComponents()) {
-                    comp.setEnabled(false);
-                }
-                detailsStep.setEnabled(true);
-
-                currentStepPanel.removeAll();
-
-                currentStepPanel.add(detailsPanel);
-
-                currentStepPanel.repaint();
-                currentStepPanel.revalidate();
+                setStep(detailsStep, stepsPanel);
+                setPanel(detailsPanel, currentStepPanel);
             }
         });
 
         confirmStep.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                for (Component comp : stepsPanel.getComponents()) {
-                    comp.setEnabled(false);
-                }
-                confirmStep.setEnabled(true);
-
-                currentStepPanel.removeAll();
-
-                currentStepPanel.add(confirmPanel);
-
-                currentStepPanel.repaint();
-                currentStepPanel.revalidate();
+                setStep(confirmStep, stepsPanel);
+                setPanel(confirmPanel, currentStepPanel);
             }
         });
         /// endregion
 
         /// endregion
+
+        System.out.println("Reading database file...");
+        try {
+            roomClasses = FileHandler.readFile("roomclasses");
+            System.out.println("DONE!");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        RoomEditor.loadClassesInTree(roomSelRoomTypesTree, roomClasses);
     }
 
     public static void setStep(Container step, Container panel) {
