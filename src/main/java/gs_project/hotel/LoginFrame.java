@@ -87,7 +87,9 @@ public class LoginFrame extends MainFrame {
             String passw = String.valueOf(pass.getPassword());
             if (adminOption.isSelected()) {
                 if (uid.getText().equalsIgnoreCase("ADMIN") && passw.equalsIgnoreCase("ADMIN")) {
-                    // show admin pane
+                    this.hideFrame();
+                    AdminFrame adminFrame = new AdminFrame();
+                    adminFrame.showFrame();
                 } else {
                     JOptionPane.showMessageDialog(this, "WRONG UID OR PASSWORD!", "LOGIN ERROR", JOptionPane.ERROR_MESSAGE);
                 }
@@ -98,8 +100,8 @@ public class LoginFrame extends MainFrame {
                     for (Operator o: operators) {
                         if (uid.getText().equals(o.getUid()) && passw.equals(o.getPassword())) {
                             this.hideFrame();
-                            OperatorFrame d = new OperatorFrame();
-                            d.showFrame();
+                            OperatorFrame operatorFrame = new OperatorFrame();
+                            operatorFrame.showFrame();
                             return;
                         }
                     }

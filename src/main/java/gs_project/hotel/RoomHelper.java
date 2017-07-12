@@ -9,10 +9,12 @@ import java.util.*;
 import java.util.List;
 
 public class RoomHelper {
+    public final static String FILENAME = "roomclasses";
+
     public static void readFromFile() {
-        System.out.println("Reading database file...");
+        System.out.print("Reading database file: \"" + FILENAME + "\" ...");
         try {
-            roomClasses = FileHandler.readFile("roomclasses");
+            roomClasses = FileHandler.readFile(FILENAME);
             System.out.println("DONE!");
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -22,9 +24,9 @@ public class RoomHelper {
     }
 
     public static void writeToFile() {
-        System.out.println("Writing database file...");
+        System.out.print("Writing database file: \"" + FILENAME + "\" ...");
         try {
-            FileHandler.writeFile("roomclasses", RoomHelper.roomClasses);
+            FileHandler.writeFile(FILENAME, RoomHelper.roomClasses);
             System.out.println("DONE!");
         } catch (IOException e1) {
             e1.printStackTrace();

@@ -1,5 +1,6 @@
 package gs_project.hotel;
 
+import com.github.lgooddatepicker.components.DatePicker;
 import gs_project.hotel.types.RoomClass;
 
 import javax.swing.*;
@@ -26,8 +27,13 @@ public class AdminFrame extends OperatorFrame {
     private final JPanel operatorManagePanel;
     private final JPanel editRemoveOperatorPanel;
     private final JPanel addOperatorPanel;
+    private final JPanel reportsPanel;
+    private final JPanel reportsButtonPanel;
+
+    private final JScrollPane reportsScrollPane;
 
     private final JTable operatorTable;
+    private final JTable reportsTable;
 
     private final JLabel operatorIdLabel;
     private final JLabel operatorNameLabel;
@@ -43,6 +49,8 @@ public class AdminFrame extends OperatorFrame {
     private final JLabel editOperatorEmailLabel;
     private final JLabel editOperatorPhoneLabel;
     private final JLabel editOperatorAddressLabel;
+    private final JLabel reportsHeader;
+    private final JLabel reportsDateRangeLabel;
 
     private final JTextField operatorIdBox;
     private final JTextField operatorNameBox;
@@ -69,6 +77,9 @@ public class AdminFrame extends OperatorFrame {
     private final JButton transactionReportButton;
     private final JButton visitorDatabaseButton;
     private final JButton currentBookingsButton;
+
+    private final DatePicker reportsStartDatePicker;
+    private final DatePicker reportsEndDatePicker;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -513,9 +524,50 @@ public class AdminFrame extends OperatorFrame {
 
         /// endregion
 
+        /// region reportsCommonPanel
+        reportsPanel = new JPanel();
+        reportsPanel.setBorder(new LineBorder(Color.GRAY));
+        reportsPanel.setBounds(0, 0, 592, 549);
+        reportsPanel.setLayout(null);
+
+        reportsHeader = new JLabel("REGISTERED VISITORS");
+        reportsHeader.setFont(new Font("Tahoma", Font.BOLD, 20));
+        reportsHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        reportsHeader.setBounds(12, 12, 568, 32);
+        reportsPanel.add(reportsHeader);
+
+        reportsScrollPane = new JScrollPane();
+        reportsScrollPane.setBounds(12, 56, 568, 413);
+        reportsPanel.add(reportsScrollPane);
+
+        reportsTable = new JTable();
+        reportsTable.setShowHorizontalLines(false);
+        reportsTable.setShowGrid(false);
+        reportsTable.setFont(new Font("Tahoma", Font.BOLD, 14));
+        reportsTable.setFillsViewportHeight(true);
+        reportsScrollPane.setViewportView(reportsTable);
+
+        reportsButtonPanel = new JPanel();
+        reportsButtonPanel.setBounds(12, 481, 568, 56);
+        reportsPanel.add(reportsButtonPanel);
+        reportsButtonPanel.setLayout(null);
+
+        reportsStartDatePicker = new DatePicker();
+        reportsStartDatePicker.setBounds(234, 12, 155, 32);
+        reportsButtonPanel.add(reportsStartDatePicker);
+
+        reportsEndDatePicker = new DatePicker();
+        reportsEndDatePicker.setBounds(401, 12, 155, 32);
+        reportsButtonPanel.add(reportsEndDatePicker);
+
+        reportsDateRangeLabel = new JLabel("<html><p  style=\"text-align:right\">DATE &#183;<br>RANGE &#183;</p></html>");
+        reportsDateRangeLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        reportsDateRangeLabel.setBounds(152, 12, 72, 32);
+        reportsButtonPanel.add(reportsDateRangeLabel);
+        /// endregion
+
         /// region events
         operatorMangeButton.addActionListener(e -> {
-            // todo set this
             backButton.setBounds(10, 202, 128, 32);
             ((JPanel) manageOperatorTabPanel.getSelectedComponent()).add(backButton);
 
@@ -523,19 +575,58 @@ public class AdminFrame extends OperatorFrame {
         });
 
         manageRoomsButton.addActionListener(e -> {
-            // todo set this
             backButton.setBounds(112, 500, 128, 32);
             roomEditorRightPanel.add(backButton);
 
             setPanel(roomEditorPanel, rightPanel);
-
         });
 
         manageOperatorTabPanel.addChangeListener(e -> {
             ((JPanel) manageOperatorTabPanel.getSelectedComponent()).add(backButton);
         });
 
-        manageRoomsButton.doClick();
+        visitorDatabaseButton.addActionListener(e -> {
+            backButton.setBounds(12, 12, 128, 32);
+            reportsButtonPanel.add(backButton);
+
+            reportsHeader.setText("REGISTERED VISITORS");
+            reportsStartDatePicker.setVisible(false);
+            reportsEndDatePicker.setVisible(false);
+            reportsDateRangeLabel.setVisible(false);
+
+            // todo change reportsTable
+
+            setPanel(reportsPanel, rightPanel);
+        });
+
+        transactionReportButton.addActionListener(e -> {
+            backButton.setBounds(12, 12, 128, 32);
+            reportsButtonPanel.add(backButton);
+
+            reportsHeader.setText("RECENT TRANSACTIONS");
+            reportsStartDatePicker.setVisible(true);
+            reportsEndDatePicker.setVisible(true);
+            reportsDateRangeLabel.setVisible(true);
+
+            // todo change reportsTable
+
+            setPanel(reportsPanel, rightPanel);
+        });
+
+        currentBookingsButton.addActionListener(e -> {
+
+            backButton.setBounds(12, 12, 128, 32);
+            reportsButtonPanel.add(backButton);
+
+            reportsHeader.setText("CURRENT BOOKINGS");
+            reportsStartDatePicker.setVisible(true);
+            reportsEndDatePicker.setVisible(true);
+            reportsDateRangeLabel.setVisible(true);
+
+            // todo change reportsTable
+
+            setPanel(reportsPanel, rightPanel);
+        });
         /// endregion
     }
 }
