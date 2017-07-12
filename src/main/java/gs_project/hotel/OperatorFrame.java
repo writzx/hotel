@@ -802,14 +802,27 @@ public class OperatorFrame extends MainFrame {
 
         bookNextStepButton.addActionListener(e -> {
             if (datesPeopleStep.isEnabled()) {
+                if((int)dateAdults.getValue()<=0) {
+                    JOptionPane.showMessageDialog(this,"PLEASE SELECT ADULTS","ERROR",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(roomSelectStep, stepsPanel);
                 setPanel(roomSelectionPanel, currentStepPanel);
             } else if (roomSelectStep.isEnabled()) {
+                if(roomselPriceBox.getText().isEmpty()){
+                    JOptionPane.showMessageDialog(this,"SEARCH FOR ROOMS FIRST","ERROR",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(detailsStep, stepsPanel);
                 setPanel(detailsPanel, currentStepPanel);
             } else if (detailsStep.isEnabled()) {
+                if(detCardNumBox.getText().isEmpty() && !ValidateHelper.validateCardNumber(detCardNumBox.getText())){
+                    JOptionPane.showMessageDialog(this,"PLEASE ENTER YOUR CARD NUMBER","ERROR",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 bookNextStepButton.setText("CONFIRM BOOKING");
                 setStep(confirmStep, stepsPanel);
                 setPanel(confirmPanel, currentStepPanel);

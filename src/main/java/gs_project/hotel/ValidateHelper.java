@@ -36,4 +36,7 @@ public class ValidateHelper {
         sc.close();
 
     }
+    public static boolean validateCardNumber(String cardNo) {
+        return false;
+    }
 }
