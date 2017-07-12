@@ -3,6 +3,7 @@ package gs_project.hotel;
 import com.github.lgooddatepicker.components.DatePicker;
 import gs_project.hotel.helpers.ComponentHelper;
 import gs_project.hotel.helpers.RoomHelper;
+import gs_project.hotel.types.Dish;
 import gs_project.hotel.types.RoomClass;
 
 import javax.swing.*;
@@ -80,6 +81,12 @@ public class AdminFrame extends OperatorFrame {
 
     private final DatePicker reportsStartDatePicker;
     private final DatePicker reportsEndDatePicker;
+    private final JPanel menuEditorPanel;
+    private final JPanel menuEditorLeftPanel;
+    private final JPanel menuEditorRightPanel;
+    private final JTable menuEditorStartersTable;
+    private final JTable menuEditorMainCourseTable;
+    private final JTable menuEditorDessertTable;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -390,8 +397,6 @@ public class AdminFrame extends OperatorFrame {
         roomEditorPanel.setBounds(0, 0, 592, 549);
         roomEditorPanel.setBorder(new LineBorder(Color.GRAY));
 
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
         roomEditorLeftPanel = new JPanel();
         roomEditorLeftPanel.setLayout(new BorderLayout());
 
@@ -463,8 +468,6 @@ public class AdminFrame extends OperatorFrame {
         roomEditorCancelButton.setBounds(32, 264, 128, 32);
         roomEditorCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        roomEditorRightPanel.setPreferredSize(new Dimension(264, 336));
-
         roomEditorRightPanel.add(roomEditorRangeLabel);
         roomEditorRightPanel.add(roomEditorPriceLabel);
         roomEditorRightPanel.add(roomEditorAdultLabel);
@@ -524,6 +527,159 @@ public class AdminFrame extends OperatorFrame {
 
         /// endregion
 
+        /// region menuEditorPanel
+        menuEditorPanel = new JPanel();
+        menuEditorPanel.setLayout(new BorderLayout());
+        menuEditorPanel.setBounds(0, 0, 592, 549);
+        menuEditorPanel.setBorder(new LineBorder(Color.GRAY));
+
+        menuEditorLeftPanel = new JPanel();
+        menuEditorLeftPanel.setLayout(new BorderLayout());
+
+        JTree dishesMenuTree = new JTree();
+        dishesMenuTree.setFont(new Font("Tahoma", Font.BOLD, 14));
+
+        JButton menuEditorAddMenuButton = new JButton("ADD");
+        JButton menuEditorEditMenuButton = new JButton("EDIT");
+        JButton menuEditorRemoveMenuButton = new JButton("REMOVE");
+
+        JPanel manageMenuButtonPanel = new JPanel();
+        manageMenuButtonPanel.setLayout(new BoxLayout(manageMenuButtonPanel, LINE_AXIS));
+        manageMenuButtonPanel.add(Box.createRigidArea(new Dimension(8, menuEditorAddMenuButton.getPreferredSize().height + 16)));
+        manageMenuButtonPanel.add(menuEditorAddMenuButton);
+        manageMenuButtonPanel.add(Box.createHorizontalStrut(8));
+        manageMenuButtonPanel.add(menuEditorEditMenuButton);
+        manageMenuButtonPanel.add(Box.createHorizontalStrut(8));
+        manageMenuButtonPanel.add(menuEditorRemoveMenuButton);
+        manageMenuButtonPanel.add(Box.createHorizontalStrut(8));
+
+        menuEditorLeftPanel.add(new JScrollPane(dishesMenuTree), BorderLayout.CENTER);
+        menuEditorLeftPanel.add(manageMenuButtonPanel, BorderLayout.SOUTH);
+        menuEditorLeftPanel.setBorder(new LineBorder(Color.GRAY));
+
+        menuEditorRightPanel = new JPanel();
+        menuEditorRightPanel.setLayout(null);
+
+        /// region menuEditorRightPanel
+        JPanel menuEditorRightPanel = new JPanel();
+        menuEditorRightPanel.setLayout(null);
+
+        JLabel menuEditorStartersLabel = new JLabel("<html><center>STARTER</center></html>");
+        menuEditorStartersLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        menuEditorStartersLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        menuEditorStartersLabel.setBounds(12, 12, 84, 32);
+        menuEditorRightPanel.add(menuEditorStartersLabel);
+
+        JScrollPane menuEditorStarterScroller = new JScrollPane();
+        menuEditorStarterScroller.setBounds(109, 12, 232, 121);
+        menuEditorRightPanel.add(menuEditorStarterScroller);
+
+        menuEditorStartersTable = new JTable();
+        menuEditorStartersTable.setFillsViewportHeight(true);
+        menuEditorStarterScroller.setViewportView(menuEditorStartersTable);
+
+        JButton menuEditorStartersAddButton = new JButton("ADD");
+        menuEditorStartersAddButton.setBounds(12, 56, 84, 32);
+        menuEditorRightPanel.add(menuEditorStartersAddButton);
+
+        JButton menuEditorStartersRemoveButton = new JButton("REMOVE");
+        menuEditorStartersRemoveButton.setBounds(12, 100, 84, 32);
+        menuEditorRightPanel.add(menuEditorStartersRemoveButton);
+
+        JLabel menuEditorMainCourseLabel = new JLabel("<html><center>MAIN COURSE</center></html>");
+        menuEditorMainCourseLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        menuEditorMainCourseLabel.setBounds(12, 145, 84, 32);
+        menuEditorRightPanel.add(menuEditorMainCourseLabel);
+
+        JButton menuEditorMainCourseAddButton = new JButton("ADD");
+        menuEditorMainCourseAddButton.setBounds(12, 189, 84, 32);
+        menuEditorRightPanel.add(menuEditorMainCourseAddButton);
+
+        JButton menuEditorMainCourseRemoveButton = new JButton("REMOVE");
+        menuEditorMainCourseRemoveButton.setBounds(12, 233, 84, 32);
+        menuEditorRightPanel.add(menuEditorMainCourseRemoveButton);
+
+        JScrollPane menuEditorMainCourseScroller = new JScrollPane();
+        menuEditorMainCourseScroller.setBounds(109, 145, 232, 121);
+        menuEditorRightPanel.add(menuEditorMainCourseScroller);
+
+        menuEditorMainCourseTable = new JTable();
+        menuEditorMainCourseTable.setFillsViewportHeight(true);
+        menuEditorMainCourseScroller.setViewportView(menuEditorMainCourseTable);
+
+        JLabel menuEditorDessertLabel = new JLabel("<html><center>DESSERT</center></html>");
+        menuEditorDessertLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        menuEditorDessertLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        menuEditorDessertLabel.setBounds(12, 278, 84, 32);
+        menuEditorRightPanel.add(menuEditorDessertLabel);
+
+        JButton menuEditorDessertAddButton = new JButton("ADD");
+        menuEditorDessertAddButton.setBounds(12, 322, 84, 32);
+        menuEditorRightPanel.add(menuEditorDessertAddButton);
+
+        JButton menuEditorDessertRemoveButton = new JButton("REMOVE");
+        menuEditorDessertRemoveButton.setBounds(12, 366, 84, 32);
+        menuEditorRightPanel.add(menuEditorDessertRemoveButton);
+
+        JScrollPane menuEditorDessertScroller = new JScrollPane();
+        menuEditorDessertScroller.setBounds(109, 278, 232, 121);
+        menuEditorRightPanel.add(menuEditorDessertScroller);
+
+        menuEditorDessertTable = new JTable();
+        menuEditorDessertTable.setFillsViewportHeight(true);
+        menuEditorDessertScroller.setViewportView(menuEditorDessertTable);
+
+
+        JButton menuEditorSaveButton = new JButton("SAVE");
+        menuEditorSaveButton.setBounds(213, 411, 128, 32);
+        menuEditorSaveButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        menuEditorRightPanel.add(menuEditorSaveButton);
+
+        JButton menuEditorCancelButton = new JButton("CANCEL");
+        menuEditorCancelButton.setBounds(12, 410, 128, 32);
+        menuEditorCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        menuEditorRightPanel.add(menuEditorCancelButton);
+        /// endregion
+
+        ComponentHelper.setEnabled(menuEditorRightPanel, false, backButton);
+
+        menuEditorPanel.add(menuEditorLeftPanel, BorderLayout.WEST);
+        menuEditorPanel.add(menuEditorRightPanel, BorderLayout.CENTER);
+
+        dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
+        dishesMenuTree.setEditable(false);
+        dishesMenuTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        dishesMenuTree.addTreeWillExpandListener(new TreeWillExpandListener() {
+            @Override
+            public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+            }
+
+            @Override
+            public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+                throw new ExpandVetoException(event);
+            }
+        });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // todo MenuHelper.writeToFile();
+            }
+        });
+
+        dishesMenuTree.addTreeSelectionListener(e -> {
+            try {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
+                // todo int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+                // if (ind > -1) {
+                //     Dish dish = MenuHelper.dishes.get(ind);
+                // }
+            } catch (Exception ignored) { }
+        });
+
+        // MenuHelper.loadClassesInTree(dishesMenuTree);
+        /// endregion
+
         /// region reportsCommonPanel
         reportsPanel = new JPanel();
         reportsPanel.setBorder(new LineBorder(Color.GRAY));
@@ -579,6 +735,13 @@ public class AdminFrame extends OperatorFrame {
             roomEditorRightPanel.add(backButton);
 
             setPanel(roomEditorPanel, rightPanel);
+        });
+
+        editMealsMenuButton.addActionListener(e -> {
+            backButton.setBounds(112, 500, 128, 32);
+            menuEditorRightPanel.add(backButton);
+
+            setPanel(menuEditorPanel, rightPanel);
         });
 
         manageOperatorTabPanel.addChangeListener(e -> {
