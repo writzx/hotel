@@ -1,4 +1,4 @@
-package gs_project.hotel;
+package gs_project.hotel.helpers;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
@@ -31,8 +31,7 @@ public class ComponentHelper {
                 c.setEnabled(enabled);
                 try {
                     setEnabled((JComponent) c, enabled);
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) { }
             }
         }
     }

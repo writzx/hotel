@@ -1,6 +1,8 @@
 package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import gs_project.hotel.helpers.ComponentHelper;
+import gs_project.hotel.helpers.RoomHelper;
 import gs_project.hotel.types.RoomClass;
 
 import javax.swing.*;
@@ -12,8 +14,6 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.ArrayList;
 
 import static javax.swing.BoxLayout.LINE_AXIS;
 

@@ -1,7 +1,7 @@
 package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
-import gs_project.hotel.types.RoomClass;
+import gs_project.hotel.helpers.RoomHelper;
 
 import java.awt.*;
 
@@ -11,8 +11,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class OperatorFrame extends MainFrame {
     /// region panels

@@ -1,5 +1,6 @@
-package gs_project.hotel;
+package gs_project.hotel.helpers;
 
+import gs_project.hotel.FileHandler;
 import gs_project.hotel.types.RoomClass;
 
 import javax.swing.*;
