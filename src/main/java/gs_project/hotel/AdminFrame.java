@@ -2,8 +2,10 @@ package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import gs_project.hotel.helpers.ComponentHelper;
+import gs_project.hotel.helpers.MenuHelper;
 import gs_project.hotel.helpers.RoomHelper;
 import gs_project.hotel.types.Dish;
+import gs_project.hotel.types.MenuPackage;
 import gs_project.hotel.types.RoomClass;
 
 import javax.swing.*;
@@ -501,13 +503,6 @@ public class AdminFrame extends OperatorFrame {
             }
         });
 
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                RoomHelper.writeToFile();
-            }
-        });
-
         roomPackageTree.addTreeSelectionListener(e -> {
             try {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
@@ -660,24 +655,19 @@ public class AdminFrame extends OperatorFrame {
             }
         });
 
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                // todo MenuHelper.writeToFile();
-            }
-        });
-
         dishesMenuTree.addTreeSelectionListener(e -> {
             try {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
-                // todo int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
-                // if (ind > -1) {
-                //     Dish dish = MenuHelper.dishes.get(ind);
-                // }
+                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+                if (ind > -1) {
+                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
+
+                    // todo show values
+                }
             } catch (Exception ignored) { }
         });
 
-        // MenuHelper.loadClassesInTree(dishesMenuTree);
+        MenuHelper.loadClassesInTree(dishesMenuTree);
         /// endregion
 
         /// region reportsCommonPanel

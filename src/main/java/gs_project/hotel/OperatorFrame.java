@@ -1,6 +1,7 @@
 package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import gs_project.hotel.helpers.MenuHelper;
 import gs_project.hotel.helpers.RoomHelper;
 
 import java.awt.*;
@@ -11,6 +12,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class OperatorFrame extends MainFrame {
     /// region panels
@@ -154,6 +157,7 @@ public class OperatorFrame extends MainFrame {
     public OperatorFrame(String title) {
         super(title);
         RoomHelper.readFromFile();
+        MenuHelper.readFromFile();
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(800, 600);
@@ -915,6 +919,14 @@ public class OperatorFrame extends MainFrame {
         /// endregion
 
         /// endregion
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                RoomHelper.writeToFile();
+                MenuHelper.writeToFile();
+            }
+        });
 
         RoomHelper.loadClassesInTree(roomSelRoomTypesTree);
     }
