@@ -15,6 +15,7 @@ public class VisitorHelper {
             visitors = FileHandler.readFile(FILENAME);
             System.out.println("DONE!");
         } catch (IOException | ClassNotFoundException e) {
+            System.out.println();
             e.printStackTrace();
         }
 
@@ -27,6 +28,7 @@ public class VisitorHelper {
             FileHandler.writeFile(FILENAME, visitors);
             System.out.println("DONE!");
         } catch (IOException e1) {
+            System.out.println();
             e1.printStackTrace();
         }
     }
