@@ -10,7 +10,7 @@ import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
     // ContentPane // should not be changed
-    private static JPanel conPane = new JPanel(new BorderLayout());
+    private JPanel conPane = new JPanel(new BorderLayout());
 
     // Main Pane // should be changed before calling **setVisible**
     protected Container mainConPanel;
