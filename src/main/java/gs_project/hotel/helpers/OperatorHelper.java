@@ -3,8 +3,12 @@ package gs_project.hotel.helpers;
 import gs_project.hotel.FileHandler;
 import gs_project.hotel.types.Operator;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static gs_project.hotel.types.Operator.toObjectsArray;
 
 public class OperatorHelper {
     public final static String FILENAME = "operators";
@@ -34,4 +38,9 @@ public class OperatorHelper {
     }
 
     public static ArrayList<Operator> operators = new ArrayList<>();
+
+    public static void updateTable(JTable table) {
+        Object[][] data = toObjectsArray(operators);
+        ((DefaultTableModel)table.getModel()).setDataVector(data, Operator.getColumns());
+    }
 }

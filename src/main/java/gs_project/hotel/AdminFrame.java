@@ -1,10 +1,7 @@
 package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
-import gs_project.hotel.helpers.ComponentHelper;
-import gs_project.hotel.helpers.MenuHelper;
-import gs_project.hotel.helpers.RoomHelper;
-import gs_project.hotel.helpers.VisitorHelper;
+import gs_project.hotel.helpers.*;
 import gs_project.hotel.types.Dish;
 import gs_project.hotel.types.MenuPackage;
 import gs_project.hotel.types.Operator;
@@ -22,8 +19,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static javax.swing.BoxLayout.LINE_AXIS;
 
 public class AdminFrame extends OperatorFrame {
 
@@ -94,8 +89,6 @@ public class AdminFrame extends OperatorFrame {
     private final JTable menuEditorStartersTable;
     private final JTable menuEditorMainCourseTable;
     private final JTable menuEditorDessertTable;
-
-    private ArrayList<Operator> operators = new ArrayList<>();
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -419,7 +412,7 @@ public class AdminFrame extends OperatorFrame {
         JButton removePackageButton = new JButton("REMOVE");
 
         JPanel managePackageButtonPanel = new JPanel();
-        managePackageButtonPanel.setLayout(new BoxLayout(managePackageButtonPanel, LINE_AXIS));
+        managePackageButtonPanel.setLayout(new BoxLayout(managePackageButtonPanel, BoxLayout.LINE_AXIS));
         managePackageButtonPanel.add(Box.createRigidArea(new Dimension(8, addPackageButton.getPreferredSize().height + 16)));
         managePackageButtonPanel.add(addPackageButton);
         managePackageButtonPanel.add(Box.createHorizontalStrut(8));
@@ -498,7 +491,6 @@ public class AdminFrame extends OperatorFrame {
         roomEditorPanel.add(roomEditorLeftPanel, BorderLayout.WEST);
         roomEditorPanel.add(roomEditorRightPanel, BorderLayout.CENTER);
 
-        roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
         roomPackageTree.setEditable(false);
         roomPackageTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         roomPackageTree.addTreeWillExpandListener(new TreeWillExpandListener() {
@@ -523,10 +515,90 @@ public class AdminFrame extends OperatorFrame {
                     roomEditorAdultSpinner.setValue(selclass.getAdults());
                     roomEditorChildSpinner.setValue(selclass.getChildren());
                     roomEditorPriceSpinner.setValue(selclass.getPrice());
+                    editPackageButton.setEnabled(true);
+                } else {
+                    roomEditorStartSpinner.setValue(((SpinnerNumberModel) roomEditorStartSpinner.getModel()).getMinimum());
+                    roomEditorEndSpinner.setValue(((SpinnerNumberModel) roomEditorEndSpinner.getModel()).getMinimum());
+                    roomEditorAdultSpinner.setValue(0);
+                    roomEditorChildSpinner.setValue(0);
+                    roomEditorPriceSpinner.setValue(((SpinnerNumberModel) roomEditorPriceSpinner.getModel()).getMinimum());
+                    editPackageButton.setEnabled(node != null);
+                    removePackageButton.setEnabled(node != null);
+                }
+                if (node.isLeaf()) {
+                    addPackageButton.setEnabled(false);
+                } else {
+                    addPackageButton.setEnabled(true);
                 }
             } catch (Exception ignored) { }
         });
 
+        addPackageButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+            TypePopUp popUp = TypePopUp.show(addPackageButton, "NEW ROOM CLASS", "NEW ROOM TYPE");
+            popUp.getFirstItem().addActionListener(e1 -> {
+                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Class:", "Add Room Class", JOptionPane.QUESTION_MESSAGE);
+                if (new_t == null || new_t.isEmpty()) return;
+
+                DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
+                node.add(new_node);
+
+                ComponentHelper.expandTree(roomPackageTree);
+
+                roomPackageTree.setSelectionPath(new TreePath(new_node.getPath()));
+            });
+            popUp.getSecondItem().addActionListener(e1 -> {
+                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Type:", "Add Room Type", JOptionPane.QUESTION_MESSAGE);
+                if (new_t == null || new_t.isEmpty()) return;
+
+                DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
+                node.add(new_node);
+
+                ComponentHelper.expandTree(roomPackageTree);
+
+                roomPackageTree.setSelectionPath(new TreePath(new_node.getPath()));
+
+                ComponentHelper.setEnabled(roomEditorRightPanel, true);
+                ComponentHelper.setEnabled(roomEditorLeftPanel, false);
+            });
+        });
+
+        editPackageButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+            TypePopUp popUp = TypePopUp.show(addPackageButton, "RENAME", "EDIT VALUES");
+
+            if (node != null && !node.isLeaf()) popUp.getSecondItem().setEnabled(false);
+
+            popUp.getFirstItem().addActionListener(e1 -> {
+                // todo RENAME and update roomClasses
+            });
+            popUp.getSecondItem().addActionListener(e1 -> {
+                ComponentHelper.setEnabled(roomEditorRightPanel, true);
+                ComponentHelper.setEnabled(roomEditorLeftPanel, false);
+            });
+        });
+
+        removePackageButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+            if (node == null) return;
+            if (node.isLeaf()) {
+                for (RoomClass rc : RoomHelper.roomClasses) {
+                    if (rc.getType().equals(RoomHelper.pathToType(new TreePath(node.getPath())))) {
+                        RoomHelper.roomClasses.remove(rc);
+                    }
+                }
+            } else {
+                for (RoomClass rc : RoomHelper.roomClasses) {
+                    if (rc.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":")) {
+                        RoomHelper.roomClasses.remove(rc);
+                    }
+                }
+            }
+            roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("ROOM")));
+            RoomHelper.loadClassesInTree(roomPackageTree);
+        });
+
+        roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
         RoomHelper.loadClassesInTree(roomPackageTree);
 
         /// endregion
@@ -548,7 +620,7 @@ public class AdminFrame extends OperatorFrame {
         JButton menuEditorRemoveMenuButton = new JButton("REMOVE");
 
         JPanel manageMenuButtonPanel = new JPanel();
-        manageMenuButtonPanel.setLayout(new BoxLayout(manageMenuButtonPanel, LINE_AXIS));
+        manageMenuButtonPanel.setLayout(new BoxLayout(manageMenuButtonPanel, BoxLayout.LINE_AXIS));
         manageMenuButtonPanel.add(Box.createRigidArea(new Dimension(8, menuEditorAddMenuButton.getPreferredSize().height + 16)));
         manageMenuButtonPanel.add(menuEditorAddMenuButton);
         manageMenuButtonPanel.add(Box.createHorizontalStrut(8));
@@ -749,7 +821,7 @@ public class AdminFrame extends OperatorFrame {
             }
             else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
                 Operator nOp = new Operator(operatorIdBox.getText(),new String(operatorPasswordBox.getPassword()), operatorNameBox.getText(), operatorEmailBox.getText(),operatorPhoneBox.getText(),operatorAddressBox.getText());
-                operators.add(nOp);
+                OperatorHelper.operators.add(nOp);
                 operatorIdBox.setText("");
                 operatorPasswordBox.setText("");
                 operatorNameBox.setText("");
@@ -757,10 +829,9 @@ public class AdminFrame extends OperatorFrame {
                 operatorEmailBox.setText("");
                 operatorAddressBox.setText("");
                 operatorPhoneBox.setText("");
-                updateTable();
+                OperatorHelper.updateTable(operatorTable);
 
                 JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
-
             }
             else{
                 JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
@@ -768,7 +839,7 @@ public class AdminFrame extends OperatorFrame {
             }
         });
         operatorUpdateButton.addActionListener(e ->{
-             if(operatorPasswordBox.getPassword().length==0){
+             if(operatorPasswordBox.getPassword().length == 0){
                 JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -800,7 +871,7 @@ public class AdminFrame extends OperatorFrame {
         operatorMangeButton.addActionListener(e -> {
             backButton.setBounds(10, 202, 128, 32);
             ((JPanel) manageOperatorTabPanel.getSelectedComponent()).add(backButton);
-            updateTable();
+            OperatorHelper.updateTable(operatorTable);
             setPanel(operatorManagePanel, rightPanel);
         });
 
@@ -865,46 +936,15 @@ public class AdminFrame extends OperatorFrame {
             setPanel(reportsPanel, rightPanel);
         });
         /// endregion
-        System.out.println("Reading database file...");
-        try {
-            operators = FileHandler.readFile("operators");
-            System.out.println("DONE!");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 RoomHelper.writeToFile();
                 MenuHelper.writeToFile();
                 VisitorHelper.writeToFile();
-                try {
-                    FileHandler.writeFile("operators", operators);
-                    System.out.println("DONE!");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                OperatorHelper.writeToFile();
             }
         });
-    }
-    void updateTable() {
-        Object[][] data = toObjectsArray(operators);
-        ((DefaultTableModel)operatorTable.getModel()).setDataVector(data, getColumns());
-    }
-    public static Object[] toObjects(Operator operator) {
-        return new Object[] {operator.getUid(), operator.getName(), operator.getEmail(),new String(operator.getPassword()),operator.getPhoneNumber(), operator.getAddress() };
-    }
-
-    static Object[] getColumns() {
-        return new Object[] { "USER ID", "NAME","EMAIL","PASSWORD","PHONE NUMBER","ADDRESS" };
-    }
-
-    public static Object[][] toObjectsArray(java.util.List<Operator> operators) {
-        Object[][] objects = new Object[operators.size()][];
-        int i = 0;
-        for (Operator s:operators) {
-            objects[i++] = toObjects(s);
-        }
-        return objects;
     }
 }

@@ -1,10 +1,7 @@
 package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
-import gs_project.hotel.helpers.BookingHelper;
-import gs_project.hotel.helpers.MenuHelper;
-import gs_project.hotel.helpers.RoomHelper;
-import gs_project.hotel.helpers.VisitorHelper;
+import gs_project.hotel.helpers.*;
 import gs_project.hotel.types.MenuPackage;
 
 import java.awt.*;
@@ -169,6 +166,7 @@ public class OperatorFrame extends MainFrame {
         MenuHelper.readFromFile();
         BookingHelper.readFromFile();
         VisitorHelper.readFromFile();
+        OperatorHelper.readFromFile();
 
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -1037,6 +1035,7 @@ public class OperatorFrame extends MainFrame {
         bookCancelButton.addActionListener(e -> setPanel(null, rightPanel)); // clear right panel
 
         cancelBookingButton.addActionListener(e -> {
+            confirmCheckInButton.setText("CONFIRM CANCEL");
             checkOutHeader.setText("CANCEL BOOKING");
             cancelBookingPanel.add(checkBookIdPanel);
             confirmCancelPanel.add(bookInfoPanel);
