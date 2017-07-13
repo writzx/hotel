@@ -175,7 +175,7 @@ public class RoughOperatorInput extends JFrame{
                     }
                 }
                 JOptionPane.showMessageDialog(this, "NOT FOUND");
-            } else {
+            }/* else {
                 Operator nOp = new Operator(t3.getText(), t4.getText(), t1.getText(), textField_1.getText());
                 operators.add(nOp);
                 t3.setText("");
@@ -185,7 +185,7 @@ public class RoughOperatorInput extends JFrame{
 
                 JOptionPane.showMessageDialog(this, "ADDED");
                 updateTable();
-            }
+            }*/
         });
         t3.addFocusListener(new FocusAdapter() {
             @Override

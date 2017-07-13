@@ -7,6 +7,7 @@ import gs_project.hotel.helpers.RoomHelper;
 import gs_project.hotel.helpers.VisitorHelper;
 import gs_project.hotel.types.Dish;
 import gs_project.hotel.types.MenuPackage;
+import gs_project.hotel.types.Operator;
 import gs_project.hotel.types.RoomClass;
 
 import javax.swing.*;
@@ -18,6 +19,7 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -92,6 +94,8 @@ public class AdminFrame extends OperatorFrame {
     private final JTable menuEditorStartersTable;
     private final JTable menuEditorMainCourseTable;
     private final JTable menuEditorDessertTable;
+
+    private ArrayList<Operator> operators = new ArrayList<>();
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -169,12 +173,14 @@ public class AdminFrame extends OperatorFrame {
         operatorTable = new JTable();
         operatorTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         operatorTable.getTableHeader().setReorderingAllowed(false);
-        operatorTable.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "USER ID", "NAME", "EMAIL", "CONTACT NO.", "ADDRESS" }) {
-            Class[] columnTypes = new Class[] { String.class, String.class, String.class, String.class, String.class };
+        operatorTable.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "USER ID", "NAME", "EMAIL","PASSWORD", "CONTACT NO.", "ADDRESS" }) {
+            Class[] columnTypes = new Class[] { String.class, String.class, String.class,String.class, String.class, String.class };
+
 
             public Class getColumnClass(int columnIndex) {
                 return columnTypes[columnIndex];
             }
+
         });
         operatorTable.getColumnModel().getColumn(0).setResizable(false);
         operatorTable.getColumnModel().getColumn(0).setPreferredWidth(96);
@@ -742,8 +748,19 @@ public class AdminFrame extends OperatorFrame {
                 return;
             }
             else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
+                Operator nOp = new Operator(operatorIdBox.getText(),new String(operatorPasswordBox.getPassword()), operatorNameBox.getText(), operatorEmailBox.getText(),operatorPhoneBox.getText(),operatorAddressBox.getText());
+                operators.add(nOp);
+                operatorIdBox.setText("");
+                operatorPasswordBox.setText("");
+                operatorNameBox.setText("");
+                operatorConfirmPasswordBox.setText("");
+                operatorEmailBox.setText("");
+                operatorAddressBox.setText("");
+                operatorPhoneBox.setText("");
+                updateTable();
+
                 JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
-                //WRITE TO ARRAYLIST
+
             }
             else{
                 JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
@@ -751,15 +768,7 @@ public class AdminFrame extends OperatorFrame {
             }
         });
         operatorUpdateButton.addActionListener(e ->{
-            if(operatorIdBox.getText().isEmpty()){
-                JOptionPane.showMessageDialog(this,"ID CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if(operatorNameBox.getText().isEmpty()){
-                JOptionPane.showMessageDialog(this,"PLEASE ENTER OPERATOR NAME","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if(operatorPasswordBox.getPassword().length==0){
+             if(operatorPasswordBox.getPassword().length==0){
                 JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -776,8 +785,8 @@ public class AdminFrame extends OperatorFrame {
                 return;
             }
             else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
+
                 JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
-                //WRITE TO ARRAYLIST
             }
             else{
                 JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
@@ -785,44 +794,13 @@ public class AdminFrame extends OperatorFrame {
             }
         });
         operatorDeleteButton.addActionListener(e ->{
-            if(operatorIdBox.getText().isEmpty()){
-                JOptionPane.showMessageDialog(this,"ID CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if(operatorNameBox.getText().isEmpty()){
-                JOptionPane.showMessageDialog(this,"PLEASE ENTER OPERATOR NAME","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if(operatorPasswordBox.getPassword().length==0){
-                JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if(operatorConfirmPasswordBox.getPassword().length==0){
-                JOptionPane.showMessageDialog(this,"CONFIRM PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if(!ValidateHelper.validatePhone("+91"+operatorPhoneBox.getText())){
-                JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if(!ValidateHelper.validateEmail(operatorEmailBox.getText())){
-                JOptionPane.showMessageDialog(this,"EMAIL ID NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
-                JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
-                //WRITE TO ARRAYLIST
-            }
-            else{
-                JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+
         });
 
         operatorMangeButton.addActionListener(e -> {
             backButton.setBounds(10, 202, 128, 32);
             ((JPanel) manageOperatorTabPanel.getSelectedComponent()).add(backButton);
-
+            updateTable();
             setPanel(operatorManagePanel, rightPanel);
         });
 
@@ -887,14 +865,46 @@ public class AdminFrame extends OperatorFrame {
             setPanel(reportsPanel, rightPanel);
         });
         /// endregion
-
+        System.out.println("Reading database file...");
+        try {
+            operators = FileHandler.readFile("operators");
+            System.out.println("DONE!");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 RoomHelper.writeToFile();
                 MenuHelper.writeToFile();
                 VisitorHelper.writeToFile();
+                try {
+                    FileHandler.writeFile("operators", operators);
+                    System.out.println("DONE!");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
+    }
+    void updateTable() {
+        Object[][] data = toObjectsArray(operators);
+        ((DefaultTableModel)operatorTable.getModel()).setDataVector(data, getColumns());
+    }
+    public static Object[] toObjects(Operator operator) {
+        return new Object[] {operator.getUid(), operator.getName(), operator.getEmail(),new String(operator.getPassword()),operator.getPhoneNumber(), operator.getAddress() };
+    }
+
+    static Object[] getColumns() {
+        return new Object[] { "USER ID", "NAME","EMAIL","PASSWORD","PHONE NUMBER","ADDRESS" };
+    }
+
+    public static Object[][] toObjectsArray(java.util.List<Operator> operators) {
+        Object[][] objects = new Object[operators.size()][];
+        int i = 0;
+        for (Operator s:operators) {
+            objects[i++] = toObjects(s);
+        }
+        return objects;
     }
 }

@@ -9,13 +9,39 @@ public class Operator implements Serializable {
     private String password;
     private String name;
     private String email;
+    private String phoneNumber;
+    private String address;
 
-    public Operator(String uid, String password, String name, String email) {
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+
+
+    public Operator(String uid, String password, String name, String email, String phoneNumber, String address) {
         this.uid = uid;
         this.password = password;
         this.name = name;
         this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
     }
+
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
 
     public String getUid() {
         return uid;
