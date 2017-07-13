@@ -1,8 +1,10 @@
 package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import gs_project.hotel.helpers.BookingHelper;
 import gs_project.hotel.helpers.MenuHelper;
 import gs_project.hotel.helpers.RoomHelper;
+import gs_project.hotel.helpers.VisitorHelper;
 
 import java.awt.*;
 
@@ -14,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.print.Book;
 
 public class OperatorFrame extends MainFrame {
     /// region panels
@@ -156,8 +159,12 @@ public class OperatorFrame extends MainFrame {
      */
     public OperatorFrame(String title) {
         super(title);
+
         RoomHelper.readFromFile();
         MenuHelper.readFromFile();
+        BookingHelper.readFromFile();
+        VisitorHelper.readFromFile();
+
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(800, 600);
@@ -923,8 +930,7 @@ public class OperatorFrame extends MainFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                RoomHelper.writeToFile();
-                MenuHelper.writeToFile();
+                BookingHelper.writeToFile();
             }
         });
 

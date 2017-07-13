@@ -4,6 +4,7 @@ import com.github.lgooddatepicker.components.DatePicker;
 import gs_project.hotel.helpers.ComponentHelper;
 import gs_project.hotel.helpers.MenuHelper;
 import gs_project.hotel.helpers.RoomHelper;
+import gs_project.hotel.helpers.VisitorHelper;
 import gs_project.hotel.types.Dish;
 import gs_project.hotel.types.MenuPackage;
 import gs_project.hotel.types.RoomClass;
@@ -781,5 +782,14 @@ public class AdminFrame extends OperatorFrame {
             setPanel(reportsPanel, rightPanel);
         });
         /// endregion
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                RoomHelper.writeToFile();
+                MenuHelper.writeToFile();
+                VisitorHelper.writeToFile();
+            }
+        });
     }
 }
