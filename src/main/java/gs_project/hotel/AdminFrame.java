@@ -18,6 +18,8 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static javax.swing.BoxLayout.LINE_AXIS;
 
@@ -714,6 +716,109 @@ public class AdminFrame extends OperatorFrame {
         /// endregion
 
         /// region events
+        operatorAddButton.addActionListener(e ->{
+            if(operatorIdBox.getText().isEmpty()){
+                JOptionPane.showMessageDialog(this,"ID CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorNameBox.getText().isEmpty()){
+                JOptionPane.showMessageDialog(this,"PLEASE ENTER OPERATOR NAME","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorPasswordBox.getPassword().length==0){
+                JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorConfirmPasswordBox.getPassword().length==0){
+                JOptionPane.showMessageDialog(this,"CONFIRM PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(!ValidateHelper.validatePhone("+91"+operatorPhoneBox.getText())){
+                JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(!ValidateHelper.validateEmail(operatorEmailBox.getText())){
+                JOptionPane.showMessageDialog(this,"EMAIL ID NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
+                JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
+                //WRITE TO ARRAYLIST
+            }
+            else{
+                JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        });
+        operatorUpdateButton.addActionListener(e ->{
+            if(operatorIdBox.getText().isEmpty()){
+                JOptionPane.showMessageDialog(this,"ID CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorNameBox.getText().isEmpty()){
+                JOptionPane.showMessageDialog(this,"PLEASE ENTER OPERATOR NAME","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorPasswordBox.getPassword().length==0){
+                JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorConfirmPasswordBox.getPassword().length==0){
+                JOptionPane.showMessageDialog(this,"CONFIRM PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(!ValidateHelper.validatePhone("+91"+operatorPhoneBox.getText())){
+                JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(!ValidateHelper.validateEmail(operatorEmailBox.getText())){
+                JOptionPane.showMessageDialog(this,"EMAIL ID NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
+                JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
+                //WRITE TO ARRAYLIST
+            }
+            else{
+                JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        });
+        operatorDeleteButton.addActionListener(e ->{
+            if(operatorIdBox.getText().isEmpty()){
+                JOptionPane.showMessageDialog(this,"ID CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorNameBox.getText().isEmpty()){
+                JOptionPane.showMessageDialog(this,"PLEASE ENTER OPERATOR NAME","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorPasswordBox.getPassword().length==0){
+                JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(operatorConfirmPasswordBox.getPassword().length==0){
+                JOptionPane.showMessageDialog(this,"CONFIRM PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(!ValidateHelper.validatePhone("+91"+operatorPhoneBox.getText())){
+                JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(!ValidateHelper.validateEmail(operatorEmailBox.getText())){
+                JOptionPane.showMessageDialog(this,"EMAIL ID NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
+                JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
+                //WRITE TO ARRAYLIST
+            }
+            else{
+                JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        });
+
         operatorMangeButton.addActionListener(e -> {
             backButton.setBounds(10, 202, 128, 32);
             ((JPanel) manageOperatorTabPanel.getSelectedComponent()).add(backButton);

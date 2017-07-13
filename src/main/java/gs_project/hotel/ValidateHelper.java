@@ -19,16 +19,6 @@ public class ValidateHelper {
         return matcher.find();
     }
 
-    public static void main(String... args){
-        Scanner sc=new Scanner(System.in);
-        //System.out.println("Enter your Email:");
-        //if(validateEmail(sc.nextLine())) System.out.println("email accepted");
-        //else System.out.println("email not accepted");
-        if(validatePhone(sc.nextLine())) System.out.println("phone no accepted");
-        else System.out.println("phone number not accepted");
-        sc.close();
-
-    }
     public static boolean validateCardNumber(String cardNo) {
         return false;
     }

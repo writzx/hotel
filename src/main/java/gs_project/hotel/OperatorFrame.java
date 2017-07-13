@@ -769,6 +769,8 @@ public class OperatorFrame extends MainFrame {
         confirmCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCancelButton.setBounds(288, 378, 274, 32);
         confirmCancelPanel.add(confirmCancelButton);
+
+       // checkButton
         /// endregion
 
         /// region events
@@ -834,12 +836,26 @@ public class OperatorFrame extends MainFrame {
                     JOptionPane.showMessageDialog(this,"PLEASE ENTER YOUR CARD NUMBER","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
+                else if(detVisitorNameBox.getText().isEmpty())
+                {
+                    JOptionPane.showMessageDialog(this,"PLEASE ENTER YOUR NAME FIRST","ERROR",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                else if(!ValidateHelper.validatePhone("+91"+detPhoneNumBox.getText())){
+                    JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                else if(!ValidateHelper.validateEmail(detEmailBox.getText()))
+                {
+                    JOptionPane.showMessageDialog(this,"EMAIL NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 bookNextStepButton.setText("CONFIRM BOOKING");
                 setStep(confirmStep, stepsPanel);
                 setPanel(confirmPanel, currentStepPanel);
             } else if (confirmStep.isEnabled()) {
                 // todo confirmBooking
-                JOptionPane.showMessageDialog(OperatorFrame.this, "Booking Confirmed", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING CONFIRMED", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(datesPeopleStep, stepsPanel);
