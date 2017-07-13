@@ -42,17 +42,21 @@ public class LoginFrame extends MainFrame {
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
+        ButtonGroup group = new ButtonGroup();
+
         JRadioButton adminOption = new JRadioButton("ADMIN");
         adminOption.setForeground(Color.DARK_GRAY);
         adminOption.setFont(new Font("Dialog", Font.BOLD, 24));
         adminOption.setBounds(58, 50, 111, 32);
         contentPane.add(adminOption);
+        group.add(adminOption);
 
         JRadioButton operatorOption = new JRadioButton("OPERATOR");
         operatorOption.setForeground(Color.DARK_GRAY);
         operatorOption.setFont(new Font("Dialog", Font.BOLD, 24));
         operatorOption.setBounds(171, 50, 159, 32);
         contentPane.add(operatorOption);
+        group.add(operatorOption);
 
         JLabel heading = new JLabel("LOGIN AREA");
         heading.setForeground(Color.ORANGE);

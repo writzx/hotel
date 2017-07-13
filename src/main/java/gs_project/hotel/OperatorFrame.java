@@ -5,13 +5,15 @@ import gs_project.hotel.helpers.BookingHelper;
 import gs_project.hotel.helpers.MenuHelper;
 import gs_project.hotel.helpers.RoomHelper;
 import gs_project.hotel.helpers.VisitorHelper;
+import gs_project.hotel.types.MenuPackage;
 
 import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -133,6 +135,9 @@ public class OperatorFrame extends MainFrame {
     protected final JSpinner dateChildren;
     protected final DatePicker dateCheckInPicker;
     protected final DatePicker dateCheckoutPicker;
+    protected final JTable orderMenuOrderTable;
+    protected final JTextField orderMenuTotalBox;
+    protected final ButtonGroup buttonGroup = new ButtonGroup();
     /// endregion
 
     /**
@@ -209,6 +214,152 @@ public class OperatorFrame extends MainFrame {
         addDateTimeToStatusBar();
 
         center();
+
+        /// region menuOrderPanel
+        JPanel menuOrderPanel = new JPanel();
+        menuOrderPanel.setBorder(new LineBorder(Color.GRAY));
+        menuOrderPanel.setBounds(0, 0, 592, 549);
+        menuOrderPanel.setLayout(null);
+
+        JScrollPane orderMenuPackageScroller = new JScrollPane();
+        orderMenuPackageScroller.setBounds(12, 72, 183, 421);
+        menuOrderPanel.add(orderMenuPackageScroller);
+
+        JTree orderMenuPackageTree = new JTree();
+        orderMenuPackageScroller.setViewportView(orderMenuPackageTree);
+
+        orderMenuPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
+        orderMenuPackageTree.setEditable(false);
+        orderMenuPackageTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        orderMenuPackageTree.addTreeWillExpandListener(new TreeWillExpandListener() {
+            @Override
+            public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+            }
+
+            @Override
+            public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+                throw new ExpandVetoException(event);
+            }
+        });
+
+        orderMenuPackageTree.addTreeSelectionListener(e -> {
+            try {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) orderMenuPackageTree.getSelectionPath().getLastPathComponent();
+                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+                if (ind > -1) {
+                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
+
+                    // todo show values
+                }
+            } catch (Exception ignored) { }
+        });
+
+        JScrollPane orderMenuOrderScroller = new JScrollPane();
+        orderMenuOrderScroller.setBounds(207, 204, 373, 289);
+        menuOrderPanel.add(orderMenuOrderScroller);
+
+        orderMenuOrderTable = new JTable();
+        orderMenuOrderScroller.setViewportView(orderMenuOrderTable);
+        orderMenuOrderTable.setFillsViewportHeight(true);
+
+        JLabel orderMenuHeader = new JLabel("MEALS ORDER - MENU");
+        orderMenuHeader.setFont(new Font("Tahoma", Font.BOLD, 20));
+        orderMenuHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        orderMenuHeader.setBounds(12, 12, 568, 48);
+        menuOrderPanel.add(orderMenuHeader);
+
+        JButton orderMenuConfirmButton = new JButton("CONFIRM ORDER");
+        orderMenuConfirmButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuConfirmButton.setBounds(423, 505, 157, 32);
+        menuOrderPanel.add(orderMenuConfirmButton);
+
+        JButton orderMenuOrderClearButton = new JButton("CLEAR");
+        orderMenuOrderClearButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuOrderClearButton.setBounds(376, 160, 96, 32);
+        menuOrderPanel.add(orderMenuOrderClearButton);
+
+        JButton orderMenuPackageRemoveButton = new JButton("REMOVE");
+        orderMenuPackageRemoveButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuPackageRemoveButton.setBounds(484, 160, 96, 32);
+        menuOrderPanel.add(orderMenuPackageRemoveButton);
+
+        JLabel orderMenuTotalLabel = new JLabel("TOTAL:");
+        orderMenuTotalLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTotalLabel.setBounds(207, 505, 52, 32);
+        menuOrderPanel.add(orderMenuTotalLabel);
+
+        orderMenuTotalBox = new JTextField();
+        orderMenuTotalBox.setEditable(false);
+        orderMenuTotalBox.setBounds(277, 505, 134, 32);
+        menuOrderPanel.add(orderMenuTotalBox);
+        orderMenuTotalBox.setColumns(10);
+
+        JButton orderMenuAddButton = new JButton("ADD TO ORDER");
+        orderMenuAddButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuAddButton.setBounds(376, 116, 204, 32);
+        menuOrderPanel.add(orderMenuAddButton);
+
+        JSpinner orderMenuQuantityBox = new JSpinner();
+        orderMenuQuantityBox.setBounds(475, 72, 105, 32);
+        menuOrderPanel.add(orderMenuQuantityBox);
+
+        JRadioButton orderMenuTypeHalfOption = new JRadioButton("Half");
+        buttonGroup.add(orderMenuTypeHalfOption);
+        orderMenuTypeHalfOption.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTypeHalfOption.setBounds(203, 112, 73, 24);
+        menuOrderPanel.add(orderMenuTypeHalfOption);
+
+        JRadioButton orderMenuTypeSingleOption = new JRadioButton("Single");
+        buttonGroup.add(orderMenuTypeSingleOption);
+        orderMenuTypeSingleOption.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTypeSingleOption.setBounds(203, 140, 73, 24);
+        menuOrderPanel.add(orderMenuTypeSingleOption);
+
+        JRadioButton orderMenuTypeDoubleOption = new JRadioButton("Double");
+        buttonGroup.add(orderMenuTypeDoubleOption);
+        orderMenuTypeDoubleOption.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTypeDoubleOption.setBounds(203, 168, 73, 24);
+        menuOrderPanel.add(orderMenuTypeDoubleOption);
+
+        JLabel orderMenuTypeLabel = new JLabel("<html><center>PLATE TYPE</center></html>");
+        orderMenuTypeLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTypeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        orderMenuTypeLabel.setBounds(207, 74, 73, 30);
+        menuOrderPanel.add(orderMenuTypeLabel);
+
+        JLabel orderMenuTypePricesLabel = new JLabel("PRICES");
+        orderMenuTypePricesLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        orderMenuTypePricesLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTypePricesLabel.setBounds(285, 74, 73, 30);
+        menuOrderPanel.add(orderMenuTypePricesLabel);
+
+        JTextField orderMenuTypeHalfPriceBox = new JTextField("");
+        orderMenuTypeHalfPriceBox.setEditable(false);
+        orderMenuTypeHalfPriceBox.setHorizontalAlignment(SwingConstants.CENTER);
+        orderMenuTypeHalfPriceBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTypeHalfPriceBox.setBounds(285, 112, 73, 24);
+        menuOrderPanel.add(orderMenuTypeHalfPriceBox);
+
+        JTextField orderMenuTypeDoublePriceBox = new JTextField("");
+        orderMenuTypeDoublePriceBox.setEditable(false);
+        orderMenuTypeDoublePriceBox.setHorizontalAlignment(SwingConstants.CENTER);
+        orderMenuTypeDoublePriceBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTypeDoublePriceBox.setBounds(285, 168, 73, 24);
+        menuOrderPanel.add(orderMenuTypeDoublePriceBox);
+
+        JTextField orderMenuTypeSinglePriceBox = new JTextField("");
+        orderMenuTypeSinglePriceBox.setEditable(false);
+        orderMenuTypeSinglePriceBox.setHorizontalAlignment(SwingConstants.CENTER);
+        orderMenuTypeSinglePriceBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTypeSinglePriceBox.setBounds(285, 140, 73, 24);
+        menuOrderPanel.add(orderMenuTypeSinglePriceBox);
+
+        JLabel orderMenuQuantityLabel = new JLabel("QUANTITY:");
+        orderMenuQuantityLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        orderMenuQuantityLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuQuantityLabel.setBounds(376, 74, 81, 30);
+        menuOrderPanel.add(orderMenuQuantityLabel);
+        /// endregion
 
         /// region bookingPanel
         bookingPanel = new JPanel();
@@ -897,6 +1048,13 @@ public class OperatorFrame extends MainFrame {
             confirmCancelPanel.setVisible(true);
 
             setPanel(cancelBookingPanel, rightPanel);
+        });
+
+        foodOrderButton.addActionListener(e -> {
+            backButton.setBounds(12, 505, 180, 32);
+            menuOrderPanel.add(backButton);
+
+            setPanel(menuOrderPanel, rightPanel);
         });
 
         /// region stepsEvents
