@@ -417,6 +417,7 @@ public class AdminFrame extends OperatorFrame {
         managePackageButtonPanel.add(Box.createHorizontalStrut(8));
         managePackageButtonPanel.add(removePackageButton);
         managePackageButtonPanel.add(Box.createHorizontalStrut(8));
+        ComponentHelper.setEnabled(managePackageButtonPanel, false);
 
         roomEditorLeftPanel.add(new JScrollPane(roomPackageTree), BorderLayout.CENTER);
         roomEditorLeftPanel.add(managePackageButtonPanel, BorderLayout.SOUTH);
@@ -501,120 +502,6 @@ public class AdminFrame extends OperatorFrame {
             }
         });
 
-        roomPackageTree.addTreeSelectionListener(e -> {
-            try {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
-                int ind = RoomHelper.getClassIndex(new TreePath(node.getPath()));
-                if (ind > -1) {
-                    RoomClass selclass = RoomHelper.roomClasses.get(ind);
-                    roomEditorStartSpinner.setValue(selclass.getRooms().get(0).getRoomNo());
-                    roomEditorEndSpinner.setValue(selclass.getRooms().get(selclass.getRooms().size() - 1).getRoomNo());
-                    roomEditorAdultSpinner.setValue(selclass.getAdults());
-                    roomEditorChildSpinner.setValue(selclass.getChildren());
-                    roomEditorPriceSpinner.setValue(selclass.getPrice());
-                    editPackageButton.setEnabled(true);
-                } else {
-                    roomEditorStartSpinner.setValue(((SpinnerNumberModel) roomEditorStartSpinner.getModel()).getMinimum());
-                    roomEditorEndSpinner.setValue(((SpinnerNumberModel) roomEditorEndSpinner.getModel()).getMinimum());
-                    roomEditorAdultSpinner.setValue(0);
-                    roomEditorChildSpinner.setValue(0);
-                    roomEditorPriceSpinner.setValue(((SpinnerNumberModel) roomEditorPriceSpinner.getModel()).getMinimum());
-                    editPackageButton.setEnabled(node != null);
-                    removePackageButton.setEnabled(node != null);
-                }
-                if (node.isLeaf() && RoomHelper.getClassIndex(new TreePath(node.getPath())) >= 0) {
-                    addPackageButton.setEnabled(false);
-                } else {
-                    addPackageButton.setEnabled(true);
-                }
-            } catch (Exception ignored) { }
-        });
-
-        addPackageButton.addActionListener(e -> {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
-            TypePopUp popUp = TypePopUp.show(addPackageButton, "NEW ROOM CLASS", "NEW ROOM TYPE");
-            popUp.getFirstItem().addActionListener(e1 -> {
-                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Class:", "Add Room Class", JOptionPane.QUESTION_MESSAGE);
-                if (new_t == null || new_t.isEmpty()) return;
-
-                DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
-                node.add(new_node);
-
-                ComponentHelper.expandTree(roomPackageTree);
-
-                roomPackageTree.setSelectionPath(new TreePath(new_node.getPath()));
-            });
-            popUp.getSecondItem().addActionListener(e1 -> {
-                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Type:", "Add Room Type", JOptionPane.QUESTION_MESSAGE);
-                if (new_t == null || new_t.isEmpty()) return;
-
-                DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
-                node.add(new_node);
-
-                ComponentHelper.expandTree(roomPackageTree);
-
-                roomPackageTree.setSelectionPath(new TreePath(new_node.getPath()));
-
-                ComponentHelper.setEnabled(roomEditorRightPanel, true);
-                ComponentHelper.setEnabled(roomEditorLeftPanel, false);
-            });
-        });
-
-        editPackageButton.addActionListener(e -> {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
-            TypePopUp popUp = TypePopUp.show(addPackageButton, "RENAME", "EDIT VALUES");
-
-            if (node != null && !node.isLeaf()) popUp.getSecondItem().setEnabled(false);
-
-            if (node == null) return;
-
-            popUp.getFirstItem().addActionListener(e1 -> {
-                if (node.isLeaf()) {
-                    String new_name = JOptionPane.showInputDialog(AdminFrame.this, "Enter new name:", "Rename Room Type", JOptionPane.QUESTION_MESSAGE);
-                    for (RoomClass rc : RoomHelper.roomClasses) {
-                        String path = RoomHelper.pathToType(new TreePath(node.getPath()));
-                        if (rc.getType().equals(path)) {
-                            int last = path.lastIndexOf(":");
-                            rc.setType(path.substring(0, last < 0 ? 0 : last) + (last < 0 ? "" : ":") + new_name);
-                            break;
-                        }
-                    }
-                } else {
-                    String new_name = JOptionPane.showInputDialog(AdminFrame.this, "Enter new name:", "Rename Room Class", JOptionPane.QUESTION_MESSAGE);
-                    for (RoomClass rc : RoomHelper.roomClasses) {
-                        String path = RoomHelper.pathToType(new TreePath(node.getPath()));
-                        if (rc.getType().startsWith(path + ":")) {
-                            int last = path.lastIndexOf(":");
-                            rc.setType(path.substring(0, last < 0 ? 0 : last) + (last < 0 ? "" : ":") + new_name + rc.getType().substring(path.length()));
-                        }
-                    }
-                }
-                roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
-                RoomHelper.loadClassesInTree(roomPackageTree);
-            });
-            popUp.getSecondItem().addActionListener(e1 -> {
-                ComponentHelper.setEnabled(roomEditorRightPanel, true);
-                ComponentHelper.setEnabled(roomEditorLeftPanel, false);
-            });
-        });
-
-        removePackageButton.addActionListener(e -> {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
-            if (node == null) return;
-            if (node.isLeaf()) {
-                for (RoomClass rc : RoomHelper.roomClasses) {
-                    if (rc.getType().equals(RoomHelper.pathToType(new TreePath(node.getPath())))) {
-                        RoomHelper.roomClasses.remove(rc);
-                        break;
-                    }
-                }
-            } else {
-                RoomHelper.roomClasses.removeIf(roomClass -> roomClass.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":"));
-            }
-            roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("ROOM")));
-            RoomHelper.loadClassesInTree(roomPackageTree);
-        });
-
         roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
         RoomHelper.loadClassesInTree(roomPackageTree);
 
@@ -645,6 +532,7 @@ public class AdminFrame extends OperatorFrame {
         manageMenuButtonPanel.add(Box.createHorizontalStrut(8));
         manageMenuButtonPanel.add(menuEditorRemoveMenuButton);
         manageMenuButtonPanel.add(Box.createHorizontalStrut(8));
+        ComponentHelper.setEnabled(manageMenuButtonPanel, false);
 
         menuEditorLeftPanel.add(new JScrollPane(dishesMenuTree), BorderLayout.CENTER);
         menuEditorLeftPanel.add(manageMenuButtonPanel, BorderLayout.SOUTH);
@@ -811,6 +699,253 @@ public class AdminFrame extends OperatorFrame {
         /// endregion
 
         /// region events
+        /// region menuEditor events
+        dishesMenuTree.addTreeSelectionListener(e -> {
+            try {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
+                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+                if (ind > -1) {
+                    MenuPackage mPack = MenuHelper.menuPackages.get(ind);
+                    // set list values
+                    menuEditorEditMenuButton.setEnabled(true);
+                } else {
+                    // set default values
+                    menuEditorEditMenuButton.setEnabled(node != null);
+                    menuEditorRemoveMenuButton.setEnabled(node != null);
+                }
+
+                if (node.isLeaf() && ind >=0) {
+                    menuEditorAddMenuButton.setEnabled(false);
+                } else {
+                    menuEditorAddMenuButton.setEnabled(true);
+                }
+            } catch (Exception ignored) { }
+        });
+
+        menuEditorAddMenuButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
+            TypePopUp popUp = TypePopUp.show(menuEditorAddMenuButton, "NEW MENU PACKAGE", "NEW MENU");
+            popUp.getFirstItem().addActionListener(e1 -> {
+                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Class:", "Add Room Class", JOptionPane.QUESTION_MESSAGE);
+                if (new_t == null || new_t.isEmpty()) return;
+
+                DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
+                node.add(new_node);
+
+                ComponentHelper.expandTree(dishesMenuTree);
+
+                dishesMenuTree.setSelectionPath(new TreePath(new_node.getPath()));
+            });
+            popUp.getSecondItem().addActionListener(e1 -> {
+                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Type:", "Add Room Type", JOptionPane.QUESTION_MESSAGE);
+                if (new_t == null || new_t.isEmpty()) return;
+
+                DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
+                node.add(new_node);
+
+                ComponentHelper.expandTree(dishesMenuTree);
+
+                dishesMenuTree.setSelectionPath(new TreePath(new_node.getPath()));
+
+                ComponentHelper.setEnabled(menuEditorRightPanel, true);
+                ComponentHelper.setEnabled(menuEditorLeftPanel, false);
+            });
+        });
+
+        menuEditorEditMenuButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
+            TypePopUp popUp = TypePopUp.show(menuEditorEditMenuButton, "RENAME", "EDIT DISHES");
+
+            if (node != null && !node.isLeaf()) popUp.getSecondItem().setEnabled(false);
+
+            if (node == null) return;
+
+            popUp.getFirstItem().addActionListener(e1 -> {
+                if (node.isLeaf()) {
+                    String new_name = JOptionPane.showInputDialog(AdminFrame.this, "Enter new name:", "Rename Menu", JOptionPane.QUESTION_MESSAGE);
+                    for (MenuPackage rc : MenuHelper.menuPackages) {
+                        String path = MenuHelper.pathToType(new TreePath(node.getPath()));
+                        if (rc.getType().equals(path)) {
+                            int last = path.lastIndexOf(":");
+                            rc.setType(path.substring(0, last < 0 ? 0 : last) + (last < 0 ? "" : ":") + new_name);
+                            break;
+                        }
+                    }
+                } else {
+                    String new_name = JOptionPane.showInputDialog(AdminFrame.this, "Enter new name:", "Rename Menu Package", JOptionPane.QUESTION_MESSAGE);
+                    for (MenuPackage rc : MenuHelper.menuPackages) {
+                        String path = MenuHelper.pathToType(new TreePath(node.getPath()));
+                        if (rc.getType().startsWith(path + ":")) {
+                            int last = path.lastIndexOf(":");
+                            rc.setType(path.substring(0, last < 0 ? 0 : last) + (last < 0 ? "" : ":") + new_name + rc.getType().substring(path.length()));
+                        }
+                    }
+                }
+                dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+                MenuHelper.loadClassesInTree(dishesMenuTree);
+            });
+            popUp.getSecondItem().addActionListener(e1 -> {
+                ComponentHelper.setEnabled(menuEditorRightPanel, true);
+                ComponentHelper.setEnabled(menuEditorLeftPanel, false);
+            });
+        });
+
+        menuEditorRemoveMenuButton.addActionListener(e -> {DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+            if (node == null) return;
+            if (node.isLeaf()) {
+                for (MenuPackage rc : MenuHelper.menuPackages) {
+                    if (rc.getType().equals(MenuHelper.pathToType(new TreePath(node.getPath())))) {
+                        MenuHelper.menuPackages.remove(rc);
+                        break;
+                    }
+                }
+            } else {
+                MenuHelper.menuPackages.removeIf(roomClass -> roomClass.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":"));
+            }
+            roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("ROOM")));
+            MenuHelper.loadClassesInTree(roomPackageTree);
+        });
+
+        menuEditorCancelButton.addActionListener(e -> {
+            // check if getClassIndex is -1, if yes delete, if not don't delete.
+            ComponentHelper.setEnabled(menuEditorRightPanel, false);
+            ComponentHelper.setEnabled(menuEditorLeftPanel, true);
+        });
+
+        menuEditorSaveButton.addActionListener(e -> {
+            // check if getClassIndex is -1, if yes its new type, add, if not its edit, update
+            ComponentHelper.setEnabled(menuEditorRightPanel, false);
+            ComponentHelper.setEnabled(menuEditorLeftPanel, true);
+        });
+        /// endregion
+
+        /// region roomEditor events
+        roomPackageTree.addTreeSelectionListener(e -> {
+            try {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+                int ind = RoomHelper.getClassIndex(new TreePath(node.getPath()));
+                if (ind > -1) {
+                    RoomClass selclass = RoomHelper.roomClasses.get(ind);
+                    roomEditorStartSpinner.setValue(selclass.getRooms().get(0).getRoomNo());
+                    roomEditorEndSpinner.setValue(selclass.getRooms().get(selclass.getRooms().size() - 1).getRoomNo());
+                    roomEditorAdultSpinner.setValue(selclass.getAdults());
+                    roomEditorChildSpinner.setValue(selclass.getChildren());
+                    roomEditorPriceSpinner.setValue(selclass.getPrice());
+                    editPackageButton.setEnabled(true);
+                } else {
+                    roomEditorStartSpinner.setValue(((SpinnerNumberModel) roomEditorStartSpinner.getModel()).getMinimum());
+                    roomEditorEndSpinner.setValue(((SpinnerNumberModel) roomEditorEndSpinner.getModel()).getMinimum());
+                    roomEditorAdultSpinner.setValue(0);
+                    roomEditorChildSpinner.setValue(0);
+                    roomEditorPriceSpinner.setValue(((SpinnerNumberModel) roomEditorPriceSpinner.getModel()).getMinimum());
+                    editPackageButton.setEnabled(node != null);
+                    removePackageButton.setEnabled(node != null);
+                }
+                if (node.isLeaf() && ind >= 0) {
+                    addPackageButton.setEnabled(false);
+                } else {
+                    addPackageButton.setEnabled(true);
+                }
+            } catch (Exception ignored) { }
+        });
+
+        addPackageButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+            TypePopUp popUp = TypePopUp.show(addPackageButton, "NEW ROOM CLASS", "NEW ROOM TYPE");
+            popUp.getFirstItem().addActionListener(e1 -> {
+                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Class:", "Add Room Class", JOptionPane.QUESTION_MESSAGE);
+                if (new_t == null || new_t.isEmpty()) return;
+
+                DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
+                node.add(new_node);
+
+                ComponentHelper.expandTree(roomPackageTree);
+
+                roomPackageTree.setSelectionPath(new TreePath(new_node.getPath()));
+            });
+            popUp.getSecondItem().addActionListener(e1 -> {
+                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Type:", "Add Room Type", JOptionPane.QUESTION_MESSAGE);
+                if (new_t == null || new_t.isEmpty()) return;
+
+                DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
+                node.add(new_node);
+
+                ComponentHelper.expandTree(roomPackageTree);
+
+                roomPackageTree.setSelectionPath(new TreePath(new_node.getPath()));
+
+                ComponentHelper.setEnabled(roomEditorRightPanel, true);
+                ComponentHelper.setEnabled(roomEditorLeftPanel, false);
+            });
+        });
+
+        editPackageButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+            TypePopUp popUp = TypePopUp.show(editPackageButton, "RENAME", "EDIT ROOM");
+
+            if (node != null && !node.isLeaf()) popUp.getSecondItem().setEnabled(false);
+
+            if (node == null) return;
+
+            popUp.getFirstItem().addActionListener(e1 -> {
+                if (node.isLeaf()) {
+                    String new_name = JOptionPane.showInputDialog(AdminFrame.this, "Enter new name:", "Rename Room Type", JOptionPane.QUESTION_MESSAGE);
+                    for (RoomClass rc : RoomHelper.roomClasses) {
+                        String path = RoomHelper.pathToType(new TreePath(node.getPath()));
+                        if (rc.getType().equals(path)) {
+                            int last = path.lastIndexOf(":");
+                            rc.setType(path.substring(0, last < 0 ? 0 : last) + (last < 0 ? "" : ":") + new_name);
+                            break;
+                        }
+                    }
+                } else {
+                    String new_name = JOptionPane.showInputDialog(AdminFrame.this, "Enter new name:", "Rename Room Class", JOptionPane.QUESTION_MESSAGE);
+                    for (RoomClass rc : RoomHelper.roomClasses) {
+                        String path = RoomHelper.pathToType(new TreePath(node.getPath()));
+                        if (rc.getType().startsWith(path + ":")) {
+                            int last = path.lastIndexOf(":");
+                            rc.setType(path.substring(0, last < 0 ? 0 : last) + (last < 0 ? "" : ":") + new_name + rc.getType().substring(path.length()));
+                        }
+                    }
+                }
+                roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+                RoomHelper.loadClassesInTree(roomPackageTree);
+            });
+            popUp.getSecondItem().addActionListener(e1 -> {
+                ComponentHelper.setEnabled(roomEditorRightPanel, true);
+                ComponentHelper.setEnabled(roomEditorLeftPanel, false);
+            });
+        });
+
+        roomEditorCancelButton.addActionListener(e -> {
+            // check if getClassIndex is -1, if yes delete, if not don't delete.
+            ComponentHelper.setEnabled(roomEditorRightPanel, false);
+            ComponentHelper.setEnabled(roomEditorLeftPanel, true);
+        });
+        roomEditorSaveButton.addActionListener(e -> {
+            // check if getClassIndex is -1, if yes its new type, add, if not its edit, update
+            ComponentHelper.setEnabled(roomEditorRightPanel, false);
+            ComponentHelper.setEnabled(roomEditorLeftPanel, true);
+        });
+
+        removePackageButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+            if (node == null) return;
+            if (node.isLeaf()) {
+                for (RoomClass rc : RoomHelper.roomClasses) {
+                    if (rc.getType().equals(RoomHelper.pathToType(new TreePath(node.getPath())))) {
+                        RoomHelper.roomClasses.remove(rc);
+                        break;
+                    }
+                }
+            } else {
+                RoomHelper.roomClasses.removeIf(roomClass -> roomClass.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":"));
+            }
+            roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("ROOM")));
+            RoomHelper.loadClassesInTree(roomPackageTree);
+        });
+        /// endregion
+
         operatorAddButton.addActionListener(e ->{
             if(operatorIdBox.getText().isEmpty()){
                 JOptionPane.showMessageDialog(this,"ID CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
@@ -933,7 +1068,6 @@ public class AdminFrame extends OperatorFrame {
                 }
             }
         });
-
 
         operatorMangeButton.addActionListener(e -> {
             backButton.setBounds(10, 202, 128, 32);
