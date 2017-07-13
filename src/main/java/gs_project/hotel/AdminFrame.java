@@ -19,6 +19,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class AdminFrame extends OperatorFrame {
 
@@ -525,7 +526,7 @@ public class AdminFrame extends OperatorFrame {
                     editPackageButton.setEnabled(node != null);
                     removePackageButton.setEnabled(node != null);
                 }
-                if (node.isLeaf()) {
+                if (node.isLeaf() && RoomHelper.getClassIndex(new TreePath(node.getPath())) >= 0) {
                     addPackageButton.setEnabled(false);
                 } else {
                     addPackageButton.setEnabled(true);
@@ -569,8 +570,31 @@ public class AdminFrame extends OperatorFrame {
 
             if (node != null && !node.isLeaf()) popUp.getSecondItem().setEnabled(false);
 
+            if (node == null) return;
+
             popUp.getFirstItem().addActionListener(e1 -> {
-                // todo RENAME and update roomClasses
+                if (node.isLeaf()) {
+                    String new_name = JOptionPane.showInputDialog(AdminFrame.this, "Enter new name:", "Rename Room Type", JOptionPane.QUESTION_MESSAGE);
+                    for (RoomClass rc : RoomHelper.roomClasses) {
+                        String path = RoomHelper.pathToType(new TreePath(node.getPath()));
+                        if (rc.getType().equals(path)) {
+                            int last = path.lastIndexOf(":");
+                            rc.setType(path.substring(0, last < 0 ? 0 : last) + (last < 0 ? "" : ":") + new_name);
+                            break;
+                        }
+                    }
+                } else {
+                    String new_name = JOptionPane.showInputDialog(AdminFrame.this, "Enter new name:", "Rename Room Class", JOptionPane.QUESTION_MESSAGE);
+                    for (RoomClass rc : RoomHelper.roomClasses) {
+                        String path = RoomHelper.pathToType(new TreePath(node.getPath()));
+                        if (rc.getType().startsWith(path + ":")) {
+                            int last = path.lastIndexOf(":");
+                            rc.setType(path.substring(0, last < 0 ? 0 : last) + (last < 0 ? "" : ":") + new_name + rc.getType().substring(path.length()));
+                        }
+                    }
+                }
+                roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+                RoomHelper.loadClassesInTree(roomPackageTree);
             });
             popUp.getSecondItem().addActionListener(e1 -> {
                 ComponentHelper.setEnabled(roomEditorRightPanel, true);
@@ -585,14 +609,11 @@ public class AdminFrame extends OperatorFrame {
                 for (RoomClass rc : RoomHelper.roomClasses) {
                     if (rc.getType().equals(RoomHelper.pathToType(new TreePath(node.getPath())))) {
                         RoomHelper.roomClasses.remove(rc);
+                        break;
                     }
                 }
             } else {
-                for (RoomClass rc : RoomHelper.roomClasses) {
-                    if (rc.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":")) {
-                        RoomHelper.roomClasses.remove(rc);
-                    }
-                }
+                RoomHelper.roomClasses.removeIf(roomClass -> roomClass.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":"));
             }
             roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("ROOM")));
             RoomHelper.loadClassesInTree(roomPackageTree);
