@@ -2,7 +2,6 @@ package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import gs_project.hotel.helpers.*;
-import gs_project.hotel.types.Dish;
 import gs_project.hotel.types.MenuPackage;
 import gs_project.hotel.types.Operator;
 import gs_project.hotel.types.RoomClass;
@@ -16,10 +15,7 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 
 public class AdminFrame extends OperatorFrame {
 
@@ -860,34 +856,84 @@ public class AdminFrame extends OperatorFrame {
             }
         });
         operatorUpdateButton.addActionListener(e ->{
-             if(operatorPasswordBox.getPassword().length == 0){
+             if(editOperatorPasswordBox.getPassword().length == 0){
                 JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            else if(operatorConfirmPasswordBox.getPassword().length==0){
+            else if(editOperatorConfirmPasswordBox.getPassword().length==0){
                 JOptionPane.showMessageDialog(this,"CONFIRM PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            else if(!ValidateHelper.validatePhone("+91"+operatorPhoneBox.getText())){
+            else if(!ValidateHelper.validatePhone("+91"+editOperatorPhoneBox.getText())){
                 JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            else if(!ValidateHelper.validateEmail(operatorEmailBox.getText())){
+            else if(!ValidateHelper.validateEmail(editOperatorEmailBox.getText())){
                 JOptionPane.showMessageDialog(this,"EMAIL ID NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
-
-                JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
+            else if(Arrays.equals(editOperatorPasswordBox.getPassword(),editOperatorConfirmPasswordBox.getPassword())){
+                 for (int i = 0; i < OperatorHelper.operators.size(); i++) {
+                     Operator op = OperatorHelper.operators.get(i);
+                     if (op.getUid().equals(editOperatorIdBox.getText())) {
+                         op.setName(editOperatorNameBox.getText());
+                         op.setEmail(editOperatorEmailBox.getText());
+                         op.setPassword(new String(editOperatorPasswordBox.getPassword()));
+                         op.setPhoneNumber(editOperatorPhoneBox.getText());
+                         OperatorHelper.operators.set(i, op);
+                         OperatorHelper.updateTable(operatorTable);
+                         editOperatorIdBox.setText("");
+                         editOperatorNameBox.setText("");
+                         editOperatorPasswordBox.setText("");
+                         editOperatorConfirmPasswordBox.setText("");
+                         editOperatorEmailBox.setText("");
+                         editOperatorPhoneBox.setText("");
+                         editOperatorAddressBox.setText("");
+                         return;
+                     }
+                 }
+                JOptionPane.showMessageDialog(this,"OPERATOR UPDATED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
             }
             else{
                 JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
             }
         });
-        operatorDeleteButton.addActionListener(e ->{
-
+        operatorTable.getSelectionModel().addListSelectionListener(e ->{
+            if(operatorTable.getSelectedRow()<0){
+                return;
+            }
+            String opid=String.valueOf(operatorTable.getValueAt(operatorTable.getSelectedRow(),0));
+            for(Operator os:OperatorHelper.operators)
+            {
+                if(os.getUid().equals(opid)){
+                    editOperatorIdBox.setText(os.getUid());
+                    editOperatorNameBox.setText(os.getName());
+                    editOperatorPasswordBox.setText(os.getPassword());
+                    editOperatorConfirmPasswordBox.setText(os.getPassword());
+                    editOperatorEmailBox.setText(os.getEmail());
+                    editOperatorPhoneBox.setText(os.getPhoneNumber());
+                    editOperatorAddressBox.setText(os.getAddress());
+                }
+            }
         });
+        operatorDeleteButton.addActionListener(e ->{
+            for(Operator op:OperatorHelper.operators){
+                if(editOperatorIdBox.getText().equals(op.getUid())) {
+                    OperatorHelper.operators.remove(op);
+                    OperatorHelper.updateTable(operatorTable);
+                    editOperatorIdBox.setText("");
+                    editOperatorNameBox.setText("");
+                    editOperatorPasswordBox.setText("");
+                    editOperatorConfirmPasswordBox.setText("");
+                    editOperatorEmailBox.setText("");
+                    editOperatorPhoneBox.setText("");
+                    editOperatorAddressBox.setText("");
+                    break;
+                }
+            }
+        });
+
 
         operatorMangeButton.addActionListener(e -> {
             backButton.setBounds(10, 202, 128, 32);
