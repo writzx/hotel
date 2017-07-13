@@ -1,4 +1,4 @@
-package gs_project.hotel;
+package gs_project.hotel.helpers;
 
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -15,7 +15,11 @@ public class ValidateHelper {
     }
 
     public static boolean validatePhone(String phone) {
+        if(phone.length()!=13){
+            return false;
+        }
         Matcher matcher = VALID_PHONE_NUMBER_REGEX .matcher(phone);
+
         return matcher.find();
     }
 
