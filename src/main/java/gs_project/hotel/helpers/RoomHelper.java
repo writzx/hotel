@@ -1,11 +1,13 @@
 package gs_project.hotel.helpers;
 
 import gs_project.hotel.FileHandler;
+import gs_project.hotel.types.Room;
 import gs_project.hotel.types.RoomClass;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
 
@@ -52,6 +54,21 @@ public class RoomHelper {
             }
         }
         return -1;
+    }
+
+    public static ArrayList<Room> buildRoomList(int start, int end) {
+        for (RoomClass rc: roomClasses) {
+            for (Room r: rc.getRooms()) {
+                if (r.getRoomNo() >= start && r.getRoomNo() <= end) {
+                    return null;
+                }
+            }
+        }
+        ArrayList<Room> rooml = new ArrayList<>();
+        for (int i = start; i <= end; i++) {
+            rooml.add(new Room(i));
+        }
+        return rooml;
     }
 
     public static List<Integer> getClassIndices (TreePath path) {

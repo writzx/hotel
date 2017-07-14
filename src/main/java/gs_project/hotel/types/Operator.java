@@ -75,7 +75,7 @@ public class Operator implements Serializable {
     }
 
     public static Object[] getColumns() {
-        return new Object[] { "USER ID", "NAME","EMAIL","PASSWORD","PHONE NUMBER","ADDRESS" };
+        return new Object[] { "USER ID", "NAME","EMAIL","PASSWORD","CONTACT NO.","ADDRESS" };
     }
 
     public static Object[][] toObjectsArray(java.util.List<Operator> operators) {

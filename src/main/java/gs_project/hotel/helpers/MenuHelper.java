@@ -1,12 +1,15 @@
 package gs_project.hotel.helpers;
 
 import gs_project.hotel.FileHandler;
+import gs_project.hotel.types.Dish;
 import gs_project.hotel.types.MenuPackage;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -26,6 +29,97 @@ public class MenuHelper {
         }
 
         if (menuPackages == null) { menuPackages = new ArrayList<>(); }
+    }
+
+    public static ArrayList<Dish> tableToDishList(JTable table) {
+        ArrayList<Dish> dishes = new ArrayList<>();
+        DefaultTableModel model = (DefaultTableModel)table.getModel();
+        for (int i = 0 ; i < table.getRowCount(); i++) {
+            String name = model.getValueAt(i, 0).toString();
+            int minQua = Integer.valueOf(model.getValueAt(i, 1).toString());
+            int maxQua = Integer.valueOf(model.getValueAt(i, 2).toString());
+            int price = Integer.valueOf(model.getValueAt(i, 3).toString());
+            if (name.isEmpty() || minQua <= 0 || maxQua <= 0 || minQua > maxQua || price <= 0) { return  null; }
+            dishes.add(new Dish(name, minQua, maxQua, price));
+        }
+        return dishes;
+    }
+
+    public static Dish takeDishInput(Component root) {
+        String name = "";
+        while (name == null || name.isEmpty()) {
+            name = JOptionPane.showInputDialog(root, "Enter Dish name:", "NAME", JOptionPane.QUESTION_MESSAGE);
+            if (name == null || name.isEmpty()) {
+                int yn = JOptionPane.showConfirmDialog(root, "Name cannot be empty. Do you want to re-enter and continue?", "Invalid Name", JOptionPane.YES_NO_OPTION);
+                if (yn != JOptionPane.YES_OPTION) {
+                    return null;
+                }
+            }
+        }
+        String minQua = "";
+        int min = 0;
+        while (minQua == null || minQua.isEmpty()) {
+            minQua = JOptionPane.showInputDialog(root, "Enter minimum quantity:", "MIN. QUANTITY", JOptionPane.QUESTION_MESSAGE);
+            if (minQua == null || minQua.isEmpty()) {
+                int yn = JOptionPane.showConfirmDialog(root, "Minimum quantity cannot be empty. Do you want to re-enter and continue?", "Invalid Quantity", JOptionPane.YES_NO_OPTION);
+                if (yn != JOptionPane.YES_OPTION) {
+                    return null;
+                }
+            }
+            try {
+                min = Integer.valueOf(minQua);
+                if (min < 0) {
+                    minQua = "";
+                    JOptionPane.showMessageDialog(root, "Minimum quantity cannot be less than zero. Re-enter!", "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException nfe) {
+                minQua = "";
+                JOptionPane.showMessageDialog(root, "Minimum quantity can only be a integer. Re-enter!", "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        String maxQua = "";
+        int max = 0;
+        while (maxQua == null || maxQua.isEmpty()) {
+            maxQua = JOptionPane.showInputDialog(root, "Enter maximum quantity:", "MAX. QUANTITY", JOptionPane.QUESTION_MESSAGE);
+            if (maxQua == null || maxQua.isEmpty()) {
+                int yn = JOptionPane.showConfirmDialog(root, "Maximum quantity cannot be empty. Do you want to re-enter and continue?", "Invalid Quantity", JOptionPane.YES_NO_OPTION);
+                if (yn != JOptionPane.YES_OPTION) {
+                    return null;
+                }
+            }
+            try {
+                max = Integer.valueOf(maxQua);
+                if (max < min) {
+                    maxQua = "";
+                    JOptionPane.showMessageDialog(root, "Minimum quantity cannot be less than minimum quantity. Re-enter!", "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException nfe) {
+                maxQua = "";
+                JOptionPane.showMessageDialog(root, "Maximum quantity can only be a integer. Re-enter!", "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        String priceStr = "";
+        int price = 0;
+        while (priceStr == null || priceStr.isEmpty()) {
+            priceStr = JOptionPane.showInputDialog(root, "Enter price:", "PRICE", JOptionPane.QUESTION_MESSAGE);
+            if (priceStr == null || priceStr.isEmpty()) {
+                int yn = JOptionPane.showConfirmDialog(root, "Price quantity cannot be empty. Do you want to re-enter and continue?", "Invalid Price", JOptionPane.YES_NO_OPTION);
+                if (yn != JOptionPane.YES_OPTION) {
+                    return null;
+                }
+            }
+            try {
+                price = Integer.valueOf(priceStr);
+                if (price <= 0) {
+                    priceStr = "";
+                    JOptionPane.showMessageDialog(root, "Price cannot be less than or equal to zero. Re-enter!", "Invalid Price", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException nfe) {
+                priceStr = "";
+                JOptionPane.showMessageDialog(root, "Price can only be a integer. Re-enter!", "Invalid Price", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return new Dish(name, min, max, price);
     }
 
     public static void writeToFile() {

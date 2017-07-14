@@ -1,5 +1,6 @@
 package gs_project.hotel;
 
+import gs_project.hotel.helpers.ComponentHelper;
 import gs_project.hotel.types.Operator;
 
 import javax.swing.*;
@@ -131,7 +132,7 @@ public class RoughOperatorInput extends JFrame{
         scrollPane.setBounds(242, 48, 400, 233);
         panel_2.add(scrollPane);
 
-        table = new JTable();
+        table = ComponentHelper.createNewTable();
         table.setFillsViewportHeight(true);
         scrollPane.setViewportView(table);
 

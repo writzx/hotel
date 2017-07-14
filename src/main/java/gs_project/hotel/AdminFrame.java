@@ -2,9 +2,7 @@ package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import gs_project.hotel.helpers.*;
-import gs_project.hotel.types.MenuPackage;
-import gs_project.hotel.types.Operator;
-import gs_project.hotel.types.RoomClass;
+import gs_project.hotel.types.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -15,7 +13,9 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class AdminFrame extends OperatorFrame {
 
@@ -160,18 +160,10 @@ public class AdminFrame extends OperatorFrame {
         operatorManagePanel.add(operatorTableScrollPane);
 
         /// region operatorTable
-        operatorTable = new JTable();
+        operatorTable = ComponentHelper.createNewTable();
         operatorTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         operatorTable.getTableHeader().setReorderingAllowed(false);
-        operatorTable.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "USER ID", "NAME", "EMAIL","PASSWORD", "CONTACT NO.", "ADDRESS" }) {
-            Class[] columnTypes = new Class[] { String.class, String.class, String.class,String.class, String.class, String.class };
-
-
-            public Class getColumnClass(int columnIndex) {
-                return columnTypes[columnIndex];
-            }
-
-        });
+        ((DefaultTableModel) operatorTable.getModel()).setColumnIdentifiers(Operator.getColumns());
         operatorTable.getColumnModel().getColumn(0).setResizable(false);
         operatorTable.getColumnModel().getColumn(0).setPreferredWidth(96);
         operatorTable.getColumnModel().getColumn(0).setMinWidth(96);
@@ -555,7 +547,8 @@ public class AdminFrame extends OperatorFrame {
         menuEditorStarterScroller.setBounds(109, 12, 232, 121);
         menuEditorRightPanel.add(menuEditorStarterScroller);
 
-        menuEditorStartersTable = new JTable();
+        menuEditorStartersTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel)menuEditorStartersTable.getModel()).setColumnIdentifiers(Dish.getColumns());
         menuEditorStartersTable.setFillsViewportHeight(true);
         menuEditorStarterScroller.setViewportView(menuEditorStartersTable);
 
@@ -584,7 +577,8 @@ public class AdminFrame extends OperatorFrame {
         menuEditorMainCourseScroller.setBounds(109, 145, 232, 121);
         menuEditorRightPanel.add(menuEditorMainCourseScroller);
 
-        menuEditorMainCourseTable = new JTable();
+        menuEditorMainCourseTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel)menuEditorMainCourseTable.getModel()).setColumnIdentifiers(Dish.getColumns());
         menuEditorMainCourseTable.setFillsViewportHeight(true);
         menuEditorMainCourseScroller.setViewportView(menuEditorMainCourseTable);
 
@@ -606,10 +600,10 @@ public class AdminFrame extends OperatorFrame {
         menuEditorDessertScroller.setBounds(109, 278, 232, 121);
         menuEditorRightPanel.add(menuEditorDessertScroller);
 
-        menuEditorDessertTable = new JTable();
+        menuEditorDessertTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel)menuEditorDessertTable.getModel()).setColumnIdentifiers(Dish.getColumns());
         menuEditorDessertTable.setFillsViewportHeight(true);
         menuEditorDessertScroller.setViewportView(menuEditorDessertTable);
-
 
         JButton menuEditorSaveButton = new JButton("SAVE");
         menuEditorSaveButton.setBounds(213, 411, 128, 32);
@@ -672,7 +666,7 @@ public class AdminFrame extends OperatorFrame {
         reportsScrollPane.setBounds(12, 56, 568, 413);
         reportsPanel.add(reportsScrollPane);
 
-        reportsTable = new JTable();
+        reportsTable = ComponentHelper.createNewTable();
         reportsTable.setShowHorizontalLines(false);
         reportsTable.setShowGrid(false);
         reportsTable.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -700,6 +694,19 @@ public class AdminFrame extends OperatorFrame {
 
         /// region events
         /// region menuEditor events
+        menuEditorDessertAddButton.addActionListener(e -> {
+            // Dish d = MenuHelper.takeDishInput(AdminFrame.this);
+
+        });
+
+        menuEditorStartersAddButton.addActionListener(e -> {
+
+        });
+
+        menuEditorDessertAddButton.addActionListener(e -> {
+
+        });
+
         dishesMenuTree.addTreeSelectionListener(e -> {
             try {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
@@ -781,7 +788,7 @@ public class AdminFrame extends OperatorFrame {
                         }
                     }
                 }
-                dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+                dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
                 MenuHelper.loadClassesInTree(dishesMenuTree);
             });
             popUp.getSecondItem().addActionListener(e1 -> {
@@ -790,7 +797,8 @@ public class AdminFrame extends OperatorFrame {
             });
         });
 
-        menuEditorRemoveMenuButton.addActionListener(e -> {DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+        menuEditorRemoveMenuButton.addActionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
             if (node == null) return;
             if (node.isLeaf()) {
                 for (MenuPackage rc : MenuHelper.menuPackages) {
@@ -802,18 +810,49 @@ public class AdminFrame extends OperatorFrame {
             } else {
                 MenuHelper.menuPackages.removeIf(roomClass -> roomClass.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":"));
             }
-            roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("ROOM")));
+            roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("MENU")));
             MenuHelper.loadClassesInTree(roomPackageTree);
         });
 
         menuEditorCancelButton.addActionListener(e -> {
-            // check if getClassIndex is -1, if yes delete, if not don't delete.
+            dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
+            MenuHelper.loadClassesInTree(dishesMenuTree);
+
             ComponentHelper.setEnabled(menuEditorRightPanel, false);
             ComponentHelper.setEnabled(menuEditorLeftPanel, true);
         });
 
         menuEditorSaveButton.addActionListener(e -> {
-            // check if getClassIndex is -1, if yes its new type, add, if not its edit, update
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
+
+            int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+
+            if (menuEditorMainCourseTable.getRowCount() <= 0) {
+                JOptionPane.showMessageDialog(AdminFrame.this, "Main Courses table cannot be empty", "Invalid Table Data", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else {
+                ArrayList<Dish> starters = MenuHelper.tableToDishList(menuEditorStartersTable);
+                ArrayList<Dish> maincourse = MenuHelper.tableToDishList(menuEditorMainCourseTable);
+                ArrayList<Dish> desserts = MenuHelper.tableToDishList(menuEditorDessertTable);
+                if (starters == null) {
+                    JOptionPane.showMessageDialog(AdminFrame.this, "Errors in the Starters table", "Invalid Table Data", JOptionPane.ERROR_MESSAGE);
+                } else if (maincourse == null) {
+                    JOptionPane.showMessageDialog(AdminFrame.this, "Errors in the Main Courses table", "Invalid Table Data", JOptionPane.ERROR_MESSAGE);
+                } else if (desserts == null) {
+                    JOptionPane.showMessageDialog(AdminFrame.this, "Errors in the Desserts table", "Invalid Table Data", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    MenuPackage pk = new MenuPackage(MenuHelper.pathToType(new TreePath(node.getPath())), starters, maincourse, desserts);
+                    if (ind < 0) {
+                        MenuHelper.menuPackages.add(pk);
+                    } else {
+                        MenuHelper.menuPackages.set(ind, pk);
+                    }
+                }
+            }
+
+            dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
+            MenuHelper.loadClassesInTree(dishesMenuTree);
+
             ComponentHelper.setEnabled(menuEditorRightPanel, false);
             ComponentHelper.setEnabled(menuEditorLeftPanel, true);
         });
@@ -918,12 +957,45 @@ public class AdminFrame extends OperatorFrame {
         });
 
         roomEditorCancelButton.addActionListener(e -> {
-            // check if getClassIndex is -1, if yes delete, if not don't delete.
+            roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+            RoomHelper.loadClassesInTree(roomPackageTree);
+
             ComponentHelper.setEnabled(roomEditorRightPanel, false);
             ComponentHelper.setEnabled(roomEditorLeftPanel, true);
         });
         roomEditorSaveButton.addActionListener(e -> {
-            // check if getClassIndex is -1, if yes its new type, add, if not its edit, update
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
+
+            int ind = RoomHelper.getClassIndex(new TreePath(node.getPath()));
+
+            if (roomEditorStartSpinner.getValue() == roomEditorEndSpinner.getValue()) {
+                JOptionPane.showMessageDialog(AdminFrame.this, "The start and end of Room Range cannot be same.", "No rooms in range", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else if ((int)roomEditorAdultSpinner.getValue() <= 0) {
+                JOptionPane.showMessageDialog(AdminFrame.this, "The number of adults cannot be zero.", "No room capacity", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else if ((int) roomEditorPriceSpinner.getValue() <= 1000 || (int) roomEditorPriceSpinner.getValue() >= 10000) {
+                JOptionPane.showMessageDialog(AdminFrame.this, "The entered price is out of acceptable range", "Wrong price", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else {
+                ArrayList<Room> rooml = RoomHelper.buildRoomList((int) roomEditorStartSpinner.getValue(), (int) roomEditorEndSpinner.getValue());
+                if (rooml == null) {
+                    JOptionPane.showMessageDialog(AdminFrame.this, "The room range cannot overlap with other rooms' range.", "Overlapping room range", JOptionPane.ERROR_MESSAGE);
+                    return;
+                } else {
+                    RoomClass rc = new RoomClass(RoomHelper.pathToType(new TreePath(node.getPath())), (int) roomEditorPriceSpinner.getValue(), (int) roomEditorAdultSpinner.getValue(), (int) roomEditorChildSpinner.getValue(), rooml);
+                    if (ind < 0) {
+                        RoomHelper.roomClasses.add(rc);
+                    } else {
+                        RoomHelper.roomClasses.set(ind, rc);
+                    }
+                    RoomHelper.roomClasses.sort(Comparator.comparing(RoomClass::getPrice));
+                }
+            }
+
+            roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+            RoomHelper.loadClassesInTree(roomPackageTree);
+
             ComponentHelper.setEnabled(roomEditorRightPanel, false);
             ComponentHelper.setEnabled(roomEditorLeftPanel, true);
         });

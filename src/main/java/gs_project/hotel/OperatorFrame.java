@@ -255,7 +255,7 @@ public class OperatorFrame extends MainFrame {
         orderMenuOrderScroller.setBounds(207, 204, 373, 289);
         menuOrderPanel.add(orderMenuOrderScroller);
 
-        orderMenuOrderTable = new JTable();
+        orderMenuOrderTable = ComponentHelper.createNewTable();
         orderMenuOrderScroller.setViewportView(orderMenuOrderTable);
         orderMenuOrderTable.setFillsViewportHeight(true);
 
