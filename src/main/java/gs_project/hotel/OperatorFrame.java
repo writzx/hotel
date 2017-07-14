@@ -997,6 +997,8 @@ public class OperatorFrame extends MainFrame {
                     JOptionPane.showMessageDialog(this,"PLEASE CHANGE CHECK OUT DATE","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
+                roomSelCheckInBox.setDate(dateCheckInPicker.getDate());
+                roomSelCheckOutBox.setDate(dateCheckoutPicker.getDate());
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(roomSelectStep, stepsPanel);
                 setPanel(roomSelectionPanel, currentStepPanel);
@@ -1005,7 +1007,7 @@ public class OperatorFrame extends MainFrame {
                     JOptionPane.showMessageDialog(this,"SEARCH FOR ROOMS FIRST","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                else if(!roomSelCheckInBox.getDate().isAfter(roomSelCheckOutBox.getDate())){
+                else if(!roomSelCheckOutBox.getDate().isAfter(roomSelCheckInBox.getDate())){
                     JOptionPane.showMessageDialog(this,"PLEASE CHANGE CHECK OUT DATE","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -1054,19 +1056,21 @@ public class OperatorFrame extends MainFrame {
         });
 
         roomSelRoomTypesTree.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomSelRoomTypesTree.getSelectionPath().getLastPathComponent();
+            try {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomSelRoomTypesTree.getSelectionPath().getLastPathComponent();
 
-            if (node == null) return;
-            int ind = RoomHelper.getClassIndex(new TreePath(node.getPath()));
+                if (node == null) return;
+                int ind = RoomHelper.getClassIndex(new TreePath(node.getPath()));
 
-            int days = roomSelCheckInBox.getDate().until(roomSelCheckOutBox.getDate()).getDays();
-            if (ind > -1) {
-                RoomClass rc = RoomHelper.roomClasses.get(ind);
-                roomselPriceBox.setText("" + (days * rc.getPrice()));
-                roomSelRoomNoBox.setText("" + rc.getType());
-            } else {
-                roomselPriceBox.setText("");
-            }
+                int days = roomSelCheckInBox.getDate().until(roomSelCheckOutBox.getDate()).getDays();
+                if (ind > -1) {
+                    RoomClass rc = RoomHelper.roomClasses.get(ind);
+                    roomselPriceBox.setText("" + (days * rc.getPrice()));
+                    roomSelRoomNoBox.setText("" + rc.getType());
+                } else {
+                    roomselPriceBox.setText("");
+                }
+            } catch (Exception ignored) { }
         });
 
         backButton.addActionListener(e -> {
@@ -1127,7 +1131,7 @@ public class OperatorFrame extends MainFrame {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                  populateVisitor(searchCard());
+                populateVisitor(searchCard());
             }
 
             @Override
@@ -1210,8 +1214,6 @@ public class OperatorFrame extends MainFrame {
                 BookingHelper.writeToFile();
             }
         });
-
-        RoomHelper.loadClassesInTree(roomSelRoomTypesTree);
     }
 
     public static void setStep(Container step, Container panel) {
@@ -1237,6 +1239,7 @@ public class OperatorFrame extends MainFrame {
         ds.setDateRangeLimits(LocalDate.now(), null);
         db.setDateToToday();
     }
+
    public int searchCard(){
         for(int i=0;i<VisitorHelper.visitors.size();i++){
             Visitor vs=VisitorHelper.visitors.get(i);
@@ -1249,14 +1252,14 @@ public class OperatorFrame extends MainFrame {
 
    void populateVisitor(int i) {
        if(i==-1){
-           detCardNumBox.setText("");
+           detVisitorNameBox.setText("");
            detPhoneNumBox.setText("");
            detEmailBox.setText("");
            detAddressBox.setText("");
            return;
        }
        Visitor vs = VisitorHelper.visitors.get(i);
-       detCardNumBox.setText(vs.getName());
+       detVisitorNameBox.setText(vs.getName());
        detPhoneNumBox.setText(vs.getContactNo());
        detEmailBox.setText(vs.getEmailId());
        detAddressBox.setText(vs.getAddress());
