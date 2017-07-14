@@ -47,6 +47,13 @@ public class RoomHelper {
         ComponentHelper.expandTree(tree);
     }
 
+    public static void loadClassesInTree(JTree tree, ArrayList<RoomClass> classes) {
+        for (RoomClass rc: classes) {
+            buildTreeFromType((DefaultTreeModel) tree.getModel(), rc.getType());
+        }
+        ComponentHelper.expandTree(tree);
+    }
+
     public static int getClassIndex(TreePath path) {
         for (int i = 0; i < roomClasses.size(); i++) {
             if (roomClasses.get(i).getType().equalsIgnoreCase(pathToType(path))) {

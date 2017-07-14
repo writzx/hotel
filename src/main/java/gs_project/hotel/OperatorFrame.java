@@ -4,7 +4,10 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.sun.org.apache.regexp.internal.RETest;
 import gs_project.hotel.helpers.*;
+import gs_project.hotel.types.Booking;
 import gs_project.hotel.types.MenuPackage;
+import gs_project.hotel.types.Room;
+import gs_project.hotel.types.RoomClass;
 import gs_project.hotel.types.Visitor;
 
 import java.awt.*;
@@ -21,6 +24,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.ArrayList;
 
 public class OperatorFrame extends MainFrame {
@@ -1048,6 +1053,22 @@ public class OperatorFrame extends MainFrame {
             }
         });
 
+        roomSelRoomTypesTree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomSelRoomTypesTree.getSelectionPath().getLastPathComponent();
+
+            if (node == null) return;
+            int ind = RoomHelper.getClassIndex(new TreePath(node.getPath()));
+
+            int days = roomSelCheckInBox.getDate().until(roomSelCheckOutBox.getDate()).getDays();
+            if (ind > -1) {
+                RoomClass rc = RoomHelper.roomClasses.get(ind);
+                roomselPriceBox.setText("" + (days * rc.getPrice()));
+                roomSelRoomNoBox.setText("" + rc.getType());
+            } else {
+                roomselPriceBox.setText("");
+            }
+        });
+
         backButton.addActionListener(e -> {
             if (detailsStep.isEnabled()) {
                 bookNextStepButton.setText("NEXT STEP");
@@ -1159,7 +1180,27 @@ public class OperatorFrame extends MainFrame {
                 setPanel(confirmPanel, currentStepPanel);
             }
         });
+
+        roomSelSearchBtn.addActionListener(e -> {
+            ArrayList<RoomClass> classes = new ArrayList<>();
+
+            for (RoomClass rc:RoomHelper.roomClasses) {
+                for (Room r:rc.getRooms()) {
+                    boolean found = false;
+                    for (Booking b:r.getBookings()) {
+                        if (roomSelCheckInBox.getDate().isAfter(LocalDate.parse(b.getCheckoutdate())) && roomSelCheckOutBox.getDate().isBefore(LocalDate.parse(b.getCheckindate()))) {
+                            classes.add(rc);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) { break; }
+                }
+            }
+            RoomHelper.loadClassesInTree(roomSelRoomTypesTree, classes);
+        });
         /// endregion
+
 
         /// endregion
 
@@ -1190,12 +1231,11 @@ public class OperatorFrame extends MainFrame {
         outer.repaint();
         outer.revalidate();
     }
-    private static DatePickerSettings datePickerSettings(DatePicker db){
+    private static void datePickerSettings(DatePicker db){
         DatePickerSettings ds=new DatePickerSettings();
         db.setSettings(ds);
-        ds.setDateRangeLimits(LocalDate.now(),null);
+        ds.setDateRangeLimits(LocalDate.now(), null);
         db.setDateToToday();
-        return ds;
     }
    public int searchCard(){
         for(int i=0;i<VisitorHelper.visitors.size();i++){

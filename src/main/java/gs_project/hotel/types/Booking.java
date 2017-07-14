@@ -10,7 +10,7 @@ public class Booking implements Serializable {
     private String checkindate;
     private String checkoutdate;
 
-    public Booking(String id, String roomType, String bookingdate, String checkindate, String checkoutdate) {
+    public Booking(String id, String bookingdate, String checkindate, String checkoutdate) {
         this.id = id;
         this.bookingdate = bookingdate;
         this.checkindate = checkindate;
