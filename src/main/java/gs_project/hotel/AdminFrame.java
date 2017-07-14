@@ -728,7 +728,7 @@ public class AdminFrame extends OperatorFrame {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
             TypePopUp popUp = TypePopUp.show(menuEditorAddMenuButton, "NEW MENU PACKAGE", "NEW MENU");
             popUp.getFirstItem().addActionListener(e1 -> {
-                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Class:", "Add Room Class", JOptionPane.QUESTION_MESSAGE);
+                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Menu Package Name:", "Add Menu Package", JOptionPane.QUESTION_MESSAGE);
                 if (new_t == null || new_t.isEmpty()) return;
 
                 DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
@@ -739,7 +739,7 @@ public class AdminFrame extends OperatorFrame {
                 dishesMenuTree.setSelectionPath(new TreePath(new_node.getPath()));
             });
             popUp.getSecondItem().addActionListener(e1 -> {
-                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Room Type:", "Add Room Type", JOptionPane.QUESTION_MESSAGE);
+                String new_t = JOptionPane.showInputDialog(AdminFrame.this, "Enter new Menu Name:", "Add Menu Name", JOptionPane.QUESTION_MESSAGE);
                 if (new_t == null || new_t.isEmpty()) return;
 
                 DefaultMutableTreeNode new_node = new DefaultMutableTreeNode(new_t);
@@ -805,8 +805,8 @@ public class AdminFrame extends OperatorFrame {
             } else {
                 MenuHelper.menuPackages.removeIf(roomClass -> roomClass.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":"));
             }
-            roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("MENU")));
-            MenuHelper.loadClassesInTree(roomPackageTree);
+            dishesMenuTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("MENU")));
+            MenuHelper.loadClassesInTree(dishesMenuTree);
         });
 
         menuEditorCancelButton.addActionListener(e -> {

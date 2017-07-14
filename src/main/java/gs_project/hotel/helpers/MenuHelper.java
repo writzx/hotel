@@ -133,6 +133,48 @@ public class MenuHelper {
         }
     }
 
+    public static void loadDishesInTree(JTree tree) {
+        loadClassesInTree(tree);
+        loadDishesInNode((DefaultMutableTreeNode) tree.getModel().getRoot());
+    }
+
+    public static void loadDishesInNode(DefaultMutableTreeNode node) {
+        int count = node.getChildCount();
+        for (int i = 0; i < count; i++) {
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
+            if (childNode.isLeaf()) {
+                int ind = getClassIndex(new TreePath(childNode.getPath()));
+                if (ind != -1) {
+                    MenuPackage mpack = MenuHelper.menuPackages.get(i);
+
+                    if (mpack.getStarters().size() > 0) {
+                        DefaultMutableTreeNode starters = new DefaultMutableTreeNode("STARTERS");
+                        for (Dish d:mpack.getStarters()) {
+                            starters.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + " per plate]"));
+                        }
+                        childNode.add(starters);
+                    }
+                    if (mpack.getMaincourse().size() > 0) {
+                        DefaultMutableTreeNode maincourse = new DefaultMutableTreeNode("MAIN-COURSE");
+                        for (Dish d:mpack.getMaincourse()) {
+                            maincourse.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + " per plate]"));
+                        }
+                        childNode.add(maincourse);
+                    }
+                    if (mpack.getDesserts().size() > 0) {
+                        DefaultMutableTreeNode desserts = new DefaultMutableTreeNode("DESSERTS");
+                        for (Dish d:mpack.getDesserts()) {
+                            desserts.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + " per plate]"));
+                        }
+                        childNode.add(desserts);
+                    }
+                }
+            } else {
+                loadDishesInNode(childNode);
+            }
+        }
+    }
+
     public static ArrayList<MenuPackage> menuPackages = new ArrayList<>();
 
     public static void loadClassesInTree(JTree tree) {

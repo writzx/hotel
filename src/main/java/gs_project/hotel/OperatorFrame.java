@@ -2,13 +2,8 @@ package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
-import com.sun.org.apache.regexp.internal.RETest;
 import gs_project.hotel.helpers.*;
-import gs_project.hotel.types.Booking;
-import gs_project.hotel.types.MenuPackage;
-import gs_project.hotel.types.Room;
-import gs_project.hotel.types.RoomClass;
-import gs_project.hotel.types.Visitor;
+import gs_project.hotel.types.*;
 
 import java.awt.*;
 
@@ -24,8 +19,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.ArrayList;
 
 public class OperatorFrame extends MainFrame {
@@ -55,7 +48,7 @@ public class OperatorFrame extends MainFrame {
     protected final JButton checkOutButton;
     protected final JButton foodOrderButton;
     protected final JButton cancelBookingButton;
-    protected final JButton detCardCheckButton;
+    protected final JButton detCardGenerateButton;
     protected final JButton roomSelSearchBtn;
     protected final JButton bookNextStepButton;
     protected final JButton bookCancelButton;
@@ -252,17 +245,7 @@ public class OperatorFrame extends MainFrame {
             }
         });
 
-        orderMenuPackageTree.addTreeSelectionListener(e -> {
-            try {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) orderMenuPackageTree.getSelectionPath().getLastPathComponent();
-                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
-                if (ind > -1) {
-                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
-
-                    // todo show values
-                }
-            } catch (Exception ignored) { }
-        });
+        MenuHelper.loadDishesInTree(orderMenuPackageTree);
 
         JScrollPane orderMenuOrderScroller = new JScrollPane();
         orderMenuOrderScroller.setBounds(207, 204, 373, 289);
@@ -369,6 +352,129 @@ public class OperatorFrame extends MainFrame {
         orderMenuQuantityLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuQuantityLabel.setBounds(376, 74, 81, 30);
         menuOrderPanel.add(orderMenuQuantityLabel);
+
+
+        orderMenuQuantityBox.setEnabled(false);
+        orderMenuTypeHalfOption.setEnabled(false);
+        orderMenuTypeSingleOption.setEnabled(false);
+        orderMenuTypeDoubleOption.setEnabled(false);
+        orderMenuAddButton.setEnabled(false);
+
+        orderMenuPackageTree.addTreeSelectionListener(e -> {
+            try {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) orderMenuPackageTree.getSelectionPath().getParentPath().getParentPath().getLastPathComponent();
+                if (node == null) return;
+                DefaultMutableTreeNode typeNode = (DefaultMutableTreeNode) orderMenuPackageTree.getSelectionPath().getParentPath().getLastPathComponent();
+                if (typeNode == null) return;
+                DefaultMutableTreeNode dishNode = (DefaultMutableTreeNode) orderMenuPackageTree.getSelectionPath().getLastPathComponent();
+                if (dishNode == null) return;
+                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+                if (ind > -1) {
+                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
+                    if (typeNode.toString().equals("STARTERS")) {
+                        for(Dish d:menuPackage.getStarters()) {
+                            if (d.getName().split("\t")[0].equals(dishNode.toString())) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + (.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + d.getPrice());
+                                orderMenuTypeDoublePriceBox.setText("₹ " + (1.85 * d.getPrice()));
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
+                                orderMenuQuantityBox.setEnabled(true);
+                                orderMenuTypeHalfOption.setEnabled(true);
+                                orderMenuTypeSingleOption.setEnabled(true);
+                                orderMenuTypeDoubleOption.setEnabled(true);
+                                orderMenuAddButton.setEnabled(true);
+                                break;
+                            } else {
+                                orderMenuTypeHalfPriceBox.setText("");
+                                orderMenuTypeSinglePriceBox.setText("");
+                                orderMenuTypeDoublePriceBox.setText("");
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                                orderMenuQuantityBox.setValue(0);
+                                orderMenuQuantityBox.setEnabled(false);
+                                orderMenuTypeHalfOption.setEnabled(false);
+                                orderMenuTypeSingleOption.setEnabled(false);
+                                orderMenuTypeDoubleOption.setEnabled(false);
+                                orderMenuAddButton.setEnabled(false);
+                            }
+                        }
+                    } else if (typeNode.toString().equals("DESSERTS")) {
+                        for(Dish d:menuPackage.getDesserts()) {
+                            if (d.getName().split("\t")[0].equals(dishNode.toString())) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + (.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + d.getPrice());
+                                orderMenuTypeDoublePriceBox.setText("₹ " + (1.85 * d.getPrice()));
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
+                                orderMenuQuantityBox.setEnabled(true);
+                                orderMenuTypeHalfOption.setEnabled(true);
+                                orderMenuTypeSingleOption.setEnabled(true);
+                                orderMenuTypeDoubleOption.setEnabled(true);
+                                orderMenuAddButton.setEnabled(true);
+                                break;
+                            } else {
+                                orderMenuTypeHalfPriceBox.setText("");
+                                orderMenuTypeSinglePriceBox.setText("");
+                                orderMenuTypeDoublePriceBox.setText("");
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                                orderMenuQuantityBox.setValue(0);
+                                orderMenuQuantityBox.setEnabled(false);
+                                orderMenuTypeHalfOption.setEnabled(false);
+                                orderMenuTypeSingleOption.setEnabled(false);
+                                orderMenuTypeDoubleOption.setEnabled(false);
+                                orderMenuAddButton.setEnabled(false);
+                            }
+                        }
+                    } else if (typeNode.toString().equals("MAIN-COURSE")) {
+                        for(Dish d:menuPackage.getMaincourse()) {
+                            if (d.getName().split("\t")[0].equals(dishNode.toString())) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + (.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + d.getPrice());
+                                orderMenuTypeDoublePriceBox.setText("₹ " + (1.85 * d.getPrice()));
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
+                                orderMenuQuantityBox.setEnabled(true);
+                                orderMenuTypeHalfOption.setEnabled(true);
+                                orderMenuTypeSingleOption.setEnabled(true);
+                                orderMenuTypeDoubleOption.setEnabled(true);
+                                orderMenuAddButton.setEnabled(true);
+                                break;
+                            } else {
+                                orderMenuTypeHalfPriceBox.setText("");
+                                orderMenuTypeSinglePriceBox.setText("");
+                                orderMenuTypeDoublePriceBox.setText("");
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                                orderMenuQuantityBox.setValue(0);
+                                orderMenuQuantityBox.setEnabled(false);
+                                orderMenuTypeHalfOption.setEnabled(false);
+                                orderMenuTypeSingleOption.setEnabled(false);
+                                orderMenuTypeDoubleOption.setEnabled(false);
+                                orderMenuAddButton.setEnabled(false);
+                            }
+                        }
+                    } else {
+                        orderMenuTypeHalfPriceBox.setText("");
+                        orderMenuTypeSinglePriceBox.setText("");
+                        orderMenuTypeDoublePriceBox.setText("");
+                        orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                        orderMenuQuantityBox.setValue(0);
+                        orderMenuQuantityBox.setEnabled(false);
+                        orderMenuTypeHalfOption.setEnabled(false);
+                        orderMenuTypeSingleOption.setEnabled(false);
+                        orderMenuTypeDoubleOption.setEnabled(false);
+                        orderMenuAddButton.setEnabled(false);
+                    }
+                } else {
+                    orderMenuTypeHalfPriceBox.setText("");
+                    orderMenuTypeSinglePriceBox.setText("");
+                    orderMenuTypeDoublePriceBox.setText("");
+                    orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                    orderMenuQuantityBox.setValue(0);
+                    orderMenuQuantityBox.setEnabled(false);
+                    orderMenuTypeHalfOption.setEnabled(false);
+                    orderMenuTypeSingleOption.setEnabled(false);
+                    orderMenuTypeDoubleOption.setEnabled(false);
+                    orderMenuAddButton.setEnabled(false);
+                }
+            } catch (Exception ignored) { }
+        });
         /// endregion
 
         /// region bookingPanel
@@ -610,10 +716,10 @@ public class OperatorFrame extends MainFrame {
         detVerifyDocBox.setBounds(245, 394, 317, 32);
         detailsPanel.add(detVerifyDocBox);
 
-        detCardCheckButton = new JButton("CHECK");
-        detCardCheckButton.setFont(new Font("Tahoma", Font.BOLD, 14));
-        detCardCheckButton.setBounds(466, 76, 96, 32);
-        detailsPanel.add(detCardCheckButton);
+        detCardGenerateButton = new JButton("GENERATE");
+        detCardGenerateButton.setFont(new Font("Tahoma", Font.BOLD, 12));
+        detCardGenerateButton.setBounds(466, 76, 96, 32);
+        detailsPanel.add(detCardGenerateButton);
         /// endregion
 
         /// region roomSelectionPanel
@@ -1144,6 +1250,9 @@ public class OperatorFrame extends MainFrame {
                 populateVisitor(searchCard());
             }
         });
+        detCardGenerateButton.addActionListener(e -> {
+            detCardNumBox.setText(IDGenerator.generate());
+        });
         /// region stepsEvents
         datesPeopleStep.addMouseListener(new MouseAdapter() {
             @Override
@@ -1191,8 +1300,20 @@ public class OperatorFrame extends MainFrame {
             for (RoomClass rc:RoomHelper.roomClasses) {
                 for (Room r:rc.getRooms()) {
                     boolean found = false;
-                    for (Booking b:r.getBookings()) {
-                        if (roomSelCheckInBox.getDate().isAfter(LocalDate.parse(b.getCheckoutdate())) && roomSelCheckOutBox.getDate().isBefore(LocalDate.parse(b.getCheckindate()))) {
+                    if (r.getBookings().size() == 0) {
+                        classes.add(rc);
+                        break;
+                    }
+                    if (roomSelCheckInBox.getDate().isAfter(LocalDate.parse(r.getBookings().get(r.getBookings().size() - 1).getCheckoutdate()))) {
+                        classes.add(rc);
+                        break;
+                    }
+                    if (roomSelCheckOutBox.getDate().isBefore(LocalDate.parse(r.getBookings().get(0).getCheckoutdate()))) {
+                        classes.add(rc);
+                        break;
+                    }
+                    for (int i = 0; i < r.getBookings().size() - 1; i++) {
+                        if (roomSelCheckInBox.getDate().isAfter(LocalDate.parse(r.getBookings().get(i).getCheckoutdate())) && roomSelCheckOutBox.getDate().isBefore(LocalDate.parse(r.getBookings().get(i + 1).getCheckindate()))) {
                             classes.add(rc);
                             found = true;
                             break;
