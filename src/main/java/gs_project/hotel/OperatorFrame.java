@@ -1,6 +1,8 @@
 package gs_project.hotel;
 
 import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.DatePickerSettings;
+import com.sun.org.apache.regexp.internal.RETest;
 import gs_project.hotel.helpers.*;
 import gs_project.hotel.types.MenuPackage;
 
@@ -15,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
 
 public class OperatorFrame extends MainFrame {
     /// region panels
@@ -663,10 +666,15 @@ public class OperatorFrame extends MainFrame {
         roomSelCheckInBox = new DatePicker();
         roomSelCheckInBox.setBounds(127, 93, 162, 32);
         roomSelectionPanel.add(roomSelCheckInBox);
+        datePickerSettings(roomSelCheckInBox);
+        roomSelCheckInBox.setDateToToday();
 
         roomSelCheckOutBox = new DatePicker();
         roomSelCheckOutBox.setBounds(127, 169, 162, 32);
         roomSelectionPanel.add(roomSelCheckOutBox);
+        datePickerSettings(roomSelCheckOutBox);
+        roomSelCheckOutBox.setDateToToday();
+
         /// endregion
 
         /// region datesPeoplePanel
@@ -711,13 +719,21 @@ public class OperatorFrame extends MainFrame {
         dateChildren.setBounds(312, 351, 230, 32);
         datesPeoplePanel.add(dateChildren);
 
+
+
+
         dateCheckInPicker = new DatePicker();
         dateCheckInPicker.setBounds(312, 95, 230, 32);
         datesPeoplePanel.add(dateCheckInPicker);
+        datePickerSettings(dateCheckInPicker);
+       dateCheckInPicker.setDateToToday();
+
 
         dateCheckoutPicker = new DatePicker();
         dateCheckoutPicker.setBounds(312, 178, 230, 32);
         datesPeoplePanel.add(dateCheckoutPicker);
+        datePickerSettings(dateCheckoutPicker);
+        dateCheckoutPicker.setDateToToday();
         /// endregion
 
         /// endregion
@@ -1055,6 +1071,17 @@ public class OperatorFrame extends MainFrame {
             setPanel(menuOrderPanel, rightPanel);
         });
 
+        checkButton.addActionListener(e ->{
+            if(bookId.getText().isEmpty()){
+                JOptionPane.showMessageDialog(this,"PLEASE ENTER BOOKING ID TO CONTINUE","ERROR",JOptionPane.ERROR_MESSAGE);
+
+                return;
+            }
+            else {
+
+               bookInfoPanel.setVisible(true);
+            }
+        });
         /// region stepsEvents
         datesPeopleStep.addMouseListener(new MouseAdapter() {
             @Override
@@ -1125,6 +1152,13 @@ public class OperatorFrame extends MainFrame {
 
         outer.repaint();
         outer.revalidate();
+    }
+    private static DatePickerSettings datePickerSettings(DatePicker db){
+        DatePickerSettings ds=new DatePickerSettings();
+        db.setSettings(ds);
+        ds.setDateRangeLimits(LocalDate.now(),null);
+        db.setDateToToday();
+        return ds;
     }
 }
 
