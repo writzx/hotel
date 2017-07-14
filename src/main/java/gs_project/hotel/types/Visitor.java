@@ -1,6 +1,8 @@
 package gs_project.hotel.types;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Visitor implements Serializable {
@@ -11,9 +13,9 @@ public class Visitor implements Serializable {
     private String emailId;
     private String contactNo;
     private String address;
-    private List<Booking> bookings;
+    private ArrayList<Booking> bookings;
 
-    public Visitor(String cardId, String name, String emailId, String contactNo, String address, List<Booking> bookings) {
+    public Visitor(String cardId, String name, String emailId, String contactNo, String address, ArrayList<Booking> bookings) {
         this.cardId = cardId;
         this.name = name;
         this.emailId = emailId;
@@ -63,11 +65,11 @@ public class Visitor implements Serializable {
         this.address = address;
     }
 
-    public List<Booking> getBookings() {
+    public ArrayList<Booking> getBookings() {
         return bookings;
     }
 
-    public void setBookings(List<Booking> bookings) {
+    public void setBookings(ArrayList<Booking> bookings) {
         this.bookings = bookings;
     }
     ///endregion

@@ -5,11 +5,14 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.sun.org.apache.regexp.internal.RETest;
 import gs_project.hotel.helpers.*;
 import gs_project.hotel.types.MenuPackage;
+import gs_project.hotel.types.Visitor;
 
 import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.*;
@@ -18,6 +21,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class OperatorFrame extends MainFrame {
     /// region panels
@@ -137,6 +141,7 @@ public class OperatorFrame extends MainFrame {
     protected final JTable orderMenuOrderTable;
     protected final JTextField orderMenuTotalBox;
     protected final ButtonGroup buttonGroup = new ButtonGroup();
+    private JTextArea detAddressBox;
     /// endregion
 
     /**
@@ -571,7 +576,7 @@ public class OperatorFrame extends MainFrame {
         detAdressScroller.setBounds(245, 276, 317, 98);
         detailsPanel.add(detAdressScroller);
 
-        JTextArea detAddressBox = new JTextArea();
+        detAddressBox = new JTextArea();
         detAdressScroller.setViewportView(detAddressBox);
         detAddressBox.setLineWrap(true);
 
@@ -983,13 +988,20 @@ public class OperatorFrame extends MainFrame {
                     JOptionPane.showMessageDialog(this,"PLEASE SELECT ADULTS","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
+                else if(!dateCheckoutPicker.getDate().isAfter(dateCheckInPicker.getDate())){
+                    JOptionPane.showMessageDialog(this,"PLEASE CHANGE CHECK OUT DATE","ERROR",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(roomSelectStep, stepsPanel);
                 setPanel(roomSelectionPanel, currentStepPanel);
             } else if (roomSelectStep.isEnabled()) {
                 if(roomselPriceBox.getText().isEmpty()){
                     JOptionPane.showMessageDialog(this,"SEARCH FOR ROOMS FIRST","ERROR",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                else if(!roomSelCheckInBox.getDate().isAfter(roomSelCheckOutBox.getDate())){
+                    JOptionPane.showMessageDialog(this,"PLEASE CHANGE CHECK OUT DATE","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 bookNextStepButton.setText("NEXT STEP");
@@ -1013,6 +1025,14 @@ public class OperatorFrame extends MainFrame {
                 {
                     JOptionPane.showMessageDialog(this,"EMAIL NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
+                }
+                int i = searchCard();
+                Visitor vis=new Visitor(detCardNumBox.getText(),detVisitorNameBox.getText(),detEmailBox.getText(),detPhoneNumBox.getText(),detAddressBox.getText(),new ArrayList<>());
+                if(i==-1){
+                    VisitorHelper.visitors.add(vis);
+                }
+                else {
+                    VisitorHelper.visitors.set(i, vis);
                 }
                 bookNextStepButton.setText("CONFIRM BOOKING");
                 setStep(confirmStep, stepsPanel);
@@ -1080,6 +1100,23 @@ public class OperatorFrame extends MainFrame {
             else {
 
                bookInfoPanel.setVisible(true);
+            }
+        });
+        detCardNumBox.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                  populateVisitor(searchCard());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                populateVisitor(searchCard());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                populateVisitor(searchCard());
             }
         });
         /// region stepsEvents
@@ -1160,5 +1197,29 @@ public class OperatorFrame extends MainFrame {
         db.setDateToToday();
         return ds;
     }
+   public int searchCard(){
+        for(int i=0;i<VisitorHelper.visitors.size();i++){
+            Visitor vs=VisitorHelper.visitors.get(i);
+            if(vs.getCardId().equals(detCardNumBox.getText())){
+               return i;
+            }
+        }
+        return -1;
+   }
+
+   void populateVisitor(int i) {
+       if(i==-1){
+           detCardNumBox.setText("");
+           detPhoneNumBox.setText("");
+           detEmailBox.setText("");
+           detAddressBox.setText("");
+           return;
+       }
+       Visitor vs = VisitorHelper.visitors.get(i);
+       detCardNumBox.setText(vs.getName());
+       detPhoneNumBox.setText(vs.getContactNo());
+       detEmailBox.setText(vs.getEmailId());
+       detAddressBox.setText(vs.getAddress());
+   }
 }
 
