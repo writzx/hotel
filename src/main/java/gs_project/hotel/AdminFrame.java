@@ -86,6 +86,8 @@ public class AdminFrame extends OperatorFrame {
     private final JTable menuEditorStartersTable;
     private final JTable menuEditorMainCourseTable;
     private final JTable menuEditorDessertTable;
+    private JTree dishesMenuTree;
+    private JTree roomPackageTree;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -161,8 +163,6 @@ public class AdminFrame extends OperatorFrame {
 
         /// region operatorTable
         operatorTable = ComponentHelper.createNewTable();
-        operatorTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        operatorTable.getTableHeader().setReorderingAllowed(false);
         ((DefaultTableModel) operatorTable.getModel()).setColumnIdentifiers(Operator.getColumns());
         operatorTable.getColumnModel().getColumn(0).setResizable(false);
         operatorTable.getColumnModel().getColumn(0).setPreferredWidth(96);
@@ -393,7 +393,7 @@ public class AdminFrame extends OperatorFrame {
         roomEditorLeftPanel = new JPanel();
         roomEditorLeftPanel.setLayout(new BorderLayout());
 
-        JTree roomPackageTree = new JTree();
+        roomPackageTree = new JTree();
         roomPackageTree.setFont(new Font("Tahoma", Font.BOLD, 14));
 
         JButton addPackageButton = new JButton("ADD");
@@ -481,20 +481,7 @@ public class AdminFrame extends OperatorFrame {
         roomEditorPanel.add(roomEditorLeftPanel, BorderLayout.WEST);
         roomEditorPanel.add(roomEditorRightPanel, BorderLayout.CENTER);
 
-        roomPackageTree.setEditable(false);
-        roomPackageTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        roomPackageTree.addTreeWillExpandListener(new TreeWillExpandListener() {
-            @Override
-            public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
-            }
-
-            @Override
-            public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
-                throw new ExpandVetoException(event);
-            }
-        });
-
-        roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+        roomPackageTree = ComponentHelper.setupTree(roomPackageTree, "ROOM");
         RoomHelper.loadClassesInTree(roomPackageTree);
 
         /// endregion
@@ -508,7 +495,7 @@ public class AdminFrame extends OperatorFrame {
         menuEditorLeftPanel = new JPanel();
         menuEditorLeftPanel.setLayout(new BorderLayout());
 
-        JTree dishesMenuTree = new JTree();
+        dishesMenuTree = new JTree();
         dishesMenuTree.setFont(new Font("Tahoma", Font.BOLD, 14));
 
         JButton menuEditorAddMenuButton = new JButton("ADD");
@@ -621,32 +608,7 @@ public class AdminFrame extends OperatorFrame {
         menuEditorPanel.add(menuEditorLeftPanel, BorderLayout.WEST);
         menuEditorPanel.add(menuEditorRightPanel, BorderLayout.CENTER);
 
-        dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
-        dishesMenuTree.setEditable(false);
-        dishesMenuTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        dishesMenuTree.addTreeWillExpandListener(new TreeWillExpandListener() {
-            @Override
-            public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
-            }
-
-            @Override
-            public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
-                throw new ExpandVetoException(event);
-            }
-        });
-
-        dishesMenuTree.addTreeSelectionListener(e -> {
-            try {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) dishesMenuTree.getSelectionPath().getLastPathComponent();
-                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
-                if (ind > -1) {
-                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
-
-                    // todo show values
-                }
-            } catch (Exception ignored) { }
-        });
-
+        dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
         MenuHelper.loadClassesInTree(dishesMenuTree);
         /// endregion
 
@@ -695,16 +657,45 @@ public class AdminFrame extends OperatorFrame {
         /// region events
         /// region menuEditor events
         menuEditorDessertAddButton.addActionListener(e -> {
-            // Dish d = MenuHelper.takeDishInput(AdminFrame.this);
+            Dish d = MenuHelper.takeDishInput(AdminFrame.this);
 
+            if (d != null) {
+                ((DefaultTableModel) menuEditorDessertTable.getModel()).addRow(d.toObjects());
+            }
         });
 
         menuEditorStartersAddButton.addActionListener(e -> {
+            Dish d = MenuHelper.takeDishInput(AdminFrame.this);
 
+            if (d != null) {
+                ((DefaultTableModel) menuEditorStartersTable.getModel()).addRow(d.toObjects());
+            }
         });
 
-        menuEditorDessertAddButton.addActionListener(e -> {
+        menuEditorMainCourseAddButton.addActionListener(e -> {
+            Dish d = MenuHelper.takeDishInput(AdminFrame.this);
 
+            if (d != null) {
+                ((DefaultTableModel) menuEditorMainCourseTable.getModel()).addRow(d.toObjects());
+            }
+        });
+
+        menuEditorDessertRemoveButton.addActionListener(e -> {
+            if (menuEditorDessertTable.getSelectedRow() != -1) {
+                ((DefaultTableModel) menuEditorDessertTable.getModel()).removeRow(menuEditorDessertTable.getSelectedRow());
+            }
+        });
+
+        menuEditorStartersRemoveButton.addActionListener(e -> {
+            if (menuEditorStartersTable.getSelectedRow() != -1) {
+                ((DefaultTableModel) menuEditorStartersTable.getModel()).removeRow(menuEditorStartersTable.getSelectedRow());
+            }
+        });
+
+        menuEditorMainCourseRemoveButton.addActionListener(e -> {
+            if (menuEditorMainCourseTable.getSelectedRow() != -1) {
+                ((DefaultTableModel) menuEditorMainCourseTable.getModel()).removeRow(menuEditorMainCourseTable.getSelectedRow());
+            }
         });
 
         dishesMenuTree.addTreeSelectionListener(e -> {
@@ -713,10 +704,14 @@ public class AdminFrame extends OperatorFrame {
                 int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
                 if (ind > -1) {
                     MenuPackage mPack = MenuHelper.menuPackages.get(ind);
-                    // set list values
+                    ((DefaultTableModel) menuEditorStartersTable.getModel()).setDataVector(Dish.toObjectsArray(mPack.getStarters()), Dish.getColumns());
+                    ((DefaultTableModel) menuEditorMainCourseTable.getModel()).setDataVector(Dish.toObjectsArray(mPack.getMaincourse()), Dish.getColumns());
+                    ((DefaultTableModel) menuEditorDessertTable.getModel()).setDataVector(Dish.toObjectsArray(mPack.getDesserts()), Dish.getColumns());
                     menuEditorEditMenuButton.setEnabled(true);
                 } else {
-                    // set default values
+                    ((DefaultTableModel) menuEditorStartersTable.getModel()).setRowCount(0);
+                    ((DefaultTableModel) menuEditorMainCourseTable.getModel()).setRowCount(0);
+                    ((DefaultTableModel) menuEditorDessertTable.getModel()).setRowCount(0);
                     menuEditorEditMenuButton.setEnabled(node != null);
                     menuEditorRemoveMenuButton.setEnabled(node != null);
                 }

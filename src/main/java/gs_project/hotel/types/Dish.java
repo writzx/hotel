@@ -57,10 +57,10 @@ public class Dish implements Serializable {
         return new Object[] { "NAME", "MIN. QUANTITY", "MAX. QUANTITY", "PRICE"};
     }
 
-    public static Object[][] toObjectsArray(java.util.List<Operator> operators) {
-        Object[][] objects = new Object[operators.size()][];
+    public static Object[][] toObjectsArray(java.util.List<Dish> dishes) {
+        Object[][] objects = new Object[dishes.size()][];
         int i = 0;
-        for (Operator s:operators) {
+        for (Dish s:dishes) {
             objects[i++] = s.toObjects();
         }
         return objects;

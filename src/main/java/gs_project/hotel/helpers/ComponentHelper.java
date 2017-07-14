@@ -1,9 +1,14 @@
 package gs_project.hotel.helpers;
 
 import javax.swing.*;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +31,25 @@ public class ComponentHelper {
         table.setDefaultRenderer(String.class, cellRenderer);
 
         return table;
+    }
+
+    public static JTree setupTree(JTree tree, String rootName) {
+        if (tree == null) tree = new JTree();
+        tree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode(rootName)));
+        tree.setEditable(false);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.addTreeWillExpandListener(new TreeWillExpandListener() {
+            @Override
+            public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+
+            }
+
+            @Override
+            public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+                throw new ExpandVetoException(event);
+            }
+        });
+        return tree;
     }
 
     public static void expandTree(JTree tree) {
