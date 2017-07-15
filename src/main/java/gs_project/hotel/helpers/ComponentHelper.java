@@ -27,6 +27,7 @@ public class ComponentHelper {
 
         JTable table = new JTable(readonlyModel);
 
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getTableHeader().setReorderingAllowed(false);
         table.setDefaultRenderer(String.class, cellRenderer);
 

@@ -15,6 +15,10 @@ public class Room implements Serializable {
         this.roomNo = roomNo;
         bookings = new ArrayList<>();
     }
+    public Room(int roomNo, ArrayList<Booking> bookings) {
+        this.roomNo = roomNo;
+        this.bookings = bookings;
+    }
 
     ///region getter and setter
     public int getRoomNo() {

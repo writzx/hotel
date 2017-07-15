@@ -8,12 +8,14 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
 public class MenuHelper {
     public final static String FILENAME = "menupackages";
@@ -136,41 +138,55 @@ public class MenuHelper {
     public static void loadDishesInTree(JTree tree) {
         loadClassesInTree(tree);
         loadDishesInNode((DefaultMutableTreeNode) tree.getModel().getRoot());
+        ComponentHelper.expandTree(tree);
+    }
+
+    public static ArrayList<DefaultMutableTreeNode> getAllLeafNodes(DefaultMutableTreeNode node) {
+        ArrayList<DefaultMutableTreeNode> lNodes = new ArrayList<>();
+        if (node.isLeaf()) {
+            lNodes.add(node);
+        } else {
+            int n = node.getChildCount();
+            for (int i = 0; i < n; i++) {
+                lNodes.addAll(getAllLeafNodes((DefaultMutableTreeNode) node.getChildAt(i)));
+            }
+        }
+        return lNodes;
     }
 
     public static void loadDishesInNode(DefaultMutableTreeNode node) {
         int count = node.getChildCount();
         for (int i = 0; i < count; i++) {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
-            if (childNode.isLeaf()) {
+            if (childNode.getChildCount() > 0) {
+                loadDishesInNode(childNode);
+            } else {
                 int ind = getClassIndex(new TreePath(childNode.getPath()));
                 if (ind != -1) {
-                    MenuPackage mpack = MenuHelper.menuPackages.get(i);
+                    MenuPackage mpack = MenuHelper.menuPackages.get(ind);
 
                     if (mpack.getStarters().size() > 0) {
                         DefaultMutableTreeNode starters = new DefaultMutableTreeNode("STARTERS");
                         for (Dish d:mpack.getStarters()) {
-                            starters.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + " per plate]"));
+                            starters.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + "]"));
                         }
                         childNode.add(starters);
                     }
                     if (mpack.getMaincourse().size() > 0) {
                         DefaultMutableTreeNode maincourse = new DefaultMutableTreeNode("MAIN-COURSE");
                         for (Dish d:mpack.getMaincourse()) {
-                            maincourse.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + " per plate]"));
+                            maincourse.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + "]"));
                         }
                         childNode.add(maincourse);
                     }
                     if (mpack.getDesserts().size() > 0) {
                         DefaultMutableTreeNode desserts = new DefaultMutableTreeNode("DESSERTS");
                         for (Dish d:mpack.getDesserts()) {
-                            desserts.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + " per plate]"));
+                            desserts.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + "]"));
                         }
                         childNode.add(desserts);
                     }
                 }
-            } else {
-                loadDishesInNode(childNode);
             }
         }
     }

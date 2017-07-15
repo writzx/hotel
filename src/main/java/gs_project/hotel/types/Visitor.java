@@ -1,9 +1,7 @@
 package gs_project.hotel.types;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Visitor implements Serializable {
     private static final long serialVersionUID = 167471118291580830L;
@@ -13,14 +11,16 @@ public class Visitor implements Serializable {
     private String emailId;
     private String contactNo;
     private String address;
+    private String document;
     private ArrayList<Booking> bookings;
 
-    public Visitor(String cardId, String name, String emailId, String contactNo, String address, ArrayList<Booking> bookings) {
+    public Visitor(String cardId, String name, String emailId, String contactNo, String address, String document, ArrayList<Booking> bookings) {
         this.cardId = cardId;
         this.name = name;
         this.emailId = emailId;
         this.contactNo = contactNo;
         this.address = address;
+        this.document = document;
         this.bookings = bookings;
     }
 
@@ -72,5 +72,30 @@ public class Visitor implements Serializable {
     public void setBookings(ArrayList<Booking> bookings) {
         this.bookings = bookings;
     }
+
+    public String getDocument() {
+        return document;
+    }
+
+    public void setDocument(String document) {
+        this.document = document;
+    }
     ///endregion
+
+    public Object[] toObjects() {
+        return new Object[] {cardId, name, emailId, contactNo, address, document};
+    }
+
+    public static Object[] getColumns() {
+        return new Object[] { "CARD ID", "NAME", "EMAIL", "CONTACT NO.", "ADDRESS", "VERIFY DOC" };
+    }
+
+    public static Object[][] toObjectsArray(java.util.List<Visitor> visitors) {
+        Object[][] objects = new Object[visitors.size()][];
+        int i = 0;
+        for (Visitor s:visitors) {
+            objects[i++] = s.toObjects();
+        }
+        return objects;
+    }
 }

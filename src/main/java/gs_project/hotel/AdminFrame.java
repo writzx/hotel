@@ -707,13 +707,14 @@ public class AdminFrame extends OperatorFrame {
                     ((DefaultTableModel) menuEditorStartersTable.getModel()).setDataVector(Dish.toObjectsArray(mPack.getStarters()), Dish.getColumns());
                     ((DefaultTableModel) menuEditorMainCourseTable.getModel()).setDataVector(Dish.toObjectsArray(mPack.getMaincourse()), Dish.getColumns());
                     ((DefaultTableModel) menuEditorDessertTable.getModel()).setDataVector(Dish.toObjectsArray(mPack.getDesserts()), Dish.getColumns());
-                    menuEditorEditMenuButton.setEnabled(true);
+                    menuEditorEditMenuButton.setEnabled(!node.isRoot());
+                    menuEditorRemoveMenuButton.setEnabled(!node.isRoot());
                 } else {
                     ((DefaultTableModel) menuEditorStartersTable.getModel()).setRowCount(0);
                     ((DefaultTableModel) menuEditorMainCourseTable.getModel()).setRowCount(0);
                     ((DefaultTableModel) menuEditorDessertTable.getModel()).setRowCount(0);
-                    menuEditorEditMenuButton.setEnabled(node != null);
-                    menuEditorRemoveMenuButton.setEnabled(node != null);
+                    menuEditorEditMenuButton.setEnabled(node != null && !node.isRoot());
+                    menuEditorRemoveMenuButton.setEnabled(node != null && !node.isRoot());
                 }
 
                 if (node.isLeaf() && ind >=0) {
@@ -783,8 +784,11 @@ public class AdminFrame extends OperatorFrame {
                         }
                     }
                 }
-                dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
+                dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
                 MenuHelper.loadClassesInTree(dishesMenuTree);
+
+                dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
+                MenuHelper.loadDishesInTree(orderMenuPackageTree);
             });
             popUp.getSecondItem().addActionListener(e1 -> {
                 ComponentHelper.setEnabled(menuEditorRightPanel, true);
@@ -805,13 +809,26 @@ public class AdminFrame extends OperatorFrame {
             } else {
                 MenuHelper.menuPackages.removeIf(roomClass -> roomClass.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":"));
             }
-            dishesMenuTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("MENU")));
+
+            dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
             MenuHelper.loadClassesInTree(dishesMenuTree);
+
+            orderMenuPackageTree = ComponentHelper.setupTree(orderMenuPackageTree, "MENU");
+            MenuHelper.loadDishesInTree(orderMenuPackageTree);
+
+            ((DefaultTableModel) menuEditorStartersTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) menuEditorMainCourseTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) menuEditorDessertTable.getModel()).setRowCount(0);
+            menuEditorEditMenuButton.setEnabled(false);
+            menuEditorRemoveMenuButton.setEnabled(false);
         });
 
         menuEditorCancelButton.addActionListener(e -> {
-            dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
+            dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
             MenuHelper.loadClassesInTree(dishesMenuTree);
+
+            orderMenuPackageTree = ComponentHelper.setupTree(orderMenuPackageTree, "MENU");
+            MenuHelper.loadDishesInTree(orderMenuPackageTree);
 
             ComponentHelper.setEnabled(menuEditorRightPanel, false);
             ComponentHelper.setEnabled(menuEditorLeftPanel, true);
@@ -845,8 +862,13 @@ public class AdminFrame extends OperatorFrame {
                 }
             }
 
-            dishesMenuTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
+
+            dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
             MenuHelper.loadClassesInTree(dishesMenuTree);
+
+
+            orderMenuPackageTree = ComponentHelper.setupTree(orderMenuPackageTree, "MENU");
+            MenuHelper.loadDishesInTree(orderMenuPackageTree);
 
             ComponentHelper.setEnabled(menuEditorRightPanel, false);
             ComponentHelper.setEnabled(menuEditorLeftPanel, true);
@@ -865,15 +887,16 @@ public class AdminFrame extends OperatorFrame {
                     roomEditorAdultSpinner.setValue(selclass.getAdults());
                     roomEditorChildSpinner.setValue(selclass.getChildren());
                     roomEditorPriceSpinner.setValue(selclass.getPrice());
-                    editPackageButton.setEnabled(true);
+                    editPackageButton.setEnabled(!node.isRoot());
+                    removePackageButton.setEnabled(!node.isRoot());
                 } else {
                     roomEditorStartSpinner.setValue(((SpinnerNumberModel) roomEditorStartSpinner.getModel()).getMinimum());
                     roomEditorEndSpinner.setValue(((SpinnerNumberModel) roomEditorEndSpinner.getModel()).getMinimum());
                     roomEditorAdultSpinner.setValue(0);
                     roomEditorChildSpinner.setValue(0);
                     roomEditorPriceSpinner.setValue(((SpinnerNumberModel) roomEditorPriceSpinner.getModel()).getMinimum());
-                    editPackageButton.setEnabled(node != null);
-                    removePackageButton.setEnabled(node != null);
+                    editPackageButton.setEnabled(node != null && !node.isRoot());
+                    removePackageButton.setEnabled(node != null && !node.isRoot());
                 }
                 if (node.isLeaf() && ind >= 0) {
                     addPackageButton.setEnabled(false);
@@ -942,7 +965,8 @@ public class AdminFrame extends OperatorFrame {
                         }
                     }
                 }
-                roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+
+                roomPackageTree = ComponentHelper.setupTree(roomPackageTree, "ROOM");
                 RoomHelper.loadClassesInTree(roomPackageTree);
             });
             popUp.getSecondItem().addActionListener(e1 -> {
@@ -952,7 +976,7 @@ public class AdminFrame extends OperatorFrame {
         });
 
         roomEditorCancelButton.addActionListener(e -> {
-            roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+            roomPackageTree = ComponentHelper.setupTree(roomPackageTree, "ROOM");
             RoomHelper.loadClassesInTree(roomPackageTree);
 
             ComponentHelper.setEnabled(roomEditorRightPanel, false);
@@ -988,7 +1012,7 @@ public class AdminFrame extends OperatorFrame {
                 }
             }
 
-            roomPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("ROOM")));
+            roomPackageTree = ComponentHelper.setupTree(roomPackageTree, "ROOM");
             RoomHelper.loadClassesInTree(roomPackageTree);
 
             ComponentHelper.setEnabled(roomEditorRightPanel, false);
@@ -1008,8 +1032,17 @@ public class AdminFrame extends OperatorFrame {
             } else {
                 RoomHelper.roomClasses.removeIf(roomClass -> roomClass.getType().startsWith(RoomHelper.pathToType(new TreePath(node.getPath())) + ":"));
             }
-            roomPackageTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("ROOM")));
+
+            roomPackageTree = ComponentHelper.setupTree(roomPackageTree, "ROOM");
             RoomHelper.loadClassesInTree(roomPackageTree);
+
+            roomEditorStartSpinner.setValue(((SpinnerNumberModel) roomEditorStartSpinner.getModel()).getMinimum());
+            roomEditorEndSpinner.setValue(((SpinnerNumberModel) roomEditorEndSpinner.getModel()).getMinimum());
+            roomEditorAdultSpinner.setValue(0);
+            roomEditorChildSpinner.setValue(0);
+            roomEditorPriceSpinner.setValue(((SpinnerNumberModel) roomEditorPriceSpinner.getModel()).getMinimum());
+            editPackageButton.setEnabled(false);
+            removePackageButton.setEnabled(false);
         });
         /// endregion
 

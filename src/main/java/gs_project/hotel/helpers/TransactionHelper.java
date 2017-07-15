@@ -1,33 +1,31 @@
 package gs_project.hotel.helpers;
 
 import gs_project.hotel.FileHandler;
-import gs_project.hotel.types.Visitor;
+import gs_project.hotel.types.Transaction;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class VisitorHelper {
-    public final static String FILENAME = "visitors";
+public class TransactionHelper {
+    public final static String FILENAME = "transactions";
 
     public static void readFromFile() {
         System.out.print("Reading database file: \"" + FILENAME + "\" ...");
         try {
-            visitors = FileHandler.readFile(FILENAME);
+            transactions = FileHandler.readFile(FILENAME);
             System.out.println("DONE!");
         } catch (IOException | ClassNotFoundException e) {
             System.out.println();
             e.printStackTrace();
         }
 
-        if (visitors == null) { visitors = new ArrayList<>(); }
+        if (transactions == null) { transactions = new ArrayList<>(); }
     }
 
     public static void writeToFile() {
         System.out.print("Writing database file: \"" + FILENAME + "\" ...");
         try {
-            FileHandler.writeFile(FILENAME, visitors);
+            FileHandler.writeFile(FILENAME, transactions);
             System.out.println("DONE!");
         } catch (IOException e1) {
             System.out.println();
@@ -35,13 +33,5 @@ public class VisitorHelper {
         }
     }
 
-    public static ArrayList<Visitor> visitors = new ArrayList<>();
-
-    public static void loadVisitors(JTable table) {
-        ((DefaultTableModel) table.getModel()).setDataVector(Visitor.toObjectsArray(visitors), Visitor.getColumns());
-    }
-
-    public static void loadBookings(JTable table) {
-
-    }
+    public static ArrayList<Transaction> transactions = new ArrayList<>();
 }

@@ -11,15 +11,16 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeWillExpandListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.print.Book;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class OperatorFrame extends MainFrame {
     /// region panels
@@ -129,7 +130,7 @@ public class OperatorFrame extends MainFrame {
     protected final JTextField amountBox;
     protected final JTextField roomNumBox;
     protected final JScrollPane roomSelTreeScroller;
-    protected final JTree roomSelRoomTypesTree;
+    protected JTree roomSelRoomTypesTree;
     protected final DatePicker roomSelCheckInBox;
     protected final DatePicker roomSelCheckOutBox;
     protected final JSpinner dateAdults;
@@ -140,6 +141,7 @@ public class OperatorFrame extends MainFrame {
     protected final JTextField orderMenuTotalBox;
     protected final ButtonGroup buttonGroup = new ButtonGroup();
     private JTextArea detAddressBox;
+    protected JTree orderMenuPackageTree;
     /// endregion
 
     /**
@@ -228,22 +230,9 @@ public class OperatorFrame extends MainFrame {
         orderMenuPackageScroller.setBounds(12, 72, 183, 421);
         menuOrderPanel.add(orderMenuPackageScroller);
 
-        JTree orderMenuPackageTree = new JTree();
+        orderMenuPackageTree = ComponentHelper.setupTree(orderMenuPackageTree, "MENU");
         orderMenuPackageScroller.setViewportView(orderMenuPackageTree);
-
-        orderMenuPackageTree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode("MENU")));
-        orderMenuPackageTree.setEditable(false);
-        orderMenuPackageTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        orderMenuPackageTree.addTreeWillExpandListener(new TreeWillExpandListener() {
-            @Override
-            public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
-            }
-
-            @Override
-            public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
-                throw new ExpandVetoException(event);
-            }
-        });
+        orderMenuPackageTree.setFont(new Font("Tahoma", Font.PLAIN, 14));
 
         MenuHelper.loadDishesInTree(orderMenuPackageTree);
 
@@ -252,8 +241,10 @@ public class OperatorFrame extends MainFrame {
         menuOrderPanel.add(orderMenuOrderScroller);
 
         orderMenuOrderTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel) orderMenuOrderTable.getModel()).setColumnIdentifiers(Dish.getOrderColumns());
         orderMenuOrderScroller.setViewportView(orderMenuOrderTable);
         orderMenuOrderTable.setFillsViewportHeight(true);
+        orderMenuOrderTable.setFont(new Font("Tahoma", Font.BOLD, 12));
 
         JLabel orderMenuHeader = new JLabel("MEALS ORDER - MENU");
         orderMenuHeader.setFont(new Font("Tahoma", Font.BOLD, 20));
@@ -271,10 +262,10 @@ public class OperatorFrame extends MainFrame {
         orderMenuOrderClearButton.setBounds(376, 160, 96, 32);
         menuOrderPanel.add(orderMenuOrderClearButton);
 
-        JButton orderMenuPackageRemoveButton = new JButton("REMOVE");
-        orderMenuPackageRemoveButton.setFont(new Font("Tahoma", Font.BOLD, 14));
-        orderMenuPackageRemoveButton.setBounds(484, 160, 96, 32);
-        menuOrderPanel.add(orderMenuPackageRemoveButton);
+        JButton orderMenuRemoveButton = new JButton("REMOVE");
+        orderMenuRemoveButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuRemoveButton.setBounds(484, 160, 96, 32);
+        menuOrderPanel.add(orderMenuRemoveButton);
 
         JLabel orderMenuTotalLabel = new JLabel("TOTAL:");
         orderMenuTotalLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -283,6 +274,8 @@ public class OperatorFrame extends MainFrame {
 
         orderMenuTotalBox = new JTextField();
         orderMenuTotalBox.setEditable(false);
+        orderMenuTotalBox.setFont(new Font("Tahoma", Font.BOLD, 14));
+        orderMenuTotalBox.setHorizontalAlignment(SwingConstants.RIGHT);
         orderMenuTotalBox.setBounds(277, 505, 134, 32);
         menuOrderPanel.add(orderMenuTotalBox);
         orderMenuTotalBox.setColumns(10);
@@ -362,21 +355,24 @@ public class OperatorFrame extends MainFrame {
 
         orderMenuPackageTree.addTreeSelectionListener(e -> {
             try {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) orderMenuPackageTree.getSelectionPath().getParentPath().getParentPath().getLastPathComponent();
-                if (node == null) return;
-                DefaultMutableTreeNode typeNode = (DefaultMutableTreeNode) orderMenuPackageTree.getSelectionPath().getParentPath().getLastPathComponent();
-                if (typeNode == null) return;
-                DefaultMutableTreeNode dishNode = (DefaultMutableTreeNode) orderMenuPackageTree.getSelectionPath().getLastPathComponent();
+                DefaultMutableTreeNode dishNode = (DefaultMutableTreeNode) orderMenuPackageTree.getLastSelectedPathComponent();
                 if (dishNode == null) return;
+
+                DefaultMutableTreeNode typeNode = (DefaultMutableTreeNode) dishNode.getParent();
+                if (typeNode == null) return;
+
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) typeNode.getParent();
+                if (node == null) return;
+
                 int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
                 if (ind > -1) {
                     MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
                     if (typeNode.toString().equals("STARTERS")) {
                         for(Dish d:menuPackage.getStarters()) {
-                            if (d.getName().split("\t")[0].equals(dishNode.toString())) {
-                                orderMenuTypeHalfPriceBox.setText("₹ " + (.7 * d.getPrice()));
-                                orderMenuTypeSinglePriceBox.setText("₹ " + d.getPrice());
-                                orderMenuTypeDoublePriceBox.setText("₹ " + (1.85 * d.getPrice()));
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
+                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
                                 orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
                                 orderMenuQuantityBox.setEnabled(true);
                                 orderMenuTypeHalfOption.setEnabled(true);
@@ -399,10 +395,10 @@ public class OperatorFrame extends MainFrame {
                         }
                     } else if (typeNode.toString().equals("DESSERTS")) {
                         for(Dish d:menuPackage.getDesserts()) {
-                            if (d.getName().split("\t")[0].equals(dishNode.toString())) {
-                                orderMenuTypeHalfPriceBox.setText("₹ " + (.7 * d.getPrice()));
-                                orderMenuTypeSinglePriceBox.setText("₹ " + d.getPrice());
-                                orderMenuTypeDoublePriceBox.setText("₹ " + (1.85 * d.getPrice()));
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
+                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
                                 orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
                                 orderMenuQuantityBox.setEnabled(true);
                                 orderMenuTypeHalfOption.setEnabled(true);
@@ -425,10 +421,10 @@ public class OperatorFrame extends MainFrame {
                         }
                     } else if (typeNode.toString().equals("MAIN-COURSE")) {
                         for(Dish d:menuPackage.getMaincourse()) {
-                            if (d.getName().split("\t")[0].equals(dishNode.toString())) {
-                                orderMenuTypeHalfPriceBox.setText("₹ " + (.7 * d.getPrice()));
-                                orderMenuTypeSinglePriceBox.setText("₹ " + d.getPrice());
-                                orderMenuTypeDoublePriceBox.setText("₹ " + (1.85 * d.getPrice()));
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
+                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
                                 orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
                                 orderMenuQuantityBox.setEnabled(true);
                                 orderMenuTypeHalfOption.setEnabled(true);
@@ -474,6 +470,114 @@ public class OperatorFrame extends MainFrame {
                     orderMenuAddButton.setEnabled(false);
                 }
             } catch (Exception ignored) { }
+        });
+
+        orderMenuAddButton.addActionListener(e -> {
+            String plate = "";
+            double multiplier = 1;
+            if (orderMenuTypeHalfOption.isSelected()) {
+                plate = "HALF";
+                multiplier = 0.7;
+            } else if (orderMenuTypeSingleOption.isSelected()) {
+                plate = "SINGLE";
+                multiplier = 1;
+            } else if (orderMenuTypeDoubleOption.isSelected()) {
+                plate = "DOUBLE";
+                multiplier = 1.85;
+            }
+            if (plate.isEmpty()) {
+                JOptionPane.showMessageDialog(OperatorFrame.this, "You must select Plate Type.", "Plate Type error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int quantity = 0;
+            try {
+                quantity = Integer.valueOf(orderMenuQuantityBox.getValue().toString());
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(OperatorFrame.this, "You must enter a valid quantity.", "Quantity error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                DefaultMutableTreeNode dishNode = (DefaultMutableTreeNode) orderMenuPackageTree.getLastSelectedPathComponent();
+                if (dishNode == null) return;
+
+                DefaultMutableTreeNode typeNode = (DefaultMutableTreeNode) dishNode.getParent();
+                if (typeNode == null) return;
+
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) typeNode.getParent();
+                if (node == null) return;
+
+                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+
+                if (ind > -1) {
+                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
+                    DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
+                    if (typeNode.toString().equals("STARTERS")) {
+                        for (Dish d : menuPackage.getStarters()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                            }
+                        }
+                    } else if (typeNode.toString().equals("DESSERTS")) {
+                        for (Dish d : menuPackage.getDesserts()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                            }
+                        }
+                    } else if (typeNode.toString().equals("MAIN-COURSE")) {
+                        for(Dish d:menuPackage.getMaincourse()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                            }
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid dish or Currently Unavailable.", "DISH NOT FOUND", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid dish or Currently Unavailable.", "DISH NOT FOUND", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } catch (Exception ignored) { }
+            int totalPrice = 0;
+            int invalid = 0;
+            for (int i = 0; i < orderMenuOrderTable.getRowCount(); i++) {
+                try {
+                    totalPrice += Double.valueOf(orderMenuOrderTable.getValueAt(i, 3).toString().substring(2));
+                } catch (NumberFormatException nfe) {
+                    invalid++;
+                    ((DefaultTableModel) orderMenuOrderTable.getModel()).removeRow(i);
+                }
+            }
+            if (invalid > 0) {
+                JOptionPane.showMessageDialog(OperatorFrame.this, "Removed " + invalid + " invalid entries.", "Invalid Entries", JOptionPane.WARNING_MESSAGE);
+            }
+            orderMenuTotalBox.setText("₹ " + (double) totalPrice);
+        });
+
+        orderMenuRemoveButton.setEnabled(false);
+        orderMenuOrderTable.getSelectionModel().addListSelectionListener(e -> {
+            int ind = orderMenuOrderTable.getSelectedRow();
+            if (ind > -1) {
+                orderMenuRemoveButton.setEnabled(true);
+            } else {
+                orderMenuRemoveButton.setEnabled(false);
+            }
+        });
+
+        orderMenuOrderClearButton.addActionListener(e -> {
+            DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
+            model.setRowCount(0);
+        });
+
+        orderMenuRemoveButton.addActionListener(e -> {
+            int ind = orderMenuOrderTable.getSelectedRow();
+            if (ind > -1) {
+                DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
+                model.removeRow(ind);
+            } else {
+                JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid Order entry.", "Order Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         });
         /// endregion
 
@@ -712,7 +816,7 @@ public class OperatorFrame extends MainFrame {
         detHeader.setBounds(0, 0, 562, 48);
         detailsPanel.add(detHeader);
 
-        JComboBox detVerifyDocBox = new JComboBox();
+        JComboBox<String> detVerifyDocBox = new JComboBox<>(new String[] { "AADHAR", "VOTER ID", "ELECTRICITY BILL"});
         detVerifyDocBox.setBounds(245, 394, 317, 32);
         detailsPanel.add(detVerifyDocBox);
 
@@ -769,8 +873,7 @@ public class OperatorFrame extends MainFrame {
         roomSelTreeScroller.setBounds(315, 81, 247, 345);
         roomSelectionPanel.add(roomSelTreeScroller);
 
-        DefaultTreeModel roomModel = new DefaultTreeModel(new DefaultMutableTreeNode("ROOMS"));
-        roomSelRoomTypesTree = new JTree(roomModel);
+        roomSelRoomTypesTree = ComponentHelper.setupTree(roomSelRoomTypesTree, "ROOM");
         roomSelTreeScroller.setViewportView(roomSelRoomTypesTree);
 
         roomSelRoomNoBox = new JTextField();
@@ -842,7 +945,7 @@ public class OperatorFrame extends MainFrame {
         dateCheckInPicker.setBounds(312, 95, 230, 32);
         datesPeoplePanel.add(dateCheckInPicker);
         datePickerSettings(dateCheckInPicker);
-       dateCheckInPicker.setDateToToday();
+        dateCheckInPicker.setDateToToday();
 
 
         dateCheckoutPicker = new DatePicker();
@@ -1064,7 +1167,7 @@ public class OperatorFrame extends MainFrame {
             billingPanel.add(backButton);
 
             // todo call set visible in checkButton method
-            billingPanel.setVisible(true);
+            billingPanel.setVisible(false);
 
             setPanel(checkOutPanel, rightPanel);
         });
@@ -1078,7 +1181,7 @@ public class OperatorFrame extends MainFrame {
             confirmCheckInPanel.add(backButton);
 
             // todo call set visible in checkButton method
-            confirmCheckInPanel.setVisible(true);
+            confirmCheckInPanel.setVisible(false);
 
             setPanel(checkInPanel, rightPanel);
         });
@@ -1092,7 +1195,6 @@ public class OperatorFrame extends MainFrame {
             setStep(datesPeopleStep, stepsPanel);
             setPanel(datesPeoplePanel, currentStepPanel);
         });
-
         bookNextStepButton.addActionListener(e -> {
             if (datesPeopleStep.isEnabled()) {
                 if((int)dateAdults.getValue()<=0) {
@@ -1105,6 +1207,10 @@ public class OperatorFrame extends MainFrame {
                 }
                 roomSelCheckInBox.setDate(dateCheckInPicker.getDate());
                 roomSelCheckOutBox.setDate(dateCheckoutPicker.getDate());
+
+                confirmAdultsBox.setText(String.valueOf(dateAdults.getValue()));
+                confirmChildrenBox.setText(String.valueOf(dateChildren.getValue()));
+
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(roomSelectStep, stepsPanel);
                 setPanel(roomSelectionPanel, currentStepPanel);
@@ -1117,6 +1223,15 @@ public class OperatorFrame extends MainFrame {
                     JOptionPane.showMessageDialog(this,"PLEASE CHANGE CHECK OUT DATE","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
+
+                confirmCheckInBox.setText(roomSelCheckInBox.getDate().toString());
+                confirmCheckOutBox.setText(roomSelCheckOutBox.getDate().toString());
+
+                confirmRoomPackageBox.setText(roomSelRoomNoBox.getText());
+
+                confirmPriceBox.setText(roomselPriceBox.getText());
+                // todo taxes;
+
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(detailsStep, stepsPanel);
                 setPanel(detailsPanel, currentStepPanel);
@@ -1139,25 +1254,70 @@ public class OperatorFrame extends MainFrame {
                     JOptionPane.showMessageDialog(this,"EMAIL NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                int i = searchCard();
-                Visitor vis=new Visitor(detCardNumBox.getText(),detVisitorNameBox.getText(),detEmailBox.getText(),detPhoneNumBox.getText(),detAddressBox.getText(),new ArrayList<>());
-                if(i==-1){
-                    VisitorHelper.visitors.add(vis);
-                }
-                else {
-                    VisitorHelper.visitors.set(i, vis);
-                }
+
+                vis_index = searchCard();
+                vis = new Visitor(detCardNumBox.getText(),detVisitorNameBox.getText(),detEmailBox.getText(),detPhoneNumBox.getText(),detAddressBox.getText(), detVerifyDocBox.getSelectedItem().toString() , new ArrayList<>());
+
+                confirmCustNameBox.setText(detVisitorNameBox.getText());
+                confirmCardNumBox.setText(detCardNumBox.getText());
+
                 bookNextStepButton.setText("CONFIRM BOOKING");
                 setStep(confirmStep, stepsPanel);
                 setPanel(confirmPanel, currentStepPanel);
             } else if (confirmStep.isEnabled()) {
-                // todo confirmBooking
+                // todo add booking to visitor object and room object
+                Booking booking = new Booking(IDGenerator.generate(), LocalDate.now().toString(), checkInDate.getText(), checkOutDate.getText(), "current");
+                vis.getBookings().add(booking);
+                vis.getBookings().sort(Comparator.comparing(o -> LocalDate.parse(o.getCheckindate())));
+                if (vis_index == -1) {
+                    VisitorHelper.visitors.add(vis);
+                }
+                else {
+                    VisitorHelper.visitors.set(vis_index, vis);
+                }
+                boolean found = false;
+                for (RoomClass rc:RoomHelper.roomClasses) {
+                    if (rc.getType().equals(confirmRoomPackageBox.getText())) {
+                        for (Room r:rc.getRooms()) {
+
+                            if (r.getBookings().size() == 0) {
+                                r.getBookings().add(booking);
+                                found = true;
+                            }
+                            if (LocalDate.parse(confirmCheckInBox.getText()).isAfter(LocalDate.parse(r.getBookings().get(r.getBookings().size() - 1).getCheckoutdate()))) {
+                                r.getBookings().add(r.getBookings().size(), booking);
+                                found = true;
+                            }
+                            if (LocalDate.parse(confirmCheckOutBox.getText()).isBefore(LocalDate.parse(r.getBookings().get(0).getCheckoutdate()))) {
+                                r.getBookings().add(0, booking);
+                                found = true;
+                            }
+
+                            for (int i = 0; i < r.getBookings().size() - 1; i++) {
+                                if (LocalDate.parse(confirmCheckInBox.getText()).isAfter(LocalDate.parse(r.getBookings().get(i).getCheckoutdate())) && LocalDate.parse(confirmCheckOutBox.getText()).isBefore(LocalDate.parse(r.getBookings().get(i + 1).getCheckindate()))) {
+                                    r.getBookings().add(i, booking);
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (found) {
+                                r.getBookings().sort(Comparator.comparing(o -> LocalDate.parse(o.getCheckindate())));
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+
                 JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING CONFIRMED", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
+                bookNextStepButton.setText("NEXT STEP");
+                setStep(datesPeopleStep, stepsPanel);
+                setPanel(datesPeoplePanel, currentStepPanel);
             } else {
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(datesPeopleStep, stepsPanel);
                 setPanel(datesPeoplePanel, currentStepPanel);
-
             }
         });
 
@@ -1210,7 +1370,7 @@ public class OperatorFrame extends MainFrame {
             confirmCancelPanel.add(backButton);
 
             // todo call set visible in checkButton method
-            confirmCancelPanel.setVisible(true);
+            confirmCancelPanel.setVisible(false);
 
             setPanel(cancelBookingPanel, rightPanel);
         });
@@ -1385,5 +1545,8 @@ public class OperatorFrame extends MainFrame {
        detEmailBox.setText(vs.getEmailId());
        detAddressBox.setText(vs.getAddress());
    }
+   Visitor vis;
+   int vis_index;
+   String type;
 }
 
