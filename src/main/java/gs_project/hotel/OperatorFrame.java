@@ -1389,8 +1389,43 @@ public class OperatorFrame extends MainFrame {
                 return;
             }
             else {
+                for(RoomClass rc:RoomHelper.roomClasses){
+                    for(Room r:rc.getRooms()){
+                        for(Booking b:r.getBookings()){
+                            if(bookId.getText().equals(b.getId())){
+                                checkInDate.setText(b.getCheckindate());
+                                checkOutDate.setText(b.getCheckoutdate());
+                                int price=(LocalDate.parse(b.getCheckindate()).until(LocalDate.parse(b.getCheckoutdate())).getDays()*rc.getPrice());
+                                totalPrice.setText(""+price);
+                                initPaymentBox.setText (""+b.getTransactions().get(0).getValue());
+                                roomNumBox.setText(""+r.getRoomNo());
+                                int x=(price*28/100);
+                                gstBox.setText(""+x);
+                                amountBox.setText(""+(x+price));
+                                break;
+                            }
 
-               bookInfoPanel.setVisible(true);
+                        }
+                    }
+                }
+                for(Visitor vs:VisitorHelper.visitors){
+                    for(Booking b:vs.getBookings()){
+                        if(bookId.getText().equals(b.getId())){
+                            custName.setText(vs.getName());
+                            break;
+                        }
+                    }
+                }
+               if(checkOutHeader.getText().equals("CHECK IN") ) {
+
+                    confirmCheckInPanel.setVisible(true);
+               }
+               else if(checkOutHeader.getText().equals("CHECK OUT")){
+                    billingPanel.setVisible(true);
+               }
+               else {
+                   confirmCancelPanel.setVisible(true);
+               }
             }
         });
         detCardNumBox.getDocument().addDocumentListener(new DocumentListener() {
