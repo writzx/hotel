@@ -790,7 +790,7 @@ public class AdminFrame extends OperatorFrame {
                 dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
                 MenuHelper.loadClassesInTree(dishesMenuTree);
 
-                dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
+                orderMenuPackageTree = ComponentHelper.setupTree(orderMenuPackageTree, "MENU");
                 MenuHelper.loadDishesInTree(orderMenuPackageTree);
             });
             popUp.getSecondItem().addActionListener(e1 -> {
