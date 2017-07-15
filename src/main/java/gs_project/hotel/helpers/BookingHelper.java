@@ -2,9 +2,15 @@ package gs_project.hotel.helpers;
 
 import gs_project.hotel.FileHandler;
 import gs_project.hotel.types.Booking;
+import gs_project.hotel.types.Transaction;
+import gs_project.hotel.types.Visitor;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class BookingHelper {
     public final static String FILENAME = "bookings";
@@ -34,4 +40,5 @@ public class BookingHelper {
     }
 
     public static ArrayList<Booking> bookings = new ArrayList<>();
+
 }

@@ -1,6 +1,7 @@
 package gs_project.hotel.helpers;
 
 import gs_project.hotel.FileHandler;
+import gs_project.hotel.types.Transaction;
 import gs_project.hotel.types.Visitor;
 
 import javax.swing.*;
@@ -36,12 +37,4 @@ public class VisitorHelper {
     }
 
     public static ArrayList<Visitor> visitors = new ArrayList<>();
-
-    public static void loadVisitors(JTable table) {
-        ((DefaultTableModel) table.getModel()).setDataVector(Visitor.toObjectsArray(visitors), Visitor.getColumns());
-    }
-
-    public static void loadBookings(JTable table) {
-
-    }
 }

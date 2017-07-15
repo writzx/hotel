@@ -11,8 +11,11 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -1203,7 +1206,8 @@ public class AdminFrame extends OperatorFrame {
             reportsEndDatePicker.setVisible(false);
             reportsDateRangeLabel.setVisible(false);
 
-            // todo change reportsTable
+            ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) reportsTable.getModel()).setDataVector(Visitor.toObjectsArray(VisitorHelper.visitors), Visitor.getColumns());
 
             setPanel(reportsPanel, rightPanel);
         });
@@ -1217,7 +1221,8 @@ public class AdminFrame extends OperatorFrame {
             reportsEndDatePicker.setVisible(true);
             reportsDateRangeLabel.setVisible(true);
 
-            // todo change reportsTable
+            ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
+            RoomHelper.loadTransactions(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
 
             setPanel(reportsPanel, rightPanel);
         });
@@ -1232,9 +1237,20 @@ public class AdminFrame extends OperatorFrame {
             reportsEndDatePicker.setVisible(true);
             reportsDateRangeLabel.setVisible(true);
 
-            // todo change reportsTable
+            ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
+            RoomHelper.loadCurrentBookings(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
 
             setPanel(reportsPanel, rightPanel);
+        });
+
+        reportsStartDatePicker.addDateChangeListener(e -> {
+            if (reportsHeader.getText().equals("CURRENT BOOKINGS")) {
+                ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
+                RoomHelper.loadCurrentBookings(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
+            } else if (reportsHeader.getText().equals("RECENT TRANSACTIONS")) {
+                ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
+                RoomHelper.loadTransactions(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
+            }
         });
         /// endregion
 
@@ -1247,5 +1263,22 @@ public class AdminFrame extends OperatorFrame {
                 OperatorHelper.writeToFile();
             }
         });
+
+        detCardNumBox.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (detCardGenerateButton.hasFocus()) {
+                    detCardNumBox.requestFocus();
+                    return;
+                }
+                if (detCardNumBox.getText().length() != 16) {
+                    JOptionPane.showMessageDialog(AdminFrame.this, "Card Number should be 16 characters long!", "Invalid Card Number", JOptionPane.ERROR_MESSAGE);
+                    detCardNumBox.requestFocus();
+                }
+            }
+        });
+
+        reportsStartDatePicker.setDate(LocalDate.now());
+        reportsEndDatePicker.setDate(LocalDate.now());
     }
 }

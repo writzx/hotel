@@ -1,13 +1,18 @@
 package gs_project.hotel.helpers;
 
 import gs_project.hotel.FileHandler;
+import gs_project.hotel.types.Booking;
 import gs_project.hotel.types.Room;
 import gs_project.hotel.types.RoomClass;
+import gs_project.hotel.types.Transaction;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.*;
+import java.awt.print.Book;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 
@@ -133,5 +138,42 @@ public class RoomHelper {
             str.add(o.toString());
         }
         return String.join(":", str.toArray(new String[str.size()]));
+    }
+
+    public static void loadTransactions(JTable table, LocalDate dateStart, LocalDate dateEnd) {
+        ArrayList<Transaction> transactions = new ArrayList<>();
+        for (RoomClass rc:roomClasses) {
+            for (Room r: rc.getRooms()) {
+                for (Booking b : r.getBookings()) {
+                    for (Transaction t: b.getTransactions()) {
+                        LocalDate date =LocalDate.parse(t.getDate());
+                        if (date.isAfter(dateStart) && date.isBefore(dateEnd)) {
+                            transactions.add(t);
+                        }
+                    }
+                }
+            }
+        }
+        transactions.sort(Comparator.comparing(transaction -> LocalDate.parse(transaction.getDate())));
+        ((DefaultTableModel) table.getModel()).setDataVector(Transaction.toObjectsArray(transactions), Transaction.getColumns());
+    }
+
+    public static void loadCurrentBookings(JTable table, LocalDate dateStart, LocalDate dateEnd) {
+        ArrayList<Booking> bookings = new ArrayList<>();
+
+        for (RoomClass rc:roomClasses) {
+            for (Room r : rc.getRooms()) {
+                for (Booking b : r.getBookings()) {
+                    LocalDate date =LocalDate.parse(b.getBookingdate());
+                    if (date.isAfter(dateStart) && date.isBefore(dateEnd)) {
+                        bookings.add(b);
+                    }
+                }
+            }
+        }
+
+        bookings.sort(Comparator.comparing(booking -> LocalDate.parse(booking.getCheckindate())));
+
+        ((DefaultTableModel) table.getModel()).setDataVector(Booking.toObjectsArray(bookings), Booking.getColumns());
     }
 }

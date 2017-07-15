@@ -1,5 +1,6 @@
 package gs_project.hotel.types;
 
+import java.awt.print.Book;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -75,4 +76,21 @@ public class Booking implements Serializable {
         this.transactions = transactions;
     }
     ///endregion
+
+    public Object[] toObjects() {
+        return new Object[] {id, bookingdate, checkindate, checkoutdate, bookingstate};
+    }
+
+    public static Object[] getColumns() {
+        return new Object[] { "BOOKING ID", "DATE", "CHECK IN", "CHECK OUT", "STATUS" };
+    }
+
+    public static Object[][] toObjectsArray(java.util.List<Booking> bookings) {
+        Object[][] objects = new Object[bookings.size()][];
+        int i = 0;
+        for (Booking s:bookings) {
+            objects[i++] = s.toObjects();
+        }
+        return objects;
+    }
 }
