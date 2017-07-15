@@ -159,21 +159,6 @@ public class RoomHelper {
     }
 
     public static void loadCurrentBookings(JTable table, LocalDate dateStart, LocalDate dateEnd) {
-        ArrayList<Booking> bookings = new ArrayList<>();
-
-        for (RoomClass rc:roomClasses) {
-            for (Room r : rc.getRooms()) {
-                for (Booking b : r.getBookings()) {
-                    LocalDate date =LocalDate.parse(b.getBookingdate());
-                    if ((date.isAfter(dateStart) || date.isEqual(dateStart)) && (date.isBefore(dateEnd) || date.isEqual(dateEnd))) {
-                        bookings.add(b);
-                    }
-                }
-            }
-        }
-
-        bookings.sort(Comparator.comparing(booking -> LocalDate.parse(booking.getCheckindate())));
-
         ((DefaultTableModel) table.getModel()).setDataVector(RoomClass.toBookingObjectsArray(RoomHelper.roomClasses), RoomClass.getBookingColumns());
         //((DefaultTableModel) table.getModel()).setDataVector(Booking.toObjectsArray(bookings), Booking.getColumns());
     }

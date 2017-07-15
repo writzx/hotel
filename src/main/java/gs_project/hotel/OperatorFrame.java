@@ -17,9 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.print.Book;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -96,8 +94,8 @@ public class OperatorFrame extends MainFrame {
     protected final JLabel bookIdLabel;
     protected final JLabel custNameLabel;
     protected final JLabel custName;
-    protected final JLabel roomPackageNumLabel;
-    protected final JLabel roomPackageAndNum;
+    protected final JLabel roomPackageNameLabel;
+    protected final JLabel roomPackage;
     protected final JLabel checkInLabel;
     protected final JLabel checkInDate;
     protected final JLabel checkOutLabel;
@@ -164,7 +162,6 @@ public class OperatorFrame extends MainFrame {
 
         RoomHelper.readFromFile();
         MenuHelper.readFromFile();
-        BookingHelper.readFromFile();
         VisitorHelper.readFromFile();
         OperatorHelper.readFromFile();
 
@@ -1014,15 +1011,15 @@ public class OperatorFrame extends MainFrame {
         bookInfoPanel.add(custName);
         custName.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        roomPackageNumLabel = new JLabel("PACKAGE(with ROOM#):");
-        roomPackageNumLabel.setBounds(0, 35, 208, 32);
-        bookInfoPanel.add(roomPackageNumLabel);
-        roomPackageNumLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        roomPackageNameLabel = new JLabel("PACKAGE:");
+        roomPackageNameLabel.setBounds(0, 35, 208, 32);
+        bookInfoPanel.add(roomPackageNameLabel);
+        roomPackageNameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        roomPackageAndNum = new JLabel("");
-        roomPackageAndNum.setBounds(218, 35, 334, 32);
-        bookInfoPanel.add(roomPackageAndNum);
-        roomPackageAndNum.setFont(new Font("Tahoma", Font.BOLD, 14));
+        roomPackage = new JLabel("");
+        roomPackage.setBounds(218, 35, 334, 32);
+        bookInfoPanel.add(roomPackage);
+        roomPackage.setFont(new Font("Tahoma", Font.BOLD, 14));
 
         checkInLabel = new JLabel("CHECK IN DATE:");
         checkInLabel.setBounds(0, 78, 208, 32);
@@ -1141,7 +1138,7 @@ public class OperatorFrame extends MainFrame {
         confirmCancelPanel.setBounds(10, 117, 572, 421);
         cancelBookingPanel.add(confirmCancelPanel);
 
-        confirmCancelButton = new JButton("CONFIRM CHECK IN");
+        confirmCancelButton = new JButton("CONFIRM CANCEL");
         confirmCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCancelButton.setBounds(288, 378, 274, 32);
         confirmCancelPanel.add(confirmCancelButton);
@@ -1258,10 +1255,33 @@ public class OperatorFrame extends MainFrame {
                 setStep(confirmStep, stepsPanel);
                 setPanel(confirmPanel, currentStepPanel);
             } else if (confirmStep.isEnabled()) {
-                // todo add booking to visitor object and room object
-                Booking booking = new Booking(IDGenerator.generate(), LocalDate.now().toString(), confirmCheckInBox.getText(), confirmCheckOutBox.getText(), "current");
+                Booking booking = new Booking(IDGenerator.generate().substring(5), LocalDate.now().toString(), confirmCheckInBox.getText(), confirmCheckOutBox.getText(), "current");
+
+                String iniamount = "";
+                int amount = 0;
+                while (iniamount == null || iniamount.isEmpty()) {
+                    iniamount = JOptionPane.showInputDialog(OperatorFrame.this, "Enter price:", "PRICE", JOptionPane.QUESTION_MESSAGE);
+                    if (iniamount == null || iniamount.isEmpty()) {
+                        JOptionPane.showMessageDialog(OperatorFrame.this, "Intial amount cannot be empty. Re-enter!", "Invalid Price", JOptionPane.ERROR_MESSAGE);
+                        continue;
+                    }
+                    try {
+                        amount = Integer.valueOf(iniamount);
+                        if (amount <= 0) {
+                            iniamount = "";
+                            JOptionPane.showMessageDialog(OperatorFrame.this, "Intial amount cannot be less than or equal to zero. Re-enter!", "Invalid Price", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        iniamount = "";
+                        JOptionPane.showMessageDialog(OperatorFrame.this, "Intial amount can only be a integer. Re-enter!", "Invalid Price", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+
+                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), amount, booking.getBookingdate(), "INITIAL PAYMENT"));
+
                 vis.getBookings().add(booking);
                 vis.getBookings().sort(Comparator.comparing(o -> LocalDate.parse(o.getCheckindate())));
+
                 if (vis_index == -1) {
                     VisitorHelper.visitors.add(vis);
                 }
@@ -1351,7 +1371,6 @@ public class OperatorFrame extends MainFrame {
         bookCancelButton.addActionListener(e -> setPanel(null, rightPanel)); // clear right panel
 
         cancelBookingButton.addActionListener(e -> {
-            confirmCheckInButton.setText("CONFIRM CANCEL");
             checkOutHeader.setText("CANCEL BOOKING");
             cancelBookingPanel.add(checkBookIdPanel);
             confirmCancelPanel.add(bookInfoPanel);
@@ -1385,6 +1404,7 @@ public class OperatorFrame extends MainFrame {
                             if(bookId.getText().equals(b.getId())){
                                 checkInDate.setText(b.getCheckindate());
                                 checkOutDate.setText(b.getCheckoutdate());
+                                roomPackage.setText(rc.getType());
                                 int price=(LocalDate.parse(b.getCheckindate()).until(LocalDate.parse(b.getCheckoutdate())).getDays()*rc.getPrice());
                                 totalPrice.setText(""+price);
                                 initPaymentBox.setText (""+b.getTransactions().get(0).getValue());
@@ -1516,7 +1536,7 @@ public class OperatorFrame extends MainFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                BookingHelper.writeToFile();
+                RoomHelper.writeToFile();
             }
         });
     }

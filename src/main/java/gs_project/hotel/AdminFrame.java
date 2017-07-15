@@ -92,18 +92,10 @@ public class AdminFrame extends OperatorFrame {
     private JTree dishesMenuTree;
     private JTree roomPackageTree;
 
-//    public static void main(String[] args) {
-//        EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                try {
-//                    AdminFrame frame = new AdminFrame();
-//                    frame.setVisible(true);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
+    public static void main(String[] args) {
+        AdminFrame frame = new AdminFrame();
+        frame.setVisible(true);
+    }
 
     public AdminFrame() {
         super("Admin Landing Page");
@@ -1266,7 +1258,6 @@ public class AdminFrame extends OperatorFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                RoomHelper.writeToFile();
                 MenuHelper.writeToFile();
                 VisitorHelper.writeToFile();
                 OperatorHelper.writeToFile();
