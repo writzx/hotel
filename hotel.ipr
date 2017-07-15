@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactManager">
+    <artifact name="hotel:jar">
+      <output-path>$PROJECT_DIR$/out/artifacts/hotel_jar</output-path>
+      <root id="root">
+        <element id="archive" name="hotel.jar">
+          <element id="directory" name="META-INF">
+            <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+          </element>
+          <element id="module-output" name="hotel_main" />
+        </element>
+        <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/joda-time/joda-time/2.9.9/f7b520c458572890807d143670c9b24f4de90897/joda-time-2.9.9.jar" />
+        <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.lgooddatepicker/LGoodDatePicker/10.3.1/acd6d3d6f6b86f79623a6f9053eac05bc5004655/LGoodDatePicker-10.3.1.jar" />
+      </root>
+    </artifact>
+  </component>
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
       <module name="hotel_main" target="1.8" />

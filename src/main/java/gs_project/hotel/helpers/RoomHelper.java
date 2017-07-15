@@ -147,7 +147,7 @@ public class RoomHelper {
                 for (Booking b : r.getBookings()) {
                     for (Transaction t: b.getTransactions()) {
                         LocalDate date =LocalDate.parse(t.getDate());
-                        if (date.isAfter(dateStart) && date.isBefore(dateEnd)) {
+                        if ((date.isAfter(dateStart) || date.isEqual(dateStart)) && (date.isBefore(dateEnd) || date.isEqual(dateEnd))) {
                             transactions.add(t);
                         }
                     }
@@ -165,7 +165,7 @@ public class RoomHelper {
             for (Room r : rc.getRooms()) {
                 for (Booking b : r.getBookings()) {
                     LocalDate date =LocalDate.parse(b.getBookingdate());
-                    if (date.isAfter(dateStart) && date.isBefore(dateEnd)) {
+                    if ((date.isAfter(dateStart) || date.isEqual(dateStart)) && (date.isBefore(dateEnd) || date.isEqual(dateEnd))) {
                         bookings.add(b);
                     }
                 }
@@ -174,6 +174,7 @@ public class RoomHelper {
 
         bookings.sort(Comparator.comparing(booking -> LocalDate.parse(booking.getCheckindate())));
 
-        ((DefaultTableModel) table.getModel()).setDataVector(Booking.toObjectsArray(bookings), Booking.getColumns());
+        ((DefaultTableModel) table.getModel()).setDataVector(RoomClass.toBookingObjectsArray(RoomHelper.roomClasses), RoomClass.getBookingColumns());
+        //((DefaultTableModel) table.getModel()).setDataVector(Booking.toObjectsArray(bookings), Booking.getColumns());
     }
 }

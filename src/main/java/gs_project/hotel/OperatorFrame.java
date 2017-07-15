@@ -19,6 +19,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.print.Book;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -148,16 +149,8 @@ public class OperatorFrame extends MainFrame {
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    OperatorFrame frame = new OperatorFrame();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        OperatorFrame frame = new OperatorFrame();
+        frame.setVisible(true);
     }
 
     public OperatorFrame() {
@@ -1016,7 +1009,7 @@ public class OperatorFrame extends MainFrame {
         bookInfoPanel.add(custNameLabel);
         custNameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        custName = new JLabel("New label");
+        custName = new JLabel("");
         custName.setBounds(218, 0, 334, 32);
         bookInfoPanel.add(custName);
         custName.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1026,7 +1019,7 @@ public class OperatorFrame extends MainFrame {
         bookInfoPanel.add(roomPackageNumLabel);
         roomPackageNumLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        roomPackageAndNum = new JLabel("New label");
+        roomPackageAndNum = new JLabel("");
         roomPackageAndNum.setBounds(218, 35, 334, 32);
         bookInfoPanel.add(roomPackageAndNum);
         roomPackageAndNum.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1036,7 +1029,7 @@ public class OperatorFrame extends MainFrame {
         bookInfoPanel.add(checkInLabel);
         checkInLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        checkInDate = new JLabel("New label");
+        checkInDate = new JLabel("");
         checkInDate.setBounds(218, 78, 334, 32);
         bookInfoPanel.add(checkInDate);
         checkInDate.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1046,7 +1039,7 @@ public class OperatorFrame extends MainFrame {
         bookInfoPanel.add(checkOutLabel);
         checkOutLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        checkOutDate = new JLabel("New label");
+        checkOutDate = new JLabel("");
         checkOutDate.setBounds(218, 121, 334, 32);
         bookInfoPanel.add(checkOutDate);
         checkOutDate.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1056,7 +1049,7 @@ public class OperatorFrame extends MainFrame {
         bookInfoPanel.add(totalPriceLabel);
         totalPriceLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        totalPrice = new JLabel("New label");
+        totalPrice = new JLabel("");
         totalPrice.setBounds(218, 196, 334, 32);
         bookInfoPanel.add(totalPrice);
         totalPrice.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1266,7 +1259,7 @@ public class OperatorFrame extends MainFrame {
                 setPanel(confirmPanel, currentStepPanel);
             } else if (confirmStep.isEnabled()) {
                 // todo add booking to visitor object and room object
-                Booking booking = new Booking(IDGenerator.generate(), LocalDate.now().toString(), checkInDate.getText(), checkOutDate.getText(), "current");
+                Booking booking = new Booking(IDGenerator.generate(), LocalDate.now().toString(), confirmCheckInBox.getText(), confirmCheckOutBox.getText(), "current");
                 vis.getBookings().add(booking);
                 vis.getBookings().sort(Comparator.comparing(o -> LocalDate.parse(o.getCheckindate())));
                 if (vis_index == -1) {
@@ -1279,25 +1272,22 @@ public class OperatorFrame extends MainFrame {
                 for (RoomClass rc:RoomHelper.roomClasses) {
                     if (rc.getType().equals(confirmRoomPackageBox.getText())) {
                         for (Room r:rc.getRooms()) {
-
                             if (r.getBookings().size() == 0) {
                                 r.getBookings().add(booking);
                                 found = true;
-                            }
-                            if (LocalDate.parse(confirmCheckInBox.getText()).isAfter(LocalDate.parse(r.getBookings().get(r.getBookings().size() - 1).getCheckoutdate()))) {
+                            } else if (LocalDate.parse(confirmCheckInBox.getText()).isAfter(LocalDate.parse(r.getBookings().get(r.getBookings().size() - 1).getCheckoutdate()))) {
                                 r.getBookings().add(r.getBookings().size(), booking);
                                 found = true;
-                            }
-                            if (LocalDate.parse(confirmCheckOutBox.getText()).isBefore(LocalDate.parse(r.getBookings().get(0).getCheckoutdate()))) {
+                            } else if (LocalDate.parse(confirmCheckOutBox.getText()).isBefore(LocalDate.parse(r.getBookings().get(0).getCheckoutdate()))) {
                                 r.getBookings().add(0, booking);
                                 found = true;
-                            }
-
-                            for (int i = 0; i < r.getBookings().size() - 1; i++) {
-                                if (LocalDate.parse(confirmCheckInBox.getText()).isAfter(LocalDate.parse(r.getBookings().get(i).getCheckoutdate())) && LocalDate.parse(confirmCheckOutBox.getText()).isBefore(LocalDate.parse(r.getBookings().get(i + 1).getCheckindate()))) {
-                                    r.getBookings().add(i, booking);
-                                    found = true;
-                                    break;
+                            } else {
+                                for (int i = 0; i < r.getBookings().size() - 1; i++) {
+                                    if (LocalDate.parse(confirmCheckInBox.getText()).isAfter(LocalDate.parse(r.getBookings().get(i).getCheckoutdate())) && LocalDate.parse(confirmCheckOutBox.getText()).isBefore(LocalDate.parse(r.getBookings().get(i + 1).getCheckindate()))) {
+                                        r.getBookings().add(i, booking);
+                                        found = true;
+                                        break;
+                                    }
                                 }
                             }
 
@@ -1498,20 +1488,19 @@ public class OperatorFrame extends MainFrame {
                     if (r.getBookings().size() == 0) {
                         classes.add(rc);
                         break;
-                    }
-                    if (roomSelCheckInBox.getDate().isAfter(LocalDate.parse(r.getBookings().get(r.getBookings().size() - 1).getCheckoutdate()))) {
+                    } else if (roomSelCheckInBox.getDate().isAfter(LocalDate.parse(r.getBookings().get(r.getBookings().size() - 1).getCheckoutdate()))) {
                         classes.add(rc);
                         break;
-                    }
-                    if (roomSelCheckOutBox.getDate().isBefore(LocalDate.parse(r.getBookings().get(0).getCheckoutdate()))) {
+                    } else if (roomSelCheckOutBox.getDate().isBefore(LocalDate.parse(r.getBookings().get(0).getCheckoutdate()))) {
                         classes.add(rc);
                         break;
-                    }
-                    for (int i = 0; i < r.getBookings().size() - 1; i++) {
-                        if (roomSelCheckInBox.getDate().isAfter(LocalDate.parse(r.getBookings().get(i).getCheckoutdate())) && roomSelCheckOutBox.getDate().isBefore(LocalDate.parse(r.getBookings().get(i + 1).getCheckindate()))) {
-                            classes.add(rc);
-                            found = true;
-                            break;
+                    } else {
+                        for (int i = 0; i < r.getBookings().size() - 1; i++) {
+                            if (roomSelCheckInBox.getDate().isAfter(LocalDate.parse(r.getBookings().get(i).getCheckoutdate())) && roomSelCheckOutBox.getDate().isBefore(LocalDate.parse(r.getBookings().get(i + 1).getCheckindate()))) {
+                                classes.add(rc);
+                                found = true;
+                                break;
+                            }
                         }
                     }
                     if (found) { break; }

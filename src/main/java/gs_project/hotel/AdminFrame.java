@@ -92,18 +92,18 @@ public class AdminFrame extends OperatorFrame {
     private JTree dishesMenuTree;
     private JTree roomPackageTree;
 
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    AdminFrame frame = new AdminFrame();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+//    public static void main(String[] args) {
+//        EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                try {
+//                    AdminFrame frame = new AdminFrame();
+//                    frame.setVisible(true);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
 
     public AdminFrame() {
         super("Admin Landing Page");
@@ -1252,6 +1252,15 @@ public class AdminFrame extends OperatorFrame {
                 RoomHelper.loadTransactions(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
             }
         });
+        reportsEndDatePicker.addDateChangeListener(e -> {
+            if (reportsHeader.getText().equals("CURRENT BOOKINGS")) {
+                ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
+                RoomHelper.loadCurrentBookings(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
+            } else if (reportsHeader.getText().equals("RECENT TRANSACTIONS")) {
+                ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
+                RoomHelper.loadTransactions(reportsTable,reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
+            }
+        });
         /// endregion
 
         addWindowListener(new WindowAdapter() {
@@ -1267,7 +1276,7 @@ public class AdminFrame extends OperatorFrame {
         detCardNumBox.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (detCardGenerateButton.hasFocus()) {
+                if (e.getOppositeComponent() == detCardGenerateButton) {
                     detCardNumBox.requestFocus();
                     return;
                 }

@@ -333,11 +333,11 @@ public class RoomEditor extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        RoomEditor frame = new RoomEditor();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
+//    public static void main(String[] args) {
+//        RoomEditor frame = new RoomEditor();
+//        frame.setLocationRelativeTo(null);
+//        frame.setVisible(true);
+//    }
 
     private static String pathToType(TreePath path) {
         Object[] pathParts = path.getPath();

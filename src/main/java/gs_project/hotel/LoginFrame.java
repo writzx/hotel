@@ -25,10 +25,10 @@ public class LoginFrame extends MainFrame {
     /**
      * Launch the application.
      */
-    public static void main(String[] args) {
-        LoginFrame frame = new LoginFrame();
-        frame.setVisible(true);
-    }
+//    public static void main(String[] args) {
+//        LoginFrame frame = new LoginFrame();
+//        frame.setVisible(true);
+//    }
 
     /**
      * Create the frame.
