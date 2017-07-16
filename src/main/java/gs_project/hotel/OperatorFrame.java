@@ -463,6 +463,69 @@ public class OperatorFrame extends MainFrame {
             } catch (Exception ignored) { }
         });
 
+        orderMenuConfirmButton.addActionListener(e -> {
+            if (orderMenuOrderTable.getRowCount() > 0) {
+                StringBuilder entry = new StringBuilder("FOOD ORDER: (");
+                double cprice = 0;
+                for (int i = 0; i < orderMenuOrderTable.getRowCount(); i++) {
+                    String name = orderMenuOrderTable.getValueAt(i, 0).toString();
+                    String plate = orderMenuOrderTable.getValueAt(i, 1).toString();
+                    String quantity = orderMenuOrderTable.getValueAt(i, 2).toString();
+                    cprice += Double.valueOf(orderMenuOrderTable.getValueAt(i, 3).toString().substring(2));
+                    entry.append(plate).append("-").append(name).append(" x").append(quantity);
+                    if (i < orderMenuOrderTable.getRowCount() - 1) {
+                        entry.append(", ");
+                    } else {
+                        entry.append(")");
+                    }
+                }
+                int visIndex = -1;
+                int index = -1;
+
+                int payNow = JOptionPane.showConfirmDialog(OperatorFrame.this, "Complete payment now?", "Pay Now", JOptionPane.YES_NO_OPTION);
+
+                String bookingID = JOptionPane.showInputDialog(OperatorFrame.this, "Please enter the booking id:", "Booking ID", JOptionPane.OK_CANCEL_OPTION);
+
+                while (bookingID == null || bookingID.isEmpty()) {
+                    int ret = JOptionPane.showConfirmDialog(OperatorFrame.this, "Booking ID can't be empty! Do you want to cancel the confirmation?", "Invalid Booking ID", JOptionPane.YES_NO_OPTION);
+                    if (ret == JOptionPane.NO_OPTION) {
+                        return;
+                    }
+                    bookingID = JOptionPane.showInputDialog(OperatorFrame.this, "Please enter the booking id:", "Booking ID", JOptionPane.OK_CANCEL_OPTION);
+                }
+
+                do {
+                    for (int j = 0; j < VisitorHelper.visitors.size(); j++) {
+                        Visitor v = VisitorHelper.visitors.get(j);
+                        for (int i = 0; i < v.getBookings().size(); i++) {
+                            if (bookingID.equals(v.getBookings().get(i).getId())) {
+                                index = i;
+                                visIndex = j;
+                                break;
+                            }
+                        }
+                        if (visIndex > -1 && index > -1) {
+                            break;
+                        }
+                    }
+
+                    if (visIndex > -1 && index > -1) {
+                        Transaction tr = new Transaction(IDGenerator.generate().substring(7), bookingID, (int) cprice, LocalDate.now().toString(), (payNow == JOptionPane.YES_OPTION ? "[PAID]" : "[PENDING]") + entry.toString());
+
+                        VisitorHelper.visitors.get(visIndex).getBookings().get(index).getTransactions().add(tr);
+                        JOptionPane.showMessageDialog(OperatorFrame.this, "SUCCESS");
+                        return;
+                    } else {
+                        int ret = JOptionPane.showConfirmDialog(OperatorFrame.this, "Booking ID not found!  Do you want to cancel the confirmation?", "Invalid Booking ID", JOptionPane.YES_NO_OPTION);
+                        if (ret == JOptionPane.NO_OPTION) {
+                            return;
+                        }
+                        bookingID = "";
+                    }
+                } while (bookingID.isEmpty());
+            }
+        });
+
         orderMenuAddButton.addActionListener(e -> {
             String plate = "";
             double multiplier = 1;
@@ -929,9 +992,6 @@ public class OperatorFrame extends MainFrame {
         dateChildren.setBounds(312, 351, 230, 32);
         datesPeoplePanel.add(dateChildren);
 
-
-
-
         dateCheckInPicker = new DatePicker();
         dateCheckInPicker.setBounds(312, 95, 230, 32);
         datesPeoplePanel.add(dateCheckInPicker);
@@ -1144,7 +1204,7 @@ public class OperatorFrame extends MainFrame {
         confirmCancelButton.setBounds(288, 378, 274, 32);
         confirmCancelPanel.add(confirmCancelButton);
 
-       // checkButton
+        // checkButton
         /// endregion
 
         /// region events
@@ -1178,7 +1238,7 @@ public class OperatorFrame extends MainFrame {
             JOptionPane.showMessageDialog(OperatorFrame.this, "CHECK IN SUCCESSFUL!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        cancelBookingButton.addActionListener(e -> {
+        confirmCancelButton.addActionListener(e -> {
             for(RoomClass rc:RoomHelper.roomClasses){
                 for(Room r:rc.getRooms()){
                     for(Booking b:r.getBookings()){
@@ -1209,12 +1269,19 @@ public class OperatorFrame extends MainFrame {
         });
 
         genBillButton.addActionListener(e -> {
-            String pack = "";
+            int packageprice = 0;
+            int paidprice = 0;
+            int servprice = 0;
+
+            Visitor v = null;
+            Booking bx = null;
+
+            ArrayList<Transaction> trans = new ArrayList<>();
+
             for(RoomClass rc:RoomHelper.roomClasses) {
                 for (Room r : rc.getRooms()) {
                     for (Booking b : r.getBookings()) {
                         if (bookId.getText().equals(b.getId())) {
-                            pack = rc.getType();
                             if (!b.getBookingstate().equals("CHECKED IN")) {
                                 JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING IS NOT ACTIVE!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
                                 return;
@@ -1224,44 +1291,45 @@ public class OperatorFrame extends MainFrame {
                                 return;
                             }
                             b.setBookingstate("CHECKED OUT");
+                            for (Transaction t:b.getTransactions()) {
+                                packageprice += t.getValue();
+                                if (t.getDetails().contains("[PAID]")) {
+                                    paidprice += t.getValue();
+                                }
+                            }
+                            trans.add(new Transaction("", b.getId(), packageprice, b.getBookingdate(),"[PACKAGE] " + rc.getType()));
                             break;
                         }
                     }
                 }
             }
+
             for(Visitor vs:VisitorHelper.visitors) {
                 for (Booking b : vs.getBookings()) {
                     if (bookId.getText().equals(b.getId())) {
                         b.setBookingstate("CHECKED OUT");
-                        ArrayList<Transaction> transactions = new ArrayList<>();
-                        int paid = 0, packagep = 0, serv = 0;
-                        for (Transaction t:b.getTransactions()) {
-                            if (t.getDetails().startsWith("[PAID]")) {
-                                if (t.getDetails().startsWith("[PAID][PACKAGE]")) {
-                                    packagep += t.getValue();
-                                } else {
-                                    transactions.add(t);
-                                }
-                                paid += t.getValue();
-                            } else {
-                                if (t.getDetails().startsWith("[PENDING][PACKAGE]")) {
-                                    packagep += t.getValue();
-                                } else {
-                                    transactions.add(t);
-                                    serv += t.getValue();
-                                }
+                        for (Transaction t : b.getTransactions()) {
+                            servprice += t.getValue();
+                            if (t.getDetails().contains("[PAID]")) {
+                                paidprice += t.getValue();
                             }
+                            trans.add(t);
                         }
-                        transactions.add(0, new Transaction("", b.getId(), packagep, b.getBookingdate(), "PACKAGE: "+ pack));
-                        Bill bill = new Bill(vs.getName(), vs.getCardId(), b.getCheckindate(), b.getCheckoutdate(), packagep, serv, paid);
-
-                        ((DefaultTableModel) bill.getTransactionTable().getModel()).setDataVector(Transaction.toBillingObjectsArray(transactions), Transaction.getBillingColumns());
-                        bill.setTableColumnWidths();
-                        bill.setVisible(true);
-                        JOptionPane.showMessageDialog(bill, "CHECK OUT CONFIRMED! PLEASE MAKE SURE TO SAVE OR PRINT YOUR RECEIPT!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
+                        v = vs;
+                        bx = b;
                         break;
                     }
                 }
+            }
+
+            if (v != null && bx != null) {
+                Bill bill = new Bill(v.getName(), v.getCardId(), bx.getCheckindate(), bx.getCheckoutdate(), packageprice, servprice, paidprice);
+
+                ((DefaultTableModel) bill.getTransactionTable().getModel()).setDataVector(Transaction.toBillingObjectsArray(trans), Transaction.getBillingColumns());
+
+                bill.setTableColumnWidths();
+                bill.setVisible(true);
+                JOptionPane.showMessageDialog(bill, "CHECK OUT CONFIRMED! PLEASE MAKE SURE TO SAVE OR PRINT YOUR RECEIPT!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -1371,6 +1439,7 @@ public class OperatorFrame extends MainFrame {
                 setPanel(confirmPanel, currentStepPanel);
             } else if (confirmStep.isEnabled()) {
                 Booking booking = new Booking(IDGenerator.generate().substring(5), LocalDate.now().toString(), confirmCheckInBox.getText(), confirmCheckOutBox.getText(), "CURRENT");
+                Booking b = new Booking(booking.getId(), LocalDate.now().toString(), confirmCheckInBox.getText(), confirmCheckOutBox.getText(), "CURRENT");
 
                 double amount = Double.valueOf(confirmPriceBox.getText().replace("(INITIAL)", "").split("\\+")[1]);
 
@@ -1381,11 +1450,10 @@ public class OperatorFrame extends MainFrame {
                     return;
                 }
 
-                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) amount, booking.getBookingdate(), "[PAID][PACKAGE] INITIAL PAYMENT"));
-                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) (price - amount), booking.getBookingdate(), "[PENDING][PACKAGE] REMAINING PACKAGE PRICE"));
+                vis.getBookings().add(b);
 
-                vis.getBookings().add(booking);
-                vis.getBookings().sort(Comparator.comparing(o -> LocalDate.parse(o.getCheckindate())));
+                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) amount, booking.getBookingdate(), "[PAID]INITIAL PAYMENT"));
+                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) (price - amount), booking.getBookingdate(), "[PENDING]REMAINING PACKAGE PRICE"));
 
                 if (vis_index  < 0) {
                     VisitorHelper.visitors.add(vis);
