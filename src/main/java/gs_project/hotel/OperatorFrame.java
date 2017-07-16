@@ -1175,6 +1175,7 @@ public class OperatorFrame extends MainFrame {
                     }
                 }
             }
+            JOptionPane.showMessageDialog(OperatorFrame.this, "CHECK IN SUCCESSFUL!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
         });
 
         cancelBookingButton.addActionListener(e -> {
@@ -1204,6 +1205,7 @@ public class OperatorFrame extends MainFrame {
                     }
                 }
             }
+            JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING HAS BEEN CANCELLED!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
         });
 
         genBillButton.addActionListener(e -> {
@@ -1229,6 +1231,7 @@ public class OperatorFrame extends MainFrame {
                 for (Booking b : vs.getBookings()) {
                     if (bookId.getText().equals(b.getId())) {
                         b.setBookingstate("CHECKED OUT");
+                        // todo show bill window.
                         break;
                     }
                 }
