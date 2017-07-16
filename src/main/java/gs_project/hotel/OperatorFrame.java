@@ -1209,10 +1209,12 @@ public class OperatorFrame extends MainFrame {
         });
 
         genBillButton.addActionListener(e -> {
+            String pack = "";
             for(RoomClass rc:RoomHelper.roomClasses) {
                 for (Room r : rc.getRooms()) {
                     for (Booking b : r.getBookings()) {
                         if (bookId.getText().equals(b.getId())) {
+                            pack = rc.getType();
                             if (!b.getBookingstate().equals("CHECKED IN")) {
                                 JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING IS NOT ACTIVE!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
                                 return;
@@ -1231,7 +1233,32 @@ public class OperatorFrame extends MainFrame {
                 for (Booking b : vs.getBookings()) {
                     if (bookId.getText().equals(b.getId())) {
                         b.setBookingstate("CHECKED OUT");
-                        // todo show bill window.
+                        ArrayList<Transaction> transactions = new ArrayList<>();
+                        int paid = 0, packagep = 0, serv = 0;
+                        for (Transaction t:b.getTransactions()) {
+                            if (t.getDetails().startsWith("[PAID]")) {
+                                if (t.getDetails().startsWith("[PAID][PACKAGE]")) {
+                                    packagep += t.getValue();
+                                } else {
+                                    transactions.add(t);
+                                }
+                                paid += t.getValue();
+                            } else {
+                                if (t.getDetails().startsWith("[PENDING][PACKAGE]")) {
+                                    packagep += t.getValue();
+                                } else {
+                                    transactions.add(t);
+                                    serv += t.getValue();
+                                }
+                            }
+                        }
+                        transactions.add(0, new Transaction("", b.getId(), packagep, b.getBookingdate(), "PACKAGE: "+ pack));
+                        Bill bill = new Bill(vs.getName(), vs.getCardId(), b.getCheckindate(), b.getCheckoutdate(), packagep, serv, paid);
+
+                        ((DefaultTableModel) bill.getTransactionTable().getModel()).setDataVector(Transaction.toBillingObjectsArray(transactions), Transaction.getBillingColumns());
+                        bill.setTableColumnWidths();
+                        bill.setVisible(true);
+                        JOptionPane.showMessageDialog(bill, "CHECK OUT CONFIRMED! PLEASE MAKE SURE TO SAVE OR PRINT YOUR RECEIPT!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
                         break;
                     }
                 }
@@ -1307,14 +1334,14 @@ public class OperatorFrame extends MainFrame {
 
                 confirmRoomPackageBox.setText(roomSelRoomNoBox.getText());
 
-                double price = Integer.valueOf(roomselPriceBox.getText()) * 1.28;
+                price = Integer.valueOf(roomselPriceBox.getText());
                 confirmPriceBox.setText(Math.ceil(.7 * price) + " + " + Math.ceil(.3 * price) + " (INITIAL)");
 
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(detailsStep, stepsPanel);
                 setPanel(detailsPanel, currentStepPanel);
             } else if (detailsStep.isEnabled()) {
-                if(detCardNumBox.getText().isEmpty() && !ValidateHelper.validateCardNumber(detCardNumBox.getText())){
+                if(detCardNumBox.getText().isEmpty() || !ValidateHelper.validateCardNumber(detCardNumBox.getText())){
                     JOptionPane.showMessageDialog(this,"PLEASE ENTER YOUR CARD NUMBER","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -1354,12 +1381,13 @@ public class OperatorFrame extends MainFrame {
                     return;
                 }
 
-                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) amount, booking.getBookingdate(), "INITIAL PAYMENT"));
+                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) amount, booking.getBookingdate(), "[PAID][PACKAGE] INITIAL PAYMENT"));
+                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) (price - amount), booking.getBookingdate(), "[PENDING][PACKAGE] REMAINING PACKAGE PRICE"));
 
                 vis.getBookings().add(booking);
                 vis.getBookings().sort(Comparator.comparing(o -> LocalDate.parse(o.getCheckindate())));
 
-                if (vis_index == -1) {
+                if (vis_index  < 0) {
                     VisitorHelper.visitors.add(vis);
                 }
                 else {
@@ -1390,6 +1418,9 @@ public class OperatorFrame extends MainFrame {
 
                             if (found) {
                                 r.getBookings().sort(Comparator.comparing(o -> LocalDate.parse(o.getCheckindate())));
+                                Receipt receipt = new Receipt(booking.getId(), vis.getCardId(), (int) amount, rc.getType());
+                                receipt.setVisible(true);
+                                JOptionPane.showMessageDialog(receipt, "BOOKING CONFIRMED! PLEASE MAKE SURE TO SAVE OR PRINT YOUR RECEIPT!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
                                 break;
                             }
                         }
@@ -1397,7 +1428,6 @@ public class OperatorFrame extends MainFrame {
                     }
                 }
 
-                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING CONFIRMED", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(datesPeopleStep, stepsPanel);
                 setPanel(datesPeoplePanel, currentStepPanel);
@@ -1481,13 +1511,20 @@ public class OperatorFrame extends MainFrame {
                                 checkInDate.setText(b.getCheckindate());
                                 checkOutDate.setText(b.getCheckoutdate());
                                 roomPackage.setText(rc.getType());
-                                int price=(LocalDate.parse(b.getCheckindate()).until(LocalDate.parse(b.getCheckoutdate())).getDays()*rc.getPrice());
-                                totalPrice.setText(""+price);
-                                initPaymentBox.setText (""+b.getTransactions().get(0).getValue());
+                                int initial = 0;
+                                int total = 0;
+                                for (Transaction t:b.getTransactions()) {
+                                    if (t.getDetails().startsWith("[PAID]")) {
+                                        initial += t.getValue();
+                                    }
+                                    total += t.getValue();
+                                }
+                                totalPrice.setText(""+total);
+                                initPaymentBox.setText ("" + initial);
                                 roomNumBox.setText(""+r.getRoomNo());
-                                int x=(price*28/100);
+                                int x=(total*28/100);
                                 gstBox.setText(""+x);
-                                amountBox.setText(""+(x+price));
+                                amountBox.setText(""+(x+total-initial));
                                 break;
                             }
                         }
@@ -1666,5 +1703,6 @@ public class OperatorFrame extends MainFrame {
    Visitor vis;
    int vis_index;
    String type;
+   double price;
 }
 

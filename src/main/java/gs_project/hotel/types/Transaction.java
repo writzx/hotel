@@ -71,7 +71,25 @@ public class Transaction implements Serializable {
         Object[][] objects = new Object[transactions.size()][];
         int i = 0;
         for (Transaction s:transactions) {
-            objects[i++] = s.toObjects();
+            if (s.getDetails().startsWith("[PAID]")) {
+                objects[i++] = s.toObjects();
+            }
+        }
+        return objects;
+    }
+
+    public static Object[] getBillingColumns() { return new Object[] {"SL. NO.", "DETAILS", "AMOUNT"}; }
+
+    public Object[] toBillingObjects(int index) { return new Object[] { (index + 1), details.replace("[PAID]", "").replace("[PENDING]", "").replace("[PACKAGE]", ""), value}; }
+
+    public static Object[][] toBillingObjectsArray(java.util.List<Transaction> transactions) {
+        Object[][] objects = new Object[transactions.size()][];
+        int i = 0;
+        for (Transaction s:transactions) {
+            String se = s.getDetails().replace("[PAID]", "").replace("[PENDING]", "").trim();
+            if (!se.startsWith("[PACKAGE]")) {
+                objects[i] = s.toBillingObjects(i++);
+            }
         }
         return objects;
     }

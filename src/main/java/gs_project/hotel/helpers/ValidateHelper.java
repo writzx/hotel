@@ -24,6 +24,6 @@ public class ValidateHelper {
     }
 
     public static boolean validateCardNumber(String cardNo) {
-        return false;
+        return cardNo.length() == IDGenerator.generate().length();
     }
 }
