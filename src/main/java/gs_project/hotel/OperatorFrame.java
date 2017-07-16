@@ -6,6 +6,7 @@ import gs_project.hotel.helpers.*;
 import gs_project.hotel.types.*;
 
 import java.awt.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -13,11 +14,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.print.Book;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,6 +39,11 @@ public class OperatorFrame extends MainFrame {
     protected final JPanel datesPeoplePanel;
     protected final JPanel checkInPanel;
     protected final JPanel confirmCheckInPanel;
+    protected JPanel menuOrderPanel;
+    protected JScrollPane orderMenuPackageScroller;
+    protected JScrollPane orderMenuOrderScroller;
+    protected final JScrollPane roomSelTreeScroller;
+    protected final JScrollPane detAdressScroller;
     /// endregion
 
     /// region buttons
@@ -56,8 +59,15 @@ public class OperatorFrame extends MainFrame {
     protected final JButton bookCancelButton;
     protected final JButton checkButton;
     protected final JButton confirmCheckInButton;
-    protected final JButton genBillButton; // checkout
+    protected final JButton genBillButton;
     protected final JButton confirmCancelButton;
+    protected final JButton orderMenuConfirmButton;
+    protected final JButton orderMenuOrderClearButton;
+    protected final JButton orderMenuRemoveButton;
+    protected final JButton orderMenuAddButton;
+    protected final JRadioButton orderMenuTypeHalfOption;
+    protected final JRadioButton orderMenuTypeSingleOption;
+    protected final JRadioButton orderMenuTypeDoubleOption;
     /// endregion
 
     /// region labels
@@ -107,6 +117,11 @@ public class OperatorFrame extends MainFrame {
     protected final JLabel gstLabel;
     protected final JLabel payAmountLabel;
     protected final JLabel roomNumLabel;
+    protected final JLabel orderMenuTypeLabel;
+    protected final JLabel orderMenuTypePricesLabel;
+    protected final JLabel orderMenuQuantityLabel;
+    protected final JLabel orderMenuHeader;
+    protected final JLabel orderMenuTotalLabel;
     /// endregion
 
     /// region textFields
@@ -129,24 +144,28 @@ public class OperatorFrame extends MainFrame {
     protected final JTextField gstBox;
     protected final JTextField amountBox;
     protected final JTextField roomNumBox;
-    protected final JScrollPane roomSelTreeScroller;
-    protected JTree roomSelRoomTypesTree;
+    protected final JTextField orderMenuTypeHalfPriceBox;
+    protected final JTextField orderMenuTypeDoublePriceBox;
+    protected final JTextField orderMenuTypeSinglePriceBox;
+    protected final JTextField orderMenuTotalBox;
+    protected final JTextArea detAddressBox;
+    /// endregion
+
     protected final DatePicker roomSelCheckInBox;
     protected final DatePicker roomSelCheckOutBox;
     protected final JSpinner dateAdults;
     protected final JSpinner dateChildren;
+    protected final JSpinner orderMenuQuantityBox;
     protected final DatePicker dateCheckInPicker;
     protected final DatePicker dateCheckoutPicker;
     protected final JTable orderMenuOrderTable;
-    protected final JTextField orderMenuTotalBox;
     protected final ButtonGroup buttonGroup = new ButtonGroup();
-    protected JTextArea detAddressBox;
     protected JTree orderMenuPackageTree;
-    /// endregion
+    protected JTree roomSelRoomTypesTree;
+    protected final JComboBox<String> detVerifyDocBox;
 
-    /**
-     * Launch the application.
-     */
+    protected final ArrayList<JButton> leftButtons = new ArrayList<>();
+
     public static void main(String[] args) {
         OperatorFrame frame = new OperatorFrame();
         frame.setVisible(true);
@@ -155,9 +174,7 @@ public class OperatorFrame extends MainFrame {
     public OperatorFrame() {
         this("Operator Landing Page");
     }
-    /**
-     * Create the frame.
-     */
+
     public OperatorFrame(String title) {
         super(title);
 
@@ -185,26 +202,31 @@ public class OperatorFrame extends MainFrame {
         bookButton.setFont(new Font("Verdana", Font.BOLD, 14));
         bookButton.setBounds(10, 11, 172, 32);
         contentPane.add(bookButton);
+        leftButtons.add(bookButton);
 
         checkInButton = new JButton("Check In");
         checkInButton.setFont(new Font("Verdana", Font.BOLD, 14));
         checkInButton.setBounds(10, 54, 172, 32);
         contentPane.add(checkInButton);
+        leftButtons.add(checkInButton);
 
         checkOutButton = new JButton("Check Out");
         checkOutButton.setFont(new Font("Verdana", Font.BOLD, 14));
         checkOutButton.setBounds(10, 97, 172, 32);
         contentPane.add(checkOutButton);
+        leftButtons.add(checkOutButton);
 
         foodOrderButton = new JButton("Food Order");
         foodOrderButton.setFont(new Font("Verdana", Font.BOLD, 14));
         foodOrderButton.setBounds(10, 140, 172, 32);
         contentPane.add(foodOrderButton);
+        leftButtons.add(foodOrderButton);
 
         cancelBookingButton = new JButton("Cancel Booking");
         cancelBookingButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         cancelBookingButton.setBounds(10, 183, 172, 32);
         contentPane.add(cancelBookingButton);
+        leftButtons.add(cancelBookingButton);
         /// endregion
 
         addDateTimeToStatusBar();
@@ -212,12 +234,12 @@ public class OperatorFrame extends MainFrame {
         center();
 
         /// region menuOrderPanel
-        JPanel menuOrderPanel = new JPanel();
+        menuOrderPanel = new JPanel();
         menuOrderPanel.setBorder(new LineBorder(Color.GRAY));
         menuOrderPanel.setBounds(0, 0, 592, 549);
         menuOrderPanel.setLayout(null);
 
-        JScrollPane orderMenuPackageScroller = new JScrollPane();
+        orderMenuPackageScroller = new JScrollPane();
         orderMenuPackageScroller.setBounds(12, 72, 183, 421);
         menuOrderPanel.add(orderMenuPackageScroller);
 
@@ -227,7 +249,7 @@ public class OperatorFrame extends MainFrame {
 
         MenuHelper.loadDishesInTree(orderMenuPackageTree);
 
-        JScrollPane orderMenuOrderScroller = new JScrollPane();
+        orderMenuOrderScroller = new JScrollPane();
         orderMenuOrderScroller.setBounds(207, 204, 373, 289);
         menuOrderPanel.add(orderMenuOrderScroller);
 
@@ -237,28 +259,28 @@ public class OperatorFrame extends MainFrame {
         orderMenuOrderTable.setFillsViewportHeight(true);
         orderMenuOrderTable.setFont(new Font("Tahoma", Font.BOLD, 12));
 
-        JLabel orderMenuHeader = new JLabel("MEALS ORDER - MENU");
+        orderMenuHeader = new JLabel("MEALS ORDER - MENU");
         orderMenuHeader.setFont(new Font("Tahoma", Font.BOLD, 20));
         orderMenuHeader.setHorizontalAlignment(SwingConstants.CENTER);
         orderMenuHeader.setBounds(12, 12, 568, 48);
         menuOrderPanel.add(orderMenuHeader);
 
-        JButton orderMenuConfirmButton = new JButton("CONFIRM ORDER");
+        orderMenuConfirmButton = new JButton("CONFIRM ORDER");
         orderMenuConfirmButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuConfirmButton.setBounds(423, 505, 157, 32);
         menuOrderPanel.add(orderMenuConfirmButton);
 
-        JButton orderMenuOrderClearButton = new JButton("CLEAR");
+        orderMenuOrderClearButton = new JButton("CLEAR");
         orderMenuOrderClearButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuOrderClearButton.setBounds(376, 160, 96, 32);
         menuOrderPanel.add(orderMenuOrderClearButton);
 
-        JButton orderMenuRemoveButton = new JButton("REMOVE");
+        orderMenuRemoveButton = new JButton("REMOVE");
         orderMenuRemoveButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuRemoveButton.setBounds(484, 160, 96, 32);
         menuOrderPanel.add(orderMenuRemoveButton);
 
-        JLabel orderMenuTotalLabel = new JLabel("TOTAL:");
+        orderMenuTotalLabel = new JLabel("TOTAL:");
         orderMenuTotalLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTotalLabel.setBounds(207, 505, 52, 32);
         menuOrderPanel.add(orderMenuTotalLabel);
@@ -271,72 +293,71 @@ public class OperatorFrame extends MainFrame {
         menuOrderPanel.add(orderMenuTotalBox);
         orderMenuTotalBox.setColumns(10);
 
-        JButton orderMenuAddButton = new JButton("ADD TO ORDER");
+        orderMenuAddButton = new JButton("ADD TO ORDER");
         orderMenuAddButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuAddButton.setBounds(376, 116, 204, 32);
         menuOrderPanel.add(orderMenuAddButton);
 
-        JSpinner orderMenuQuantityBox = new JSpinner();
+        orderMenuQuantityBox = new JSpinner();
         orderMenuQuantityBox.setBounds(475, 72, 105, 32);
         menuOrderPanel.add(orderMenuQuantityBox);
 
-        JRadioButton orderMenuTypeHalfOption = new JRadioButton("Half");
+        orderMenuTypeHalfOption = new JRadioButton("Half");
         buttonGroup.add(orderMenuTypeHalfOption);
         orderMenuTypeHalfOption.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTypeHalfOption.setBounds(203, 112, 73, 24);
         menuOrderPanel.add(orderMenuTypeHalfOption);
 
-        JRadioButton orderMenuTypeSingleOption = new JRadioButton("Single");
+        orderMenuTypeSingleOption = new JRadioButton("Single");
         buttonGroup.add(orderMenuTypeSingleOption);
         orderMenuTypeSingleOption.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTypeSingleOption.setBounds(203, 140, 73, 24);
         menuOrderPanel.add(orderMenuTypeSingleOption);
 
-        JRadioButton orderMenuTypeDoubleOption = new JRadioButton("Double");
+        orderMenuTypeDoubleOption = new JRadioButton("Double");
         buttonGroup.add(orderMenuTypeDoubleOption);
         orderMenuTypeDoubleOption.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTypeDoubleOption.setBounds(203, 168, 73, 24);
         menuOrderPanel.add(orderMenuTypeDoubleOption);
 
-        JLabel orderMenuTypeLabel = new JLabel("<html><center>PLATE TYPE</center></html>");
+        orderMenuTypeLabel = new JLabel("<html><center>PLATE TYPE</center></html>");
         orderMenuTypeLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTypeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         orderMenuTypeLabel.setBounds(207, 74, 73, 30);
         menuOrderPanel.add(orderMenuTypeLabel);
 
-        JLabel orderMenuTypePricesLabel = new JLabel("PRICES");
+        orderMenuTypePricesLabel = new JLabel("PRICES");
         orderMenuTypePricesLabel.setHorizontalAlignment(SwingConstants.CENTER);
         orderMenuTypePricesLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTypePricesLabel.setBounds(285, 74, 73, 30);
         menuOrderPanel.add(orderMenuTypePricesLabel);
 
-        JTextField orderMenuTypeHalfPriceBox = new JTextField("");
+        orderMenuTypeHalfPriceBox = new JTextField("");
         orderMenuTypeHalfPriceBox.setEditable(false);
         orderMenuTypeHalfPriceBox.setHorizontalAlignment(SwingConstants.CENTER);
         orderMenuTypeHalfPriceBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTypeHalfPriceBox.setBounds(285, 112, 73, 24);
         menuOrderPanel.add(orderMenuTypeHalfPriceBox);
 
-        JTextField orderMenuTypeDoublePriceBox = new JTextField("");
+        orderMenuTypeDoublePriceBox = new JTextField("");
         orderMenuTypeDoublePriceBox.setEditable(false);
         orderMenuTypeDoublePriceBox.setHorizontalAlignment(SwingConstants.CENTER);
         orderMenuTypeDoublePriceBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTypeDoublePriceBox.setBounds(285, 168, 73, 24);
         menuOrderPanel.add(orderMenuTypeDoublePriceBox);
 
-        JTextField orderMenuTypeSinglePriceBox = new JTextField("");
+        orderMenuTypeSinglePriceBox = new JTextField("");
         orderMenuTypeSinglePriceBox.setEditable(false);
         orderMenuTypeSinglePriceBox.setHorizontalAlignment(SwingConstants.CENTER);
         orderMenuTypeSinglePriceBox.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuTypeSinglePriceBox.setBounds(285, 140, 73, 24);
         menuOrderPanel.add(orderMenuTypeSinglePriceBox);
 
-        JLabel orderMenuQuantityLabel = new JLabel("QUANTITY:");
+        orderMenuQuantityLabel = new JLabel("QUANTITY:");
         orderMenuQuantityLabel.setHorizontalAlignment(SwingConstants.CENTER);
         orderMenuQuantityLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         orderMenuQuantityLabel.setBounds(376, 74, 81, 30);
         menuOrderPanel.add(orderMenuQuantityLabel);
-
 
         orderMenuQuantityBox.setEnabled(false);
         orderMenuTypeHalfOption.setEnabled(false);
@@ -344,295 +365,7 @@ public class OperatorFrame extends MainFrame {
         orderMenuTypeDoubleOption.setEnabled(false);
         orderMenuAddButton.setEnabled(false);
 
-        orderMenuPackageTree.addTreeSelectionListener(e -> {
-            try {
-                DefaultMutableTreeNode dishNode = (DefaultMutableTreeNode) orderMenuPackageTree.getLastSelectedPathComponent();
-                if (dishNode == null) return;
-
-                DefaultMutableTreeNode typeNode = (DefaultMutableTreeNode) dishNode.getParent();
-                if (typeNode == null) return;
-
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) typeNode.getParent();
-                if (node == null) return;
-
-                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
-                if (ind > -1) {
-                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
-                    if (typeNode.toString().equals("STARTERS")) {
-                        for(Dish d:menuPackage.getStarters()) {
-                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
-                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
-                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
-                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
-                                orderMenuQuantityBox.setEnabled(true);
-                                orderMenuTypeHalfOption.setEnabled(true);
-                                orderMenuTypeSingleOption.setEnabled(true);
-                                orderMenuTypeDoubleOption.setEnabled(true);
-                                orderMenuAddButton.setEnabled(true);
-                                break;
-                            } else {
-                                orderMenuTypeHalfPriceBox.setText("");
-                                orderMenuTypeSinglePriceBox.setText("");
-                                orderMenuTypeDoublePriceBox.setText("");
-                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
-                                orderMenuQuantityBox.setValue(0);
-                                orderMenuQuantityBox.setEnabled(false);
-                                orderMenuTypeHalfOption.setEnabled(false);
-                                orderMenuTypeSingleOption.setEnabled(false);
-                                orderMenuTypeDoubleOption.setEnabled(false);
-                                orderMenuAddButton.setEnabled(false);
-                            }
-                        }
-                    } else if (typeNode.toString().equals("DESSERTS")) {
-                        for(Dish d:menuPackage.getDesserts()) {
-                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
-                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
-                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
-                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
-                                orderMenuQuantityBox.setEnabled(true);
-                                orderMenuTypeHalfOption.setEnabled(true);
-                                orderMenuTypeSingleOption.setEnabled(true);
-                                orderMenuTypeDoubleOption.setEnabled(true);
-                                orderMenuAddButton.setEnabled(true);
-                                break;
-                            } else {
-                                orderMenuTypeHalfPriceBox.setText("");
-                                orderMenuTypeSinglePriceBox.setText("");
-                                orderMenuTypeDoublePriceBox.setText("");
-                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
-                                orderMenuQuantityBox.setValue(0);
-                                orderMenuQuantityBox.setEnabled(false);
-                                orderMenuTypeHalfOption.setEnabled(false);
-                                orderMenuTypeSingleOption.setEnabled(false);
-                                orderMenuTypeDoubleOption.setEnabled(false);
-                                orderMenuAddButton.setEnabled(false);
-                            }
-                        }
-                    } else if (typeNode.toString().equals("MAIN-COURSE")) {
-                        for(Dish d:menuPackage.getMaincourse()) {
-                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
-                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
-                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
-                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
-                                orderMenuQuantityBox.setEnabled(true);
-                                orderMenuTypeHalfOption.setEnabled(true);
-                                orderMenuTypeSingleOption.setEnabled(true);
-                                orderMenuTypeDoubleOption.setEnabled(true);
-                                orderMenuAddButton.setEnabled(true);
-                                break;
-                            } else {
-                                orderMenuTypeHalfPriceBox.setText("");
-                                orderMenuTypeSinglePriceBox.setText("");
-                                orderMenuTypeDoublePriceBox.setText("");
-                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
-                                orderMenuQuantityBox.setValue(0);
-                                orderMenuQuantityBox.setEnabled(false);
-                                orderMenuTypeHalfOption.setEnabled(false);
-                                orderMenuTypeSingleOption.setEnabled(false);
-                                orderMenuTypeDoubleOption.setEnabled(false);
-                                orderMenuAddButton.setEnabled(false);
-                            }
-                        }
-                    } else {
-                        orderMenuTypeHalfPriceBox.setText("");
-                        orderMenuTypeSinglePriceBox.setText("");
-                        orderMenuTypeDoublePriceBox.setText("");
-                        orderMenuQuantityBox.setModel(new SpinnerNumberModel());
-                        orderMenuQuantityBox.setValue(0);
-                        orderMenuQuantityBox.setEnabled(false);
-                        orderMenuTypeHalfOption.setEnabled(false);
-                        orderMenuTypeSingleOption.setEnabled(false);
-                        orderMenuTypeDoubleOption.setEnabled(false);
-                        orderMenuAddButton.setEnabled(false);
-                    }
-                } else {
-                    orderMenuTypeHalfPriceBox.setText("");
-                    orderMenuTypeSinglePriceBox.setText("");
-                    orderMenuTypeDoublePriceBox.setText("");
-                    orderMenuQuantityBox.setModel(new SpinnerNumberModel());
-                    orderMenuQuantityBox.setValue(0);
-                    orderMenuQuantityBox.setEnabled(false);
-                    orderMenuTypeHalfOption.setEnabled(false);
-                    orderMenuTypeSingleOption.setEnabled(false);
-                    orderMenuTypeDoubleOption.setEnabled(false);
-                    orderMenuAddButton.setEnabled(false);
-                }
-            } catch (Exception ignored) { }
-        });
-
-        orderMenuConfirmButton.addActionListener(e -> {
-            if (orderMenuOrderTable.getRowCount() > 0) {
-                StringBuilder entry = new StringBuilder("FOOD ORDER: (");
-                double cprice = 0;
-                for (int i = 0; i < orderMenuOrderTable.getRowCount(); i++) {
-                    String name = orderMenuOrderTable.getValueAt(i, 0).toString();
-                    String plate = orderMenuOrderTable.getValueAt(i, 1).toString();
-                    String quantity = orderMenuOrderTable.getValueAt(i, 2).toString();
-                    cprice += Double.valueOf(orderMenuOrderTable.getValueAt(i, 3).toString().substring(2));
-                    entry.append(plate).append("-").append(name).append(" x").append(quantity);
-                    if (i < orderMenuOrderTable.getRowCount() - 1) {
-                        entry.append(", ");
-                    } else {
-                        entry.append(")");
-                    }
-                }
-                int visIndex = -1;
-                int index = -1;
-
-                int payNow = JOptionPane.showConfirmDialog(OperatorFrame.this, "Complete payment now?", "Pay Now", JOptionPane.YES_NO_OPTION);
-
-                String bookingID = JOptionPane.showInputDialog(OperatorFrame.this, "Please enter the booking id:", "Booking ID", JOptionPane.OK_CANCEL_OPTION);
-
-                while (bookingID == null || bookingID.isEmpty()) {
-                    int ret = JOptionPane.showConfirmDialog(OperatorFrame.this, "Booking ID can't be empty! Do you want to cancel the confirmation?", "Invalid Booking ID", JOptionPane.YES_NO_OPTION);
-                    if (ret == JOptionPane.NO_OPTION) {
-                        return;
-                    }
-                    bookingID = JOptionPane.showInputDialog(OperatorFrame.this, "Please enter the booking id:", "Booking ID", JOptionPane.OK_CANCEL_OPTION);
-                }
-
-                do {
-                    for (int j = 0; j < VisitorHelper.visitors.size(); j++) {
-                        Visitor v = VisitorHelper.visitors.get(j);
-                        for (int i = 0; i < v.getBookings().size(); i++) {
-                            if (bookingID.equals(v.getBookings().get(i).getId())) {
-                                index = i;
-                                visIndex = j;
-                                break;
-                            }
-                        }
-                        if (visIndex > -1 && index > -1) {
-                            break;
-                        }
-                    }
-
-                    if (visIndex > -1 && index > -1) {
-                        Transaction tr = new Transaction(IDGenerator.generate().substring(7), bookingID, (int) cprice, LocalDate.now().toString(), (payNow == JOptionPane.YES_OPTION ? "[PAID]" : "[PENDING]") + entry.toString());
-
-                        VisitorHelper.visitors.get(visIndex).getBookings().get(index).getTransactions().add(tr);
-                        JOptionPane.showMessageDialog(OperatorFrame.this, "SUCCESS");
-                        return;
-                    } else {
-                        int ret = JOptionPane.showConfirmDialog(OperatorFrame.this, "Booking ID not found!  Do you want to cancel the confirmation?", "Invalid Booking ID", JOptionPane.YES_NO_OPTION);
-                        if (ret == JOptionPane.NO_OPTION) {
-                            return;
-                        }
-                        bookingID = "";
-                    }
-                } while (bookingID.isEmpty());
-            }
-        });
-
-        orderMenuAddButton.addActionListener(e -> {
-            String plate = "";
-            double multiplier = 1;
-            if (orderMenuTypeHalfOption.isSelected()) {
-                plate = "HALF";
-                multiplier = 0.7;
-            } else if (orderMenuTypeSingleOption.isSelected()) {
-                plate = "SINGLE";
-                multiplier = 1;
-            } else if (orderMenuTypeDoubleOption.isSelected()) {
-                plate = "DOUBLE";
-                multiplier = 1.85;
-            }
-            if (plate.isEmpty()) {
-                JOptionPane.showMessageDialog(OperatorFrame.this, "You must select Plate Type.", "Plate Type error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            int quantity = 0;
-            try {
-                quantity = Integer.valueOf(orderMenuQuantityBox.getValue().toString());
-            } catch (NumberFormatException nfe) {
-                JOptionPane.showMessageDialog(OperatorFrame.this, "You must enter a valid quantity.", "Quantity error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            try {
-                DefaultMutableTreeNode dishNode = (DefaultMutableTreeNode) orderMenuPackageTree.getLastSelectedPathComponent();
-                if (dishNode == null) return;
-
-                DefaultMutableTreeNode typeNode = (DefaultMutableTreeNode) dishNode.getParent();
-                if (typeNode == null) return;
-
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) typeNode.getParent();
-                if (node == null) return;
-
-                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
-
-                if (ind > -1) {
-                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
-                    DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
-                    if (typeNode.toString().equals("STARTERS")) {
-                        for (Dish d : menuPackage.getStarters()) {
-                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
-                            }
-                        }
-                    } else if (typeNode.toString().equals("DESSERTS")) {
-                        for (Dish d : menuPackage.getDesserts()) {
-                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
-                            }
-                        }
-                    } else if (typeNode.toString().equals("MAIN-COURSE")) {
-                        for(Dish d:menuPackage.getMaincourse()) {
-                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
-                            }
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid dish or Currently Unavailable.", "DISH NOT FOUND", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid dish or Currently Unavailable.", "DISH NOT FOUND", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            } catch (Exception ignored) { }
-            int totalPrice = 0;
-            int invalid = 0;
-            for (int i = 0; i < orderMenuOrderTable.getRowCount(); i++) {
-                try {
-                    totalPrice += Double.valueOf(orderMenuOrderTable.getValueAt(i, 3).toString().substring(2));
-                } catch (NumberFormatException nfe) {
-                    invalid++;
-                    ((DefaultTableModel) orderMenuOrderTable.getModel()).removeRow(i);
-                }
-            }
-            if (invalid > 0) {
-                JOptionPane.showMessageDialog(OperatorFrame.this, "Removed " + invalid + " invalid entries.", "Invalid Entries", JOptionPane.WARNING_MESSAGE);
-            }
-            orderMenuTotalBox.setText("₹ " + (double) totalPrice);
-        });
-
         orderMenuRemoveButton.setEnabled(false);
-        orderMenuOrderTable.getSelectionModel().addListSelectionListener(e -> {
-            int ind = orderMenuOrderTable.getSelectedRow();
-            if (ind > -1) {
-                orderMenuRemoveButton.setEnabled(true);
-            } else {
-                orderMenuRemoveButton.setEnabled(false);
-            }
-        });
-
-        orderMenuOrderClearButton.addActionListener(e -> {
-            DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
-            model.setRowCount(0);
-        });
-
-        orderMenuRemoveButton.addActionListener(e -> {
-            int ind = orderMenuOrderTable.getSelectedRow();
-            if (ind > -1) {
-                DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
-                model.removeRow(ind);
-            } else {
-                JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid Order entry.", "Order Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        });
         /// endregion
 
         /// region bookingPanel
@@ -695,7 +428,6 @@ public class OperatorFrame extends MainFrame {
         confirmPanel = new JPanel();
         confirmPanel.setLayout(null);
         confirmPanel.setBounds(10, 11, 572, 437);
-        // currentStepPanel.add(confirmPanel);
 
         confirmCustNameLabel = new JLabel("CUSTOMER NAME:");
         confirmCustNameLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -803,7 +535,6 @@ public class OperatorFrame extends MainFrame {
         /// region detailsPanel
         detailsPanel = new JPanel();
         detailsPanel.setBounds(10, 11, 572, 437);
-        // currentStepPanel.add(detailsPanel);
         detailsPanel.setLayout(null);
 
         detVerifyDocLabel = new JLabel("VERIFICATION DOCMENT:*");
@@ -841,7 +572,7 @@ public class OperatorFrame extends MainFrame {
         detEmailLabel.setBounds(10, 226, 216, 32);
         detailsPanel.add(detEmailLabel);
 
-        JScrollPane detAdressScroller = new JScrollPane();
+        detAdressScroller = new JScrollPane();
         detAdressScroller.setBounds(245, 276, 317, 98);
         detailsPanel.add(detAdressScroller);
 
@@ -870,7 +601,7 @@ public class OperatorFrame extends MainFrame {
         detHeader.setBounds(0, 0, 562, 48);
         detailsPanel.add(detHeader);
 
-        JComboBox<String> detVerifyDocBox = new JComboBox<>(new String[] { "AADHAR", "VOTER ID", "ELECTRICITY BILL"});
+        detVerifyDocBox = new JComboBox<>(new String[] { "AADHAR", "VOTER ID", "ELECTRICITY BILL"});
         detVerifyDocBox.setBounds(245, 394, 317, 32);
         detailsPanel.add(detVerifyDocBox);
 
@@ -883,7 +614,6 @@ public class OperatorFrame extends MainFrame {
         /// region roomSelectionPanel
         roomSelectionPanel = new JPanel();
         roomSelectionPanel.setBounds(10, 11, 572, 437);
-        // currentStepPanel.add(roomSelectionPanel);
         roomSelectionPanel.setLayout(null);
 
         roomselPriceBox = new JTextField();
@@ -954,7 +684,6 @@ public class OperatorFrame extends MainFrame {
         datesPeoplePanel = new JPanel();
         datesPeoplePanel.setLayout(null);
         datesPeoplePanel.setBounds(10, 11, 572, 437);
-        // currentStepPanel.add(datesPeoplePanel);
 
         selectDatePeopleHeader = new JLabel("<html><center>SELECT: STAY PERIOD and <br> NUMBER OF ADULTS and CHILDREN</center></html>");
         selectDatePeopleHeader.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1203,18 +932,305 @@ public class OperatorFrame extends MainFrame {
         confirmCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCancelButton.setBounds(288, 378, 274, 32);
         confirmCancelPanel.add(confirmCancelButton);
-
-        // checkButton
         /// endregion
 
         /// region events
+        orderMenuConfirmButton.addActionListener(e -> {
+            if (orderMenuOrderTable.getRowCount() > 0) {
+                StringBuilder entry = new StringBuilder("FOOD ORDER: (");
+                double cprice = 0;
+                for (int i = 0; i < orderMenuOrderTable.getRowCount(); i++) {
+                    String name = orderMenuOrderTable.getValueAt(i, 0).toString();
+                    String plate = orderMenuOrderTable.getValueAt(i, 1).toString();
+                    String quantity = orderMenuOrderTable.getValueAt(i, 2).toString();
+                    cprice += Double.valueOf(orderMenuOrderTable.getValueAt(i, 3).toString().substring(2));
+                    entry.append(plate).append("-").append(name).append(" x").append(quantity);
+                    if (i < orderMenuOrderTable.getRowCount() - 1) {
+                        entry.append(", ");
+                    } else {
+                        entry.append(")");
+                    }
+                }
+                int visIndex = -1;
+                int index = -1;
+
+                int payNow = JOptionPane.showConfirmDialog(OperatorFrame.this, "Complete payment now?", "Pay Now", JOptionPane.YES_NO_OPTION);
+
+                String bookingID = JOptionPane.showInputDialog(OperatorFrame.this, "Please enter the booking id:", "Booking ID", JOptionPane.OK_CANCEL_OPTION);
+
+                while (bookingID == null || bookingID.isEmpty()) {
+                    int ret = JOptionPane.showConfirmDialog(OperatorFrame.this, "Booking ID can't be empty! Do you want to cancel the confirmation?", "Invalid Booking ID", JOptionPane.YES_NO_OPTION);
+                    if (ret == JOptionPane.NO_OPTION) {
+                        return;
+                    }
+                    bookingID = JOptionPane.showInputDialog(OperatorFrame.this, "Please enter the booking id:", "Booking ID", JOptionPane.OK_CANCEL_OPTION);
+                }
+
+                do {
+                    for (int j = 0; j < VisitorHelper.visitors.size(); j++) {
+                        Visitor v = VisitorHelper.visitors.get(j);
+                        for (int i = 0; i < v.getBookings().size(); i++) {
+                            if (bookingID.equals(v.getBookings().get(i).getId())) {
+                                index = i;
+                                visIndex = j;
+                                break;
+                            }
+                        }
+                        if (visIndex > -1 && index > -1) {
+                            break;
+                        }
+                    }
+
+                    if (visIndex > -1 && index > -1) {
+                        Transaction tr = new Transaction(IDGenerator.generate().substring(7), bookingID, (int) cprice, LocalDate.now().toString(), (payNow == JOptionPane.YES_OPTION ? "[PAID]" : "[PENDING]") + entry.toString());
+
+                        VisitorHelper.visitors.get(visIndex).getBookings().get(index).getTransactions().add(tr);
+                        JOptionPane.showMessageDialog(OperatorFrame.this, "SUCCESS");
+                        resetPanels();
+                        setPanel(null, rightPanel);
+                        return;
+                    } else {
+                        int ret = JOptionPane.showConfirmDialog(OperatorFrame.this, "Booking ID not found!  Do you want to cancel the confirmation?", "Invalid Booking ID", JOptionPane.YES_NO_OPTION);
+                        if (ret == JOptionPane.NO_OPTION) {
+                            return;
+                        }
+                        bookingID = "";
+                    }
+                } while (bookingID.isEmpty());
+            }
+        });
+
+        orderMenuAddButton.addActionListener(e -> {
+            String plate = "";
+            double multiplier = 1;
+            if (orderMenuTypeHalfOption.isSelected()) {
+                plate = "HALF";
+                multiplier = 0.7;
+            } else if (orderMenuTypeSingleOption.isSelected()) {
+                plate = "SINGLE";
+                multiplier = 1;
+            } else if (orderMenuTypeDoubleOption.isSelected()) {
+                plate = "DOUBLE";
+                multiplier = 1.85;
+            }
+            if (plate.isEmpty()) {
+                JOptionPane.showMessageDialog(OperatorFrame.this, "You must select Plate Type.", "Plate Type error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int quantity = 0;
+            try {
+                quantity = Integer.valueOf(orderMenuQuantityBox.getValue().toString());
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(OperatorFrame.this, "You must enter a valid quantity.", "Quantity error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                DefaultMutableTreeNode dishNode = (DefaultMutableTreeNode) orderMenuPackageTree.getLastSelectedPathComponent();
+                if (dishNode == null) return;
+
+                DefaultMutableTreeNode typeNode = (DefaultMutableTreeNode) dishNode.getParent();
+                if (typeNode == null) return;
+
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) typeNode.getParent();
+                if (node == null) return;
+
+                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+
+                if (ind > -1) {
+                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
+                    DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
+                    if (typeNode.toString().equals("STARTERS")) {
+                        for (Dish d : menuPackage.getStarters()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                            }
+                        }
+                    } else if (typeNode.toString().equals("DESSERTS")) {
+                        for (Dish d : menuPackage.getDesserts()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                            }
+                        }
+                    } else if (typeNode.toString().equals("MAIN-COURSE")) {
+                        for(Dish d:menuPackage.getMaincourse()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                            }
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid dish or Currently Unavailable.", "DISH NOT FOUND", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid dish or Currently Unavailable.", "DISH NOT FOUND", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } catch (Exception ignored) { }
+            int totalPrice = 0;
+            int invalid = 0;
+            for (int i = 0; i < orderMenuOrderTable.getRowCount(); i++) {
+                try {
+                    totalPrice += Double.valueOf(orderMenuOrderTable.getValueAt(i, 3).toString().substring(2));
+                } catch (NumberFormatException nfe) {
+                    invalid++;
+                    ((DefaultTableModel) orderMenuOrderTable.getModel()).removeRow(i);
+                }
+            }
+            if (invalid > 0) {
+                JOptionPane.showMessageDialog(OperatorFrame.this, "Removed " + invalid + " invalid entries.", "Invalid Entries", JOptionPane.WARNING_MESSAGE);
+            }
+            orderMenuTotalBox.setText("₹ " + (double) totalPrice);
+        });
+
+        orderMenuOrderTable.getSelectionModel().addListSelectionListener(e -> {
+            int ind = orderMenuOrderTable.getSelectedRow();
+            if (ind > -1) {
+                orderMenuRemoveButton.setEnabled(true);
+            } else {
+                orderMenuRemoveButton.setEnabled(false);
+            }
+        });
+
+        orderMenuOrderClearButton.addActionListener(e -> {
+            DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
+            model.setRowCount(0);
+        });
+
+        orderMenuRemoveButton.addActionListener(e -> {
+            int ind = orderMenuOrderTable.getSelectedRow();
+            if (ind > -1) {
+                DefaultTableModel model = (DefaultTableModel) orderMenuOrderTable.getModel();
+                model.removeRow(ind);
+            } else {
+                JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid Order entry.", "Order Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        });
+        orderMenuPackageTree.addTreeSelectionListener(e -> {
+            try {
+                DefaultMutableTreeNode dishNode = (DefaultMutableTreeNode) orderMenuPackageTree.getLastSelectedPathComponent();
+                if (dishNode == null) return;
+
+                DefaultMutableTreeNode typeNode = (DefaultMutableTreeNode) dishNode.getParent();
+                if (typeNode == null) return;
+
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) typeNode.getParent();
+                if (node == null) return;
+
+                int ind = MenuHelper.getClassIndex(new TreePath(node.getPath()));
+                if (ind > -1) {
+                    MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
+                    if (typeNode.toString().equals("STARTERS")) {
+                        for(Dish d:menuPackage.getStarters()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
+                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
+                                orderMenuQuantityBox.setEnabled(true);
+                                orderMenuTypeHalfOption.setEnabled(true);
+                                orderMenuTypeSingleOption.setEnabled(true);
+                                orderMenuTypeDoubleOption.setEnabled(true);
+                                orderMenuAddButton.setEnabled(true);
+                                break;
+                            } else {
+                                orderMenuTypeHalfPriceBox.setText("");
+                                orderMenuTypeSinglePriceBox.setText("");
+                                orderMenuTypeDoublePriceBox.setText("");
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                                orderMenuQuantityBox.setValue(0);
+                                orderMenuQuantityBox.setEnabled(false);
+                                orderMenuTypeHalfOption.setEnabled(false);
+                                orderMenuTypeSingleOption.setEnabled(false);
+                                orderMenuTypeDoubleOption.setEnabled(false);
+                                orderMenuAddButton.setEnabled(false);
+                            }
+                        }
+                    } else if (typeNode.toString().equals("DESSERTS")) {
+                        for(Dish d:menuPackage.getDesserts()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
+                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
+                                orderMenuQuantityBox.setEnabled(true);
+                                orderMenuTypeHalfOption.setEnabled(true);
+                                orderMenuTypeSingleOption.setEnabled(true);
+                                orderMenuTypeDoubleOption.setEnabled(true);
+                                orderMenuAddButton.setEnabled(true);
+                                break;
+                            } else {
+                                orderMenuTypeHalfPriceBox.setText("");
+                                orderMenuTypeSinglePriceBox.setText("");
+                                orderMenuTypeDoublePriceBox.setText("");
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                                orderMenuQuantityBox.setValue(0);
+                                orderMenuQuantityBox.setEnabled(false);
+                                orderMenuTypeHalfOption.setEnabled(false);
+                                orderMenuTypeSingleOption.setEnabled(false);
+                                orderMenuTypeDoubleOption.setEnabled(false);
+                                orderMenuAddButton.setEnabled(false);
+                            }
+                        }
+                    } else if (typeNode.toString().equals("MAIN-COURSE")) {
+                        for(Dish d:menuPackage.getMaincourse()) {
+                            if (d.getName().equals(dishNode.toString().split("\t")[0])) {
+                                orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
+                                orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
+                                orderMenuTypeDoublePriceBox.setText("₹ " + Math.floor(1.85 * d.getPrice()));
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel(d.getMinQuantity(), d.getMinQuantity(), d.getMaxQuantity(), 1));
+                                orderMenuQuantityBox.setEnabled(true);
+                                orderMenuTypeHalfOption.setEnabled(true);
+                                orderMenuTypeSingleOption.setEnabled(true);
+                                orderMenuTypeDoubleOption.setEnabled(true);
+                                orderMenuAddButton.setEnabled(true);
+                                break;
+                            } else {
+                                orderMenuTypeHalfPriceBox.setText("");
+                                orderMenuTypeSinglePriceBox.setText("");
+                                orderMenuTypeDoublePriceBox.setText("");
+                                orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                                orderMenuQuantityBox.setValue(0);
+                                orderMenuQuantityBox.setEnabled(false);
+                                orderMenuTypeHalfOption.setEnabled(false);
+                                orderMenuTypeSingleOption.setEnabled(false);
+                                orderMenuTypeDoubleOption.setEnabled(false);
+                                orderMenuAddButton.setEnabled(false);
+                            }
+                        }
+                    } else {
+                        orderMenuTypeHalfPriceBox.setText("");
+                        orderMenuTypeSinglePriceBox.setText("");
+                        orderMenuTypeDoublePriceBox.setText("");
+                        orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                        orderMenuQuantityBox.setValue(0);
+                        orderMenuQuantityBox.setEnabled(false);
+                        orderMenuTypeHalfOption.setEnabled(false);
+                        orderMenuTypeSingleOption.setEnabled(false);
+                        orderMenuTypeDoubleOption.setEnabled(false);
+                        orderMenuAddButton.setEnabled(false);
+                    }
+                } else {
+                    orderMenuTypeHalfPriceBox.setText("");
+                    orderMenuTypeSinglePriceBox.setText("");
+                    orderMenuTypeDoublePriceBox.setText("");
+                    orderMenuQuantityBox.setModel(new SpinnerNumberModel());
+                    orderMenuQuantityBox.setValue(0);
+                    orderMenuQuantityBox.setEnabled(false);
+                    orderMenuTypeHalfOption.setEnabled(false);
+                    orderMenuTypeSingleOption.setEnabled(false);
+                    orderMenuTypeDoubleOption.setEnabled(false);
+                    orderMenuAddButton.setEnabled(false);
+                }
+            } catch (Exception ignored) { }
+        });
         confirmCheckInButton.addActionListener(e -> {
             for(RoomClass rc:RoomHelper.roomClasses){
                 for(Room r:rc.getRooms()){
                     for(Booking b:r.getBookings()){
                         if(bookId.getText().equals(b.getId())){
-                            if (b.getBookingstate().equals("CANCELLED") || b.getBookingstate().equals("CHECKED OUT")) {
-                                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING ALREADY CHECKED OUT OR CANCELLED!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
+                            if (b.getBookingstate().equals("CANCELLED") || b.getBookingstate().equals("CHECKED OUT") || b.getBookingstate().equals("CHECKED IN")) {
+                                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING ALREADY CHECKED IN, CHECKED OUT OR CANCELLED!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
                             if (LocalDate.parse(b.getCheckindate()).isAfter(LocalDate.now()) || LocalDate.parse(b.getCheckoutdate()).isBefore(LocalDate.now())) {
@@ -1236,6 +1252,9 @@ public class OperatorFrame extends MainFrame {
                 }
             }
             JOptionPane.showMessageDialog(OperatorFrame.this, "CHECK IN SUCCESSFUL!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
+
+            resetPanels();
+            setPanel(null, rightPanel);
         });
 
         confirmCancelButton.addActionListener(e -> {
@@ -1266,6 +1285,9 @@ public class OperatorFrame extends MainFrame {
                 }
             }
             JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING HAS BEEN CANCELLED!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
+
+            resetPanels();
+            setPanel(null, rightPanel);
         });
 
         genBillButton.addActionListener(e -> {
@@ -1330,16 +1352,20 @@ public class OperatorFrame extends MainFrame {
                 bill.setTableColumnWidths();
                 bill.setVisible(true);
                 JOptionPane.showMessageDialog(bill, "CHECK OUT CONFIRMED! PLEASE MAKE SURE TO SAVE OR PRINT YOUR RECEIPT!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
+
+                resetPanels();
+                setPanel(null, rightPanel);
             }
         });
 
         checkOutButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, checkOutButton);
             checkOutHeader.setText("CHECK OUT");
             checkOutPanel.add(checkBookIdPanel);
             billingPanel.add(bookInfoPanel);
 
-            backButton.setBounds(10, 378, 129, 32);
-            billingPanel.add(backButton);
+            backButton.setBounds(20, 495, 129, 32);
+            checkOutPanel.add(backButton);
 
             billingPanel.setVisible(false);
 
@@ -1347,12 +1373,13 @@ public class OperatorFrame extends MainFrame {
         });
 
         checkInButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, checkInButton);
             checkOutHeader.setText("CHECK IN");
             checkInPanel.add(checkBookIdPanel);
             confirmCheckInPanel.add(bookInfoPanel);
 
-            backButton.setBounds(10, 378, 129, 32);
-            confirmCheckInPanel.add(backButton);
+            backButton.setBounds(20, 495, 129, 32);
+            checkInPanel.add(backButton);
 
             confirmCheckInPanel.setVisible(false);
 
@@ -1360,6 +1387,7 @@ public class OperatorFrame extends MainFrame {
         });
 
         bookButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, bookButton);
             backButton.setBounds(10, 511, 129, 32);
             bookingPanel.add(backButton);
 
@@ -1370,7 +1398,7 @@ public class OperatorFrame extends MainFrame {
         });
         bookNextStepButton.addActionListener(e -> {
             if (datesPeopleStep.isEnabled()) {
-                if((int)dateAdults.getValue()<=0) {
+                if((int)dateAdults.getValue() <= 0) {
                     JOptionPane.showMessageDialog(this,"PLEASE SELECT ADULTS","ERROR",JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -1489,6 +1517,9 @@ public class OperatorFrame extends MainFrame {
                                 Receipt receipt = new Receipt(booking.getId(), vis.getCardId(), (int) amount, rc.getType());
                                 receipt.setVisible(true);
                                 JOptionPane.showMessageDialog(receipt, "BOOKING CONFIRMED! PLEASE MAKE SURE TO SAVE OR PRINT YOUR RECEIPT!", "SUCCESS!", JOptionPane.INFORMATION_MESSAGE);
+
+                                resetPanels();
+                                setPanel(null, rightPanel);
                                 break;
                             }
                         }
@@ -1525,33 +1556,41 @@ public class OperatorFrame extends MainFrame {
         });
 
         backButton.addActionListener(e -> {
-            if (detailsStep.isEnabled()) {
-                bookNextStepButton.setText("NEXT STEP");
-                setStep(roomSelectStep, stepsPanel);
-                setPanel(roomSelectionPanel, currentStepPanel);
-            } else if (confirmStep.isEnabled()) {
-                bookNextStepButton.setText("NEXT STEP");
-                setStep(detailsStep, stepsPanel);
-                setPanel(detailsPanel, currentStepPanel);
-            } else if (roomSelectStep.isEnabled()) {
-                bookNextStepButton.setText("NEXT STEP");
-                setStep(datesPeopleStep, stepsPanel);
-                setPanel(datesPeoplePanel, currentStepPanel);
+            if (bookButton.isEnabled()) {
+                if (detailsStep.isEnabled()) {
+                    bookNextStepButton.setText("NEXT STEP");
+                    setStep(roomSelectStep, stepsPanel);
+                    setPanel(roomSelectionPanel, currentStepPanel);
+                } else if (confirmStep.isEnabled()) {
+                    bookNextStepButton.setText("NEXT STEP");
+                    setStep(detailsStep, stepsPanel);
+                    setPanel(detailsPanel, currentStepPanel);
+                } else if (roomSelectStep.isEnabled()) {
+                    bookNextStepButton.setText("NEXT STEP");
+                    setStep(datesPeopleStep, stepsPanel);
+                    setPanel(datesPeoplePanel, currentStepPanel);
+                } else {
+                    resetPanels();
+                }
             } else {
-                // clear right panel
-                setPanel(null, rightPanel);
+                resetPanels();
             }
+            setPanel(null, rightPanel);
         });
 
-        bookCancelButton.addActionListener(e -> setPanel(null, rightPanel)); // clear right panel
+        bookCancelButton.addActionListener(e -> {
+            resetPanels();
+            setPanel(null, rightPanel);
+        });
 
         cancelBookingButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, cancelBookingButton);
             checkOutHeader.setText("CANCEL BOOKING");
             cancelBookingPanel.add(checkBookIdPanel);
             confirmCancelPanel.add(bookInfoPanel);
 
-            backButton.setBounds(10, 378, 129, 32);
-            confirmCancelPanel.add(backButton);
+            backButton.setBounds(20, 495, 129, 32);
+            cancelBookingPanel.add(backButton);
 
             confirmCancelPanel.setVisible(false);
 
@@ -1559,6 +1598,7 @@ public class OperatorFrame extends MainFrame {
         });
 
         foodOrderButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, foodOrderButton);
             backButton.setBounds(12, 505, 180, 32);
             menuOrderPanel.add(backButton);
 
@@ -1617,6 +1657,7 @@ public class OperatorFrame extends MainFrame {
                }
             }
         });
+
         detCardNumBox.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -1634,48 +1675,9 @@ public class OperatorFrame extends MainFrame {
                 populateVisitor(searchCard());
             }
         });
+
         detCardGenerateButton.addActionListener(e -> {
             detCardNumBox.setText(IDGenerator.generate());
-        });
-        /// region stepsEvents
-        datesPeopleStep.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                bookNextStepButton.setText("NEXT STEP");
-
-                setStep(datesPeopleStep, stepsPanel);
-                setPanel(datesPeoplePanel, currentStepPanel);
-            }
-        });
-
-        roomSelectStep.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                bookNextStepButton.setText("NEXT STEP");
-
-                setStep(roomSelectStep, stepsPanel);
-                setPanel(roomSelectionPanel, currentStepPanel);
-            }
-        });
-
-        detailsStep.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                bookNextStepButton.setText("NEXT STEP");
-
-                setStep(detailsStep, stepsPanel);
-                setPanel(detailsPanel, currentStepPanel);
-            }
-        });
-
-        confirmStep.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                bookNextStepButton.setText("CONFIRM BOOKING");
-
-                setStep(confirmStep, stepsPanel);
-                setPanel(confirmPanel, currentStepPanel);
-            }
         });
 
         roomSelSearchBtn.addActionListener(e -> {
@@ -1707,8 +1709,48 @@ public class OperatorFrame extends MainFrame {
             }
             RoomHelper.loadClassesInTree(roomSelRoomTypesTree, classes);
         });
-        /// endregion
 
+          /// region stepsEvents
+//        datesPeopleStep.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                bookNextStepButton.setText("NEXT STEP");
+//
+//                setStep(datesPeopleStep, stepsPanel);
+//                setPanel(datesPeoplePanel, currentStepPanel);
+//            }
+//        });
+//
+//        roomSelectStep.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                bookNextStepButton.setText("NEXT STEP");
+//
+//                setStep(roomSelectStep, stepsPanel);
+//                setPanel(roomSelectionPanel, currentStepPanel);
+//            }
+//        });
+//
+//        detailsStep.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                bookNextStepButton.setText("NEXT STEP");
+//
+//                setStep(detailsStep, stepsPanel);
+//                setPanel(detailsPanel, currentStepPanel);
+//            }
+//        });
+//
+//        confirmStep.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                bookNextStepButton.setText("CONFIRM BOOKING");
+//
+//                setStep(confirmStep, stepsPanel);
+//                setPanel(confirmPanel, currentStepPanel);
+//            }
+//        });
+          /// endregion
 
         /// endregion
 
@@ -1770,7 +1812,72 @@ public class OperatorFrame extends MainFrame {
    }
    Visitor vis;
    int vis_index;
-   String type;
    double price;
+
+   protected void resetPanels() {
+       roomSelCheckInBox.setDateToToday();
+       roomSelCheckOutBox.setDateToToday();
+       dateCheckInPicker.setDateToToday();
+       dateCheckoutPicker.setDateToToday();
+       dateAdults.setModel(new SpinnerNumberModel(0, 0, null, 1));
+       dateChildren.setModel(new SpinnerNumberModel(0, 0, null, 1));
+       orderMenuQuantityBox.setModel(new SpinnerNumberModel(0, 0, null, 1));
+       ((DefaultTableModel) orderMenuOrderTable.getModel()).setRowCount(0);
+       orderMenuPackageTree = ComponentHelper.setupTree(orderMenuPackageTree, "MENU");
+       roomSelRoomTypesTree = ComponentHelper.setupTree(roomSelRoomTypesTree, "ROOM");
+       detVerifyDocBox.setSelectedIndex(0);
+       confirmRoomPackageBox.setText("");
+       confirmCardNumBox.setText("");
+       confirmCustNameBox.setText("");
+       confirmCheckInBox.setText("");
+       confirmCheckOutBox.setText("");
+       confirmAdultsBox.setText("");
+       confirmChildrenBox.setText("");
+       confirmPriceBox.setText("");
+       detCardNumBox.setText("");
+       detVisitorNameBox.setText("");
+       detEmailBox.setText("");
+       detPhoneNumBox.setText("");
+       roomselPriceBox.setText("");
+       roomSelRoomNoBox.setText("");
+       bookId.setText("");
+       initPaymentBox.setText("");
+       gstBox.setText("");
+       amountBox.setText("");
+       roomNumBox.setText("");
+       orderMenuTypeHalfPriceBox.setText("");
+       orderMenuTypeDoublePriceBox.setText("");
+       orderMenuTypeSinglePriceBox.setText("");
+       orderMenuTotalBox.setText("");
+       detAddressBox.setText("");
+       orderMenuTypeHalfOption.setSelected(false);
+       orderMenuTypeSingleOption.setSelected(false);
+       orderMenuTypeDoubleOption.setSelected(false);
+       custName.setText("");
+       roomPackage.setText("");
+       checkInDate.setText("");
+       checkOutDate.setText("");
+       totalPrice.setText("");
+
+       rightPanel.removeAll();
+       rightPanel.repaint();
+       rightPanel.revalidate();
+
+       ComponentHelper.setEnabled(leftButtons, true);
+
+       MenuHelper.loadDishesInTree(orderMenuPackageTree);
+       ((DefaultTableModel) orderMenuOrderTable.getModel()).setColumnIdentifiers(Dish.getOrderColumns());
+
+       orderMenuQuantityBox.setEnabled(false);
+       orderMenuTypeHalfOption.setEnabled(false);
+       orderMenuTypeSingleOption.setEnabled(false);
+       orderMenuTypeDoubleOption.setEnabled(false);
+       orderMenuAddButton.setEnabled(false);
+
+       orderMenuRemoveButton.setEnabled(false);
+       roomSelectStep.setEnabled(false);
+       detailsStep.setEnabled(false);
+       confirmStep.setEnabled(false);
+   }
 }
 

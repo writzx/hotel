@@ -6,8 +6,6 @@ import gs_project.hotel.types.*;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeWillExpandListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -15,7 +13,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -35,8 +32,8 @@ public class AdminFrame extends OperatorFrame {
 
     private final JScrollPane reportsScrollPane;
 
-    private final JTable operatorTable;
-    private final JTable reportsTable;
+    private JTable operatorTable;
+    private JTable reportsTable;
 
     private final JLabel operatorIdLabel;
     private final JLabel operatorNameLabel;
@@ -74,7 +71,7 @@ public class AdminFrame extends OperatorFrame {
     private final JButton operatorUpdateButton;
     private final JButton operatorFormClearBtn;
     private final JButton operatorAddButton;
-    private final JButton operatorMangeButton;
+    private final JButton operatorManageButton;
     private final JButton manageRoomsButton;
     private final JButton editMealsMenuButton;
     private final JButton transactionReportButton;
@@ -86,11 +83,44 @@ public class AdminFrame extends OperatorFrame {
     private final JPanel menuEditorPanel;
     private final JPanel menuEditorLeftPanel;
     private final JPanel menuEditorRightPanel;
-    private final JTable menuEditorStartersTable;
-    private final JTable menuEditorMainCourseTable;
-    private final JTable menuEditorDessertTable;
+    private JTable menuEditorStartersTable;
+    private JTable menuEditorMainCourseTable;
+    private JTable menuEditorDessertTable;
     private JTree dishesMenuTree;
     private JTree roomPackageTree;
+    private final JButton addPackageButton;
+    private final JButton editPackageButton;
+    private final JButton removePackageButton;
+    private final JPanel managePackageButtonPanel;
+    private final JLabel roomEditorRangeLabel;
+    private final JSpinner roomEditorStartSpinner;
+    private final JSpinner roomEditorEndSpinner;
+    private final JLabel roomEditorPriceLabel;
+    private final JSpinner roomEditorPriceSpinner;
+    private final JLabel roomEditorAdultLabel;
+    private final JSpinner roomEditorAdultSpinner;
+    private final JLabel roomEditorChildLabel;
+    private final JSpinner roomEditorChildSpinner;
+    private final JButton roomEditorSaveButton;
+    private final JButton roomEditorCancelButton;
+    private final JButton menuEditorAddMenuButton;
+    private final JButton menuEditorEditMenuButton;
+    private final JButton menuEditorRemoveMenuButton;
+    private final JPanel manageMenuButtonPanel;
+    private final JLabel menuEditorStartersLabel;
+    private final JScrollPane menuEditorStarterScroller;
+    private final JButton menuEditorStartersAddButton;
+    private final JButton menuEditorStartersRemoveButton;
+    private final JLabel menuEditorMainCourseLabel;
+    private final JButton menuEditorMainCourseAddButton;
+    private final JButton menuEditorMainCourseRemoveButton;
+    private final JScrollPane menuEditorMainCourseScroller;
+    private final JLabel menuEditorDessertLabel;
+    private final JButton menuEditorDessertAddButton;
+    private final JButton menuEditorDessertRemoveButton;
+    private final JScrollPane menuEditorDessertScroller;
+    private final JButton menuEditorSaveButton;
+    private final JButton menuEditorCancelButton;
 
     public static void main(String[] args) {
         AdminFrame frame = new AdminFrame();
@@ -114,35 +144,41 @@ public class AdminFrame extends OperatorFrame {
         /// endregion
 
         /// region adminButtons
-        operatorMangeButton = new JButton("Manage Operators");
-        operatorMangeButton.setFont(new Font("Tahoma", Font.BOLD, 14));
-        operatorMangeButton.setBounds(10, 11, 172, 32);
-        contentPane.add(operatorMangeButton);
+        operatorManageButton = new JButton("Manage Operators");
+        operatorManageButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        operatorManageButton.setBounds(10, 11, 172, 32);
+        contentPane.add(operatorManageButton);
+        leftButtons.add(operatorManageButton);
 
         manageRoomsButton = new JButton("Edit Packages");
         manageRoomsButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         manageRoomsButton.setBounds(10, 54, 172, 32);
         contentPane.add(manageRoomsButton);
+        leftButtons.add(manageRoomsButton);
 
         editMealsMenuButton = new JButton("Edit Meal Menu");
         editMealsMenuButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         editMealsMenuButton.setBounds(10, 97, 172, 32);
         contentPane.add(editMealsMenuButton);
+        leftButtons.add(editMealsMenuButton);
 
         transactionReportButton = new JButton("Transaction Report");
         transactionReportButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         transactionReportButton.setBounds(10, 140, 172, 32);
         contentPane.add(transactionReportButton);
+        leftButtons.add(transactionReportButton);
 
         visitorDatabaseButton = new JButton("Registered Visitors");
         visitorDatabaseButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         visitorDatabaseButton.setBounds(10, 183, 172, 32);
         contentPane.add(visitorDatabaseButton);
+        leftButtons.add(visitorDatabaseButton);
 
         currentBookingsButton = new JButton("Current Bookings");
         currentBookingsButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         currentBookingsButton.setBounds(10, 226, 172, 32);
         contentPane.add(currentBookingsButton);
+        leftButtons.add(currentBookingsButton);
         /// endregion
         /// endregion
 
@@ -391,11 +427,11 @@ public class AdminFrame extends OperatorFrame {
         roomPackageTree = new JTree();
         roomPackageTree.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JButton addPackageButton = new JButton("ADD");
-        JButton editPackageButton = new JButton("EDIT");
-        JButton removePackageButton = new JButton("REMOVE");
+        addPackageButton = new JButton("ADD");
+        editPackageButton = new JButton("EDIT");
+        removePackageButton = new JButton("REMOVE");
 
-        JPanel managePackageButtonPanel = new JPanel();
+        managePackageButtonPanel = new JPanel();
         managePackageButtonPanel.setLayout(new BoxLayout(managePackageButtonPanel, BoxLayout.LINE_AXIS));
         managePackageButtonPanel.add(Box.createRigidArea(new Dimension(8, addPackageButton.getPreferredSize().height + 16)));
         managePackageButtonPanel.add(addPackageButton);
@@ -413,47 +449,47 @@ public class AdminFrame extends OperatorFrame {
         roomEditorRightPanel = new JPanel();
         roomEditorRightPanel.setLayout(null);
 
-        JLabel roomEditorRangeLabel = new JLabel("ROOM# RANGE: ");
+        roomEditorRangeLabel = new JLabel("ROOM# RANGE: ");
         roomEditorRangeLabel.setBounds(32, 32, 128, 32);
         roomEditorRangeLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JSpinner roomEditorStartSpinner = new JSpinner(new SpinnerNumberModel(100, 100, 1000, 1));
+        roomEditorStartSpinner = new JSpinner(new SpinnerNumberModel(100, 100, 1000, 1));
         roomEditorStartSpinner.setBounds(160, 32, 76, 32);
         roomEditorStartSpinner.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JSpinner roomEditorEndSpinner = new JSpinner(new SpinnerNumberModel(100, 100, 1000, 1));
+        roomEditorEndSpinner = new JSpinner(new SpinnerNumberModel(100, 100, 1000, 1));
         roomEditorEndSpinner.setBounds(244, 32, 76, 32);
         roomEditorEndSpinner.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JLabel roomEditorPriceLabel = new JLabel("BASE PRICE: ");
+        roomEditorPriceLabel = new JLabel("BASE PRICE: ");
         roomEditorPriceLabel.setBounds(32, 88, 128, 32);
         roomEditorPriceLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JSpinner roomEditorPriceSpinner = new JSpinner(new SpinnerNumberModel(1000, 1000, null, 100));
+        roomEditorPriceSpinner = new JSpinner(new SpinnerNumberModel(1000, 1000, null, 100));
         roomEditorPriceSpinner.setBounds(160, 88, 160, 32);
         roomEditorPriceSpinner.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JLabel roomEditorAdultLabel = new JLabel("MAX. ADULT: ");
+        roomEditorAdultLabel = new JLabel("MAX. ADULT: ");
         roomEditorAdultLabel.setBounds(32, 144, 128, 32);
         roomEditorAdultLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JSpinner roomEditorAdultSpinner = new JSpinner(new SpinnerNumberModel());
+        roomEditorAdultSpinner = new JSpinner(new SpinnerNumberModel());
         roomEditorAdultSpinner.setBounds(160, 144, 160, 32);
         roomEditorAdultSpinner.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JLabel roomEditorChildLabel = new JLabel("MAX. CHILD: ");
+        roomEditorChildLabel = new JLabel("MAX. CHILD: ");
         roomEditorChildLabel.setBounds(32, 200, 128, 32);
         roomEditorChildLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JSpinner roomEditorChildSpinner = new JSpinner(new SpinnerNumberModel());
+        roomEditorChildSpinner = new JSpinner(new SpinnerNumberModel());
         roomEditorChildSpinner.setBounds(160, 200, 160, 32);
         roomEditorChildSpinner.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JButton roomEditorSaveButton = new JButton("SAVE");
+        roomEditorSaveButton = new JButton("SAVE");
         roomEditorSaveButton.setBounds(192, 264, 128, 32);
         roomEditorSaveButton.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JButton roomEditorCancelButton = new JButton("CANCEL");
+        roomEditorCancelButton = new JButton("CANCEL");
         roomEditorCancelButton.setBounds(32, 264, 128, 32);
         roomEditorCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
 
@@ -493,11 +529,11 @@ public class AdminFrame extends OperatorFrame {
         dishesMenuTree = new JTree();
         dishesMenuTree.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        JButton menuEditorAddMenuButton = new JButton("ADD");
-        JButton menuEditorEditMenuButton = new JButton("EDIT");
-        JButton menuEditorRemoveMenuButton = new JButton("REMOVE");
+        menuEditorAddMenuButton = new JButton("ADD");
+        menuEditorEditMenuButton = new JButton("EDIT");
+        menuEditorRemoveMenuButton = new JButton("REMOVE");
 
-        JPanel manageMenuButtonPanel = new JPanel();
+        manageMenuButtonPanel = new JPanel();
         manageMenuButtonPanel.setLayout(new BoxLayout(manageMenuButtonPanel, BoxLayout.LINE_AXIS));
         manageMenuButtonPanel.add(Box.createRigidArea(new Dimension(8, menuEditorAddMenuButton.getPreferredSize().height + 16)));
         manageMenuButtonPanel.add(menuEditorAddMenuButton);
@@ -519,13 +555,13 @@ public class AdminFrame extends OperatorFrame {
         JPanel menuEditorRightPanel = new JPanel();
         menuEditorRightPanel.setLayout(null);
 
-        JLabel menuEditorStartersLabel = new JLabel("<html><center>STARTER</center></html>");
+        menuEditorStartersLabel = new JLabel("<html><center>STARTER</center></html>");
         menuEditorStartersLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuEditorStartersLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         menuEditorStartersLabel.setBounds(12, 12, 84, 32);
         menuEditorRightPanel.add(menuEditorStartersLabel);
 
-        JScrollPane menuEditorStarterScroller = new JScrollPane();
+        menuEditorStarterScroller = new JScrollPane();
         menuEditorStarterScroller.setBounds(109, 12, 232, 121);
         menuEditorRightPanel.add(menuEditorStarterScroller);
 
@@ -534,28 +570,28 @@ public class AdminFrame extends OperatorFrame {
         menuEditorStartersTable.setFillsViewportHeight(true);
         menuEditorStarterScroller.setViewportView(menuEditorStartersTable);
 
-        JButton menuEditorStartersAddButton = new JButton("ADD");
+        menuEditorStartersAddButton = new JButton("ADD");
         menuEditorStartersAddButton.setBounds(12, 56, 84, 32);
         menuEditorRightPanel.add(menuEditorStartersAddButton);
 
-        JButton menuEditorStartersRemoveButton = new JButton("REMOVE");
+        menuEditorStartersRemoveButton = new JButton("REMOVE");
         menuEditorStartersRemoveButton.setBounds(12, 100, 84, 32);
         menuEditorRightPanel.add(menuEditorStartersRemoveButton);
 
-        JLabel menuEditorMainCourseLabel = new JLabel("<html><center>MAIN COURSE</center></html>");
+        menuEditorMainCourseLabel = new JLabel("<html><center>MAIN COURSE</center></html>");
         menuEditorMainCourseLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         menuEditorMainCourseLabel.setBounds(12, 145, 84, 32);
         menuEditorRightPanel.add(menuEditorMainCourseLabel);
 
-        JButton menuEditorMainCourseAddButton = new JButton("ADD");
+        menuEditorMainCourseAddButton = new JButton("ADD");
         menuEditorMainCourseAddButton.setBounds(12, 189, 84, 32);
         menuEditorRightPanel.add(menuEditorMainCourseAddButton);
 
-        JButton menuEditorMainCourseRemoveButton = new JButton("REMOVE");
+        menuEditorMainCourseRemoveButton = new JButton("REMOVE");
         menuEditorMainCourseRemoveButton.setBounds(12, 233, 84, 32);
         menuEditorRightPanel.add(menuEditorMainCourseRemoveButton);
 
-        JScrollPane menuEditorMainCourseScroller = new JScrollPane();
+        menuEditorMainCourseScroller = new JScrollPane();
         menuEditorMainCourseScroller.setBounds(109, 145, 232, 121);
         menuEditorRightPanel.add(menuEditorMainCourseScroller);
 
@@ -564,21 +600,21 @@ public class AdminFrame extends OperatorFrame {
         menuEditorMainCourseTable.setFillsViewportHeight(true);
         menuEditorMainCourseScroller.setViewportView(menuEditorMainCourseTable);
 
-        JLabel menuEditorDessertLabel = new JLabel("<html><center>DESSERT</center></html>");
+        menuEditorDessertLabel = new JLabel("<html><center>DESSERT</center></html>");
         menuEditorDessertLabel.setHorizontalAlignment(SwingConstants.CENTER);
         menuEditorDessertLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         menuEditorDessertLabel.setBounds(12, 278, 84, 32);
         menuEditorRightPanel.add(menuEditorDessertLabel);
 
-        JButton menuEditorDessertAddButton = new JButton("ADD");
+        menuEditorDessertAddButton = new JButton("ADD");
         menuEditorDessertAddButton.setBounds(12, 322, 84, 32);
         menuEditorRightPanel.add(menuEditorDessertAddButton);
 
-        JButton menuEditorDessertRemoveButton = new JButton("REMOVE");
+        menuEditorDessertRemoveButton = new JButton("REMOVE");
         menuEditorDessertRemoveButton.setBounds(12, 366, 84, 32);
         menuEditorRightPanel.add(menuEditorDessertRemoveButton);
 
-        JScrollPane menuEditorDessertScroller = new JScrollPane();
+        menuEditorDessertScroller = new JScrollPane();
         menuEditorDessertScroller.setBounds(109, 278, 232, 121);
         menuEditorRightPanel.add(menuEditorDessertScroller);
 
@@ -587,12 +623,12 @@ public class AdminFrame extends OperatorFrame {
         menuEditorDessertTable.setFillsViewportHeight(true);
         menuEditorDessertScroller.setViewportView(menuEditorDessertTable);
 
-        JButton menuEditorSaveButton = new JButton("SAVE");
+        menuEditorSaveButton = new JButton("SAVE");
         menuEditorSaveButton.setBounds(213, 411, 128, 32);
         menuEditorSaveButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         menuEditorRightPanel.add(menuEditorSaveButton);
 
-        JButton menuEditorCancelButton = new JButton("CANCEL");
+        menuEditorCancelButton = new JButton("CANCEL");
         menuEditorCancelButton.setBounds(12, 410, 128, 32);
         menuEditorCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         menuEditorRightPanel.add(menuEditorCancelButton);
@@ -985,7 +1021,7 @@ public class AdminFrame extends OperatorFrame {
             if (roomEditorStartSpinner.getValue() == roomEditorEndSpinner.getValue()) {
                 JOptionPane.showMessageDialog(AdminFrame.this, "The start and end of Room Range cannot be same.", "No rooms in range", JOptionPane.ERROR_MESSAGE);
                 return;
-            } else if ((int)roomEditorAdultSpinner.getValue() <= 0) {
+            } else if ((int) roomEditorAdultSpinner.getValue() <= 0) {
                 JOptionPane.showMessageDialog(AdminFrame.this, "The number of adults cannot be zero.", "No room capacity", JOptionPane.ERROR_MESSAGE);
                 return;
             } else if ((int) roomEditorPriceSpinner.getValue() <= 1000 || (int) roomEditorPriceSpinner.getValue() >= 10000) {
@@ -1041,7 +1077,21 @@ public class AdminFrame extends OperatorFrame {
         });
         /// endregion
 
-        operatorAddButton.addActionListener(e ->{
+        detCardNumBox.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (e.getOppositeComponent() == detCardGenerateButton) {
+                    detCardNumBox.requestFocus();
+                    return;
+                }
+                if (detCardNumBox.getText().length() != 16) {
+                    JOptionPane.showMessageDialog(AdminFrame.this, "Card Number should be 16 characters long!", "Invalid Card Number", JOptionPane.ERROR_MESSAGE);
+                    detCardNumBox.requestFocus();
+                }
+            }
+        });
+
+        operatorAddButton.addActionListener(e -> {
             if(operatorIdBox.getText().isEmpty()){
                 JOptionPane.showMessageDialog(this,"ID CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
@@ -1066,7 +1116,7 @@ public class AdminFrame extends OperatorFrame {
                 JOptionPane.showMessageDialog(this,"EMAIL ID NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            else if(Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
+            else if (Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
                 Operator nOp = new Operator(operatorIdBox.getText(),new String(operatorPasswordBox.getPassword()), operatorNameBox.getText(), operatorEmailBox.getText(),operatorPhoneBox.getText(),operatorAddressBox.getText());
                 OperatorHelper.operators.add(nOp);
                 operatorIdBox.setText("");
@@ -1164,7 +1214,8 @@ public class AdminFrame extends OperatorFrame {
             }
         });
 
-        operatorMangeButton.addActionListener(e -> {
+        operatorManageButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, operatorManageButton);
             backButton.setBounds(10, 202, 128, 32);
             ((JPanel) manageOperatorTabPanel.getSelectedComponent()).add(backButton);
             OperatorHelper.updateTable(operatorTable);
@@ -1172,6 +1223,7 @@ public class AdminFrame extends OperatorFrame {
         });
 
         manageRoomsButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, manageRoomsButton);
             backButton.setBounds(112, 500, 128, 32);
             roomEditorRightPanel.add(backButton);
 
@@ -1179,6 +1231,7 @@ public class AdminFrame extends OperatorFrame {
         });
 
         editMealsMenuButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, editMealsMenuButton);
             backButton.setBounds(112, 500, 128, 32);
             menuEditorRightPanel.add(backButton);
 
@@ -1190,6 +1243,7 @@ public class AdminFrame extends OperatorFrame {
         });
 
         visitorDatabaseButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, visitorDatabaseButton);
             backButton.setBounds(12, 12, 128, 32);
             reportsButtonPanel.add(backButton);
 
@@ -1205,6 +1259,7 @@ public class AdminFrame extends OperatorFrame {
         });
 
         transactionReportButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, transactionReportButton);
             backButton.setBounds(12, 12, 128, 32);
             reportsButtonPanel.add(backButton);
 
@@ -1219,8 +1274,31 @@ public class AdminFrame extends OperatorFrame {
             setPanel(reportsPanel, rightPanel);
         });
 
-        currentBookingsButton.addActionListener(e -> {
+        backButton.addActionListener(e -> {
+            if (bookButton.isEnabled()) {
+                if (detailsStep.isEnabled()) {
+                    bookNextStepButton.setText("NEXT STEP");
+                    setStep(roomSelectStep, stepsPanel);
+                    setPanel(roomSelectionPanel, currentStepPanel);
+                } else if (confirmStep.isEnabled()) {
+                    bookNextStepButton.setText("NEXT STEP");
+                    setStep(detailsStep, stepsPanel);
+                    setPanel(detailsPanel, currentStepPanel);
+                } else if (roomSelectStep.isEnabled()) {
+                    bookNextStepButton.setText("NEXT STEP");
+                    setStep(datesPeopleStep, stepsPanel);
+                    setPanel(datesPeoplePanel, currentStepPanel);
+                } else {
+                    resetPanels();
+                }
+            } else {
+                resetPanels();
+            }
+            setPanel(null, rightPanel);
+        });
 
+        currentBookingsButton.addActionListener(e -> {
+            ComponentHelper.setEnabled(leftButtons, false, currentBookingsButton);
             backButton.setBounds(12, 12, 128, 32);
             reportsButtonPanel.add(backButton);
 
@@ -1264,21 +1342,91 @@ public class AdminFrame extends OperatorFrame {
             }
         });
 
-        detCardNumBox.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (e.getOppositeComponent() == detCardGenerateButton) {
-                    detCardNumBox.requestFocus();
-                    return;
-                }
-                if (detCardNumBox.getText().length() != 16) {
-                    JOptionPane.showMessageDialog(AdminFrame.this, "Card Number should be 16 characters long!", "Invalid Card Number", JOptionPane.ERROR_MESSAGE);
-                    detCardNumBox.requestFocus();
-                }
-            }
-        });
+        reportsStartDatePicker.setDateToToday();
+        reportsEndDatePicker.setDateToToday();
+    }
 
-        reportsStartDatePicker.setDate(LocalDate.now());
-        reportsEndDatePicker.setDate(LocalDate.now());
+    @Override
+    protected void resetPanels() {
+        super.resetPanels();
+
+        operatorIdBox.setText("");
+        operatorNameBox.setText("");
+        operatorEmailBox.setText("");
+        operatorPhoneBox.setText("");
+        editOperatorIdBox.setText("");
+        editOperatorNameBox.setText("");
+        editOperatorEmailBox.setText("");
+        editOperatorPhoneBox.setText("");
+        operatorAddressBox.setText("");
+        editOperatorAddressBox.setText("");
+        operatorPasswordBox.setText("");
+        editOperatorPasswordBox.setText("");
+        operatorConfirmPasswordBox.setText("");
+        editOperatorConfirmPasswordBox.setText("");
+
+        roomEditorStartSpinner.setModel(new SpinnerNumberModel(100, 100, 1000, 1));
+        roomEditorEndSpinner.setModel(new SpinnerNumberModel(100, 100, 1000, 1));
+        roomEditorPriceSpinner.setModel(new SpinnerNumberModel(1000, 1000, null, 100));
+        roomEditorAdultSpinner.setModel(new SpinnerNumberModel());
+        roomEditorChildSpinner.setModel(new SpinnerNumberModel());
+
+        /// region operatorTable
+        operatorTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel) operatorTable.getModel()).setColumnIdentifiers(Operator.getColumns());
+        operatorTable.getColumnModel().getColumn(0).setResizable(false);
+        operatorTable.getColumnModel().getColumn(0).setPreferredWidth(96);
+        operatorTable.getColumnModel().getColumn(0).setMinWidth(96);
+        operatorTable.getColumnModel().getColumn(0).setMaxWidth(96);
+
+        operatorTable.getColumnModel().getColumn(1).setResizable(false);
+        operatorTable.getColumnModel().getColumn(1).setPreferredWidth(128);
+        operatorTable.getColumnModel().getColumn(1).setMinWidth(128);
+        operatorTable.getColumnModel().getColumn(1).setMaxWidth(128);
+
+        operatorTable.getColumnModel().getColumn(2).setResizable(false);
+        operatorTable.getColumnModel().getColumn(2).setPreferredWidth(96);
+        operatorTable.getColumnModel().getColumn(2).setMinWidth(96);
+        operatorTable.getColumnModel().getColumn(2).setMaxWidth(96);
+
+        operatorTable.getColumnModel().getColumn(3).setResizable(false);
+        operatorTable.getColumnModel().getColumn(3).setPreferredWidth(96);
+        operatorTable.getColumnModel().getColumn(3).setMinWidth(96);
+        operatorTable.getColumnModel().getColumn(3).setMaxWidth(96);
+
+        operatorTable.getColumnModel().getColumn(4).setResizable(false);
+        operatorTable.getColumnModel().getColumn(4).setPreferredWidth(156);
+        operatorTable.getColumnModel().getColumn(4).setMinWidth(156);
+        operatorTable.getColumnModel().getColumn(4).setMaxWidth(156);
+
+        operatorTable.setShowGrid(false);
+        operatorTable.setShowHorizontalLines(false);
+        /// endregion
+
+        ComponentHelper.setEnabled(managePackageButtonPanel, false);
+        ComponentHelper.setEnabled(roomEditorRightPanel, false, backButton);
+        ComponentHelper.setEnabled(manageMenuButtonPanel, false);
+
+        roomPackageTree = ComponentHelper.setupTree(roomPackageTree, "ROOM");
+        RoomHelper.loadClassesInTree(roomPackageTree);
+
+        menuEditorStartersTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel) menuEditorStartersTable.getModel()).setColumnIdentifiers(Dish.getColumns());
+
+        menuEditorMainCourseTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel) menuEditorMainCourseTable.getModel()).setColumnIdentifiers(Dish.getColumns());
+
+        menuEditorDessertTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel) menuEditorDessertTable.getModel()).setColumnIdentifiers(Dish.getColumns());
+
+        reportsTable = ComponentHelper.createNewTable();
+
+        ComponentHelper.setEnabled(menuEditorRightPanel, false, backButton);
+
+        dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
+        MenuHelper.loadClassesInTree(dishesMenuTree);
+
+        reportsStartDatePicker.setDateToToday();
+        reportsEndDatePicker.setDateToToday();
     }
 }

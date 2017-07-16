@@ -81,4 +81,17 @@ public class ComponentHelper {
             }
         }
     }
+
+    public static void setEnabled(ArrayList<JButton> comp, boolean enabled, JButton... excluded) {
+        ArrayList<JButton> excs = new ArrayList<>();
+        Collections.addAll(excs, excluded);
+        for (JButton c : comp) {
+            if (!excs.contains(c)) {
+                c.setEnabled(enabled);
+                try {
+                    setEnabled(c, enabled);
+                } catch (Exception ignored) { }
+            }
+        }
+    }
 }
