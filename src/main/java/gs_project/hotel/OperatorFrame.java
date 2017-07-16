@@ -17,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.print.Book;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -43,6 +44,7 @@ public class OperatorFrame extends MainFrame {
     /// endregion
 
     /// region buttons
+    protected final JButton backButton;
     protected final JButton bookButton;
     protected final JButton checkInButton;
     protected final JButton checkOutButton;
@@ -53,9 +55,8 @@ public class OperatorFrame extends MainFrame {
     protected final JButton bookNextStepButton;
     protected final JButton bookCancelButton;
     protected final JButton checkButton;
-    protected final JButton genBillButton;
-    protected final JButton backButton;
     protected final JButton confirmCheckInButton;
+    protected final JButton genBillButton; // checkout
     protected final JButton confirmCancelButton;
     /// endregion
 
@@ -139,7 +140,7 @@ public class OperatorFrame extends MainFrame {
     protected final JTable orderMenuOrderTable;
     protected final JTextField orderMenuTotalBox;
     protected final ButtonGroup buttonGroup = new ButtonGroup();
-    private JTextArea detAddressBox;
+    protected JTextArea detAddressBox;
     protected JTree orderMenuPackageTree;
     /// endregion
 
@@ -1147,6 +1148,92 @@ public class OperatorFrame extends MainFrame {
         /// endregion
 
         /// region events
+        confirmCheckInButton.addActionListener(e -> {
+            for(RoomClass rc:RoomHelper.roomClasses){
+                for(Room r:rc.getRooms()){
+                    for(Booking b:r.getBookings()){
+                        if(bookId.getText().equals(b.getId())){
+                            if (b.getBookingstate().equals("CANCELLED") || b.getBookingstate().equals("CHECKED OUT")) {
+                                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING ALREADY CHECKED OUT OR CANCELLED!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                            if (LocalDate.parse(b.getCheckindate()).isAfter(LocalDate.now()) || LocalDate.parse(b.getCheckoutdate()).isBefore(LocalDate.now())) {
+                                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING NOT ACTIVE YET OR ALREADY EXPIRED!", "ERROR IN BOOKING DATE", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                            b.setBookingstate("CHECKED IN");
+                            break;
+                        }
+                    }
+                }
+            }
+            for(Visitor vs:VisitorHelper.visitors){
+                for(Booking b:vs.getBookings()){
+                    if(bookId.getText().equals(b.getId())) {
+                        b.setBookingstate("CHECKED IN");
+                        break;
+                    }
+                }
+            }
+        });
+
+        cancelBookingButton.addActionListener(e -> {
+            for(RoomClass rc:RoomHelper.roomClasses){
+                for(Room r:rc.getRooms()){
+                    for(Booking b:r.getBookings()){
+                        if(bookId.getText().equals(b.getId())){
+                            if (b.getBookingstate().equals("CANCELLED") || b.getBookingstate().equals("CHECKED OUT") || b.getBookingstate().equals("CHECKED IN")) {
+                                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING ALREADY CHECKED IN, CHECKED OUT OR CANCELLED!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                            if (LocalDate.parse(b.getCheckoutdate()).isBefore(LocalDate.now())) {
+                                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING ALREADY EXPIRED!", "ERROR IN BOOKING DATE", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                            b.setBookingstate("CANCELLED");
+                            break;
+                        }
+                    }
+                }
+            }
+            for(Visitor vs:VisitorHelper.visitors){
+                for(Booking b:vs.getBookings()){
+                    if(bookId.getText().equals(b.getId())) {
+                        b.setBookingstate("CANCELLED");
+                        break;
+                    }
+                }
+            }
+        });
+
+        genBillButton.addActionListener(e -> {
+            for(RoomClass rc:RoomHelper.roomClasses) {
+                for (Room r : rc.getRooms()) {
+                    for (Booking b : r.getBookings()) {
+                        if (bookId.getText().equals(b.getId())) {
+                            if (!b.getBookingstate().equals("CHECKED IN")) {
+                                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING IS NOT ACTIVE!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                            if (LocalDate.parse(b.getCheckoutdate()).isBefore(LocalDate.now())) {
+                                JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING ALREADY EXPIRED!", "ERROR IN BOOKING DATE", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                            b.setBookingstate("CHECKED OUT");
+                            break;
+                        }
+                    }
+                }
+            }
+            for(Visitor vs:VisitorHelper.visitors) {
+                for (Booking b : vs.getBookings()) {
+                    if (bookId.getText().equals(b.getId())) {
+                        b.setBookingstate("CHECKED OUT");
+                        break;
+                    }
+                }
+            }
+        });
 
         checkOutButton.addActionListener(e -> {
             checkOutHeader.setText("CHECK OUT");
@@ -1156,7 +1243,6 @@ public class OperatorFrame extends MainFrame {
             backButton.setBounds(10, 378, 129, 32);
             billingPanel.add(backButton);
 
-            // todo call set visible in checkButton method
             billingPanel.setVisible(false);
 
             setPanel(checkOutPanel, rightPanel);
@@ -1170,7 +1256,6 @@ public class OperatorFrame extends MainFrame {
             backButton.setBounds(10, 378, 129, 32);
             confirmCheckInPanel.add(backButton);
 
-            // todo call set visible in checkButton method
             confirmCheckInPanel.setVisible(false);
 
             setPanel(checkInPanel, rightPanel);
@@ -1219,8 +1304,8 @@ public class OperatorFrame extends MainFrame {
 
                 confirmRoomPackageBox.setText(roomSelRoomNoBox.getText());
 
-                confirmPriceBox.setText(roomselPriceBox.getText());
-                // todo taxes;
+                double price = Integer.valueOf(roomselPriceBox.getText()) * 1.28;
+                confirmPriceBox.setText(Math.ceil(.7 * price) + " + " + Math.ceil(.3 * price) + " (INITIAL)");
 
                 bookNextStepButton.setText("NEXT STEP");
                 setStep(detailsStep, stepsPanel);
@@ -1255,29 +1340,18 @@ public class OperatorFrame extends MainFrame {
                 setStep(confirmStep, stepsPanel);
                 setPanel(confirmPanel, currentStepPanel);
             } else if (confirmStep.isEnabled()) {
-                Booking booking = new Booking(IDGenerator.generate().substring(5), LocalDate.now().toString(), confirmCheckInBox.getText(), confirmCheckOutBox.getText(), "current");
+                Booking booking = new Booking(IDGenerator.generate().substring(5), LocalDate.now().toString(), confirmCheckInBox.getText(), confirmCheckOutBox.getText(), "CURRENT");
 
-                String iniamount = "";
-                int amount = 0;
-                while (iniamount == null || iniamount.isEmpty()) {
-                    iniamount = JOptionPane.showInputDialog(OperatorFrame.this, "Enter price:", "PRICE", JOptionPane.QUESTION_MESSAGE);
-                    if (iniamount == null || iniamount.isEmpty()) {
-                        JOptionPane.showMessageDialog(OperatorFrame.this, "Intial amount cannot be empty. Re-enter!", "Invalid Price", JOptionPane.ERROR_MESSAGE);
-                        continue;
-                    }
-                    try {
-                        amount = Integer.valueOf(iniamount);
-                        if (amount <= 0) {
-                            iniamount = "";
-                            JOptionPane.showMessageDialog(OperatorFrame.this, "Intial amount cannot be less than or equal to zero. Re-enter!", "Invalid Price", JOptionPane.ERROR_MESSAGE);
-                        }
-                    } catch (NumberFormatException nfe) {
-                        iniamount = "";
-                        JOptionPane.showMessageDialog(OperatorFrame.this, "Intial amount can only be a integer. Re-enter!", "Invalid Price", JOptionPane.ERROR_MESSAGE);
-                    }
+                double amount = Double.valueOf(confirmPriceBox.getText().replace("(INITIAL)", "").split("\\+")[1]);
+
+                int x = JOptionPane.showConfirmDialog(OperatorFrame.this, "Please pay Rs. " + amount + " before proceeding!", "Pay initial amount.", JOptionPane.OK_CANCEL_OPTION);
+
+                if (x == JOptionPane.CANCEL_OPTION) {
+                    bookCancelButton.doClick();
+                    return;
                 }
 
-                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), amount, booking.getBookingdate(), "INITIAL PAYMENT"));
+                booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) amount, booking.getBookingdate(), "INITIAL PAYMENT"));
 
                 vis.getBookings().add(booking);
                 vis.getBookings().sort(Comparator.comparing(o -> LocalDate.parse(o.getCheckindate())));
@@ -1378,7 +1452,6 @@ public class OperatorFrame extends MainFrame {
             backButton.setBounds(10, 378, 129, 32);
             confirmCancelPanel.add(backButton);
 
-            // todo call set visible in checkButton method
             confirmCancelPanel.setVisible(false);
 
             setPanel(cancelBookingPanel, rightPanel);
@@ -1401,7 +1474,7 @@ public class OperatorFrame extends MainFrame {
                 for(RoomClass rc:RoomHelper.roomClasses){
                     for(Room r:rc.getRooms()){
                         for(Booking b:r.getBookings()){
-                            if(bookId.getText().equals(b.getId())){
+                            if(bookId.getText().equals(b.getId())) {
                                 checkInDate.setText(b.getCheckindate());
                                 checkOutDate.setText(b.getCheckoutdate());
                                 roomPackage.setText(rc.getType());
@@ -1414,7 +1487,6 @@ public class OperatorFrame extends MainFrame {
                                 amountBox.setText(""+(x+price));
                                 break;
                             }
-
                         }
                     }
                 }
@@ -1426,8 +1498,7 @@ public class OperatorFrame extends MainFrame {
                         }
                     }
                 }
-               if(checkOutHeader.getText().equals("CHECK IN") ) {
-
+               if (checkOutHeader.getText().equals("CHECK IN") ) {
                     confirmCheckInPanel.setVisible(true);
                }
                else if(checkOutHeader.getText().equals("CHECK OUT")){
