@@ -19,6 +19,32 @@ public class Transaction implements Serializable {
         this.details = details;
     }
 
+    public static Object[] getColumns() {
+        return new Object[]{"TRANSACTION ID", "BOOKING ID", "AMOUNT", "DATE", "DETAILS"};
+    }
+
+    public static Object[][] toObjectsArray(java.util.List<Transaction> transactions) {
+        Object[][] objects = new Object[transactions.size()][];
+        int i = 0;
+        for (Transaction s : transactions) {
+            objects[i++] = s.toObjects();
+        }
+        return objects;
+    }
+
+    public static Object[] getBillingColumns() {
+        return new Object[]{"SL. NO.", "DETAILS", "AMOUNT"};
+    }
+
+    public static Object[][] toBillingObjectsArray(java.util.List<Transaction> transactions) {
+        Object[][] objects = new Object[transactions.size()][];
+        int i = 0;
+        for (Transaction s : transactions) {
+            objects[i] = s.toBillingObjects(i++);
+        }
+        return objects;
+    }
+
     public String getDetails() {
         return details;
     }
@@ -60,32 +86,10 @@ public class Transaction implements Serializable {
     }
 
     public Object[] toObjects() {
-        return new Object[] {id, bookingid, value, date, details};
+        return new Object[]{id, bookingid, value, date, details};
     }
 
-    public static Object[] getColumns() {
-        return new Object[] { "TRANSACTION ID", "BOOKING ID", "AMOUNT", "DATE", "DETAILS" };
-    }
-
-    public static Object[][] toObjectsArray(java.util.List<Transaction> transactions) {
-        Object[][] objects = new Object[transactions.size()][];
-        int i = 0;
-        for (Transaction s:transactions) {
-            objects[i++] = s.toObjects();
-        }
-        return objects;
-    }
-
-    public static Object[] getBillingColumns() { return new Object[] {"SL. NO.", "DETAILS", "AMOUNT"}; }
-
-    public Object[] toBillingObjects(int index) { return new Object[] { (index + 1), details.replace("[PAID]", "").replace("[PENDING]", ""), value}; }
-
-    public static Object[][] toBillingObjectsArray(java.util.List<Transaction> transactions) {
-        Object[][] objects = new Object[transactions.size()][];
-        int i = 0;
-        for (Transaction s:transactions) {
-            objects[i] = s.toBillingObjects(i++);
-        }
-        return objects;
+    public Object[] toBillingObjects(int index) {
+        return new Object[]{(index + 1), details.replace("[PAID]", "").replace("[PENDING]", ""), value};
     }
 }

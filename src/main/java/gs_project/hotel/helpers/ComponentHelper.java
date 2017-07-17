@@ -36,7 +36,7 @@ public class ComponentHelper {
 
     public static JTree setupTree(JTree tree, String rootName) {
         if (tree == null) tree = new JTree();
-        tree.setModel(new DefaultTreeModel( new DefaultMutableTreeNode(rootName)));
+        tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode(rootName)));
         tree.setEditable(false);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addTreeWillExpandListener(new TreeWillExpandListener() {
@@ -65,7 +65,8 @@ public class ComponentHelper {
             c.setEnabled(enabled);
             try {
                 setEnabled((JComponent) c, enabled);
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -77,7 +78,8 @@ public class ComponentHelper {
                 c.setEnabled(enabled);
                 try {
                     setEnabled((JComponent) c, enabled);
-                } catch (Exception ignored) { }
+                } catch (Exception ignored) {
+                }
             }
         }
     }
@@ -90,7 +92,8 @@ public class ComponentHelper {
                 c.setEnabled(enabled);
                 try {
                     setEnabled(c, enabled);
-                } catch (Exception ignored) { }
+                } catch (Exception ignored) {
+                }
             }
         }
     }

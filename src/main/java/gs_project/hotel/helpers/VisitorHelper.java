@@ -1,16 +1,14 @@
 package gs_project.hotel.helpers;
 
 import gs_project.hotel.FileHandler;
-import gs_project.hotel.types.Transaction;
 import gs_project.hotel.types.Visitor;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class VisitorHelper {
     public final static String FILENAME = "visitors";
+    public static ArrayList<Visitor> visitors = new ArrayList<>();
 
     public static void readFromFile() {
         System.out.print("Reading database file: \"" + FILENAME + "\" ...");
@@ -22,7 +20,9 @@ public class VisitorHelper {
             e.printStackTrace();
         }
 
-        if (visitors == null) { visitors = new ArrayList<>(); }
+        if (visitors == null) {
+            visitors = new ArrayList<>();
+        }
     }
 
     public static void writeToFile() {
@@ -35,6 +35,4 @@ public class VisitorHelper {
             e1.printStackTrace();
         }
     }
-
-    public static ArrayList<Visitor> visitors = new ArrayList<>();
 }

@@ -5,15 +5,14 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import gs_project.hotel.helpers.*;
 import gs_project.hotel.types.*;
 
-import java.awt.*;
-import java.util.List;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class OperatorFrame extends MainFrame {
-    /// region panels
     protected final JPanel contentPane;
     protected final JPanel rightPanel;
     protected final JPanel checkOutPanel;
@@ -39,17 +37,13 @@ public class OperatorFrame extends MainFrame {
     protected final JPanel datesPeoplePanel;
     protected final JPanel checkInPanel;
     protected final JPanel confirmCheckInPanel;
-    protected JPanel menuOrderPanel;
-    protected JScrollPane orderMenuPackageScroller;
-    protected JScrollPane orderMenuOrderScroller;
     protected final JScrollPane roomSelTreeScroller;
     protected final JScrollPane detAdressScroller;
-    /// endregion
 
-    /// region buttons
     protected final JButton backButton;
     protected final JButton bookButton;
     protected final JButton checkInButton;
+
     protected final JButton checkOutButton;
     protected final JButton foodOrderButton;
     protected final JButton cancelBookingButton;
@@ -68,12 +62,11 @@ public class OperatorFrame extends MainFrame {
     protected final JRadioButton orderMenuTypeHalfOption;
     protected final JRadioButton orderMenuTypeSingleOption;
     protected final JRadioButton orderMenuTypeDoubleOption;
-    /// endregion
 
-    /// region labels
     protected final JLabel datesPeopleStep;
     protected final JLabel roomSelectStep;
     protected final JLabel detailsStep;
+
     protected final JLabel confirmStep;
     protected final JLabel confirmCustNameLabel;
     protected final JLabel confirmCardNumLabel;
@@ -122,12 +115,11 @@ public class OperatorFrame extends MainFrame {
     protected final JLabel orderMenuQuantityLabel;
     protected final JLabel orderMenuHeader;
     protected final JLabel orderMenuTotalLabel;
-    /// endregion
 
-    /// region textFields
     protected final JTextField confirmRoomPackageBox;
     protected final JTextField confirmCardNumBox;
     protected final JTextField confirmCustNameBox;
+
     protected final JTextField confirmCheckInBox;
     protected final JTextField confirmCheckOutBox;
     protected final JTextField confirmAdultsBox;
@@ -149,27 +141,26 @@ public class OperatorFrame extends MainFrame {
     protected final JTextField orderMenuTypeSinglePriceBox;
     protected final JTextField orderMenuTotalBox;
     protected final JTextArea detAddressBox;
-    /// endregion
-
     protected final DatePicker roomSelCheckInBox;
     protected final DatePicker roomSelCheckOutBox;
     protected final JSpinner dateAdults;
+
     protected final JSpinner dateChildren;
     protected final JSpinner orderMenuQuantityBox;
     protected final DatePicker dateCheckInPicker;
     protected final DatePicker dateCheckoutPicker;
     protected final JTable orderMenuOrderTable;
     protected final ButtonGroup buttonGroup = new ButtonGroup();
+    protected final JComboBox<String> detVerifyDocBox;
+    protected final ArrayList<JButton> leftButtons = new ArrayList<>();
+    protected JPanel menuOrderPanel;
+    protected JScrollPane orderMenuPackageScroller;
+    protected JScrollPane orderMenuOrderScroller;
     protected JTree orderMenuPackageTree;
     protected JTree roomSelRoomTypesTree;
-    protected final JComboBox<String> detVerifyDocBox;
-
-    protected final ArrayList<JButton> leftButtons = new ArrayList<>();
-
-    public static void main(String[] args) {
-        OperatorFrame frame = new OperatorFrame();
-        frame.setVisible(true);
-    }
+    Visitor vis;
+    int vis_index;
+    double price;
 
     public OperatorFrame() {
         this("Operator Landing Page");
@@ -197,7 +188,7 @@ public class OperatorFrame extends MainFrame {
         rightPanel.setBounds(192, 11, 592, 549);
         contentPane.add(rightPanel);
 
-        /// region leftButtons
+
         bookButton = new JButton("Booking");
         bookButton.setFont(new Font("Verdana", Font.BOLD, 14));
         bookButton.setBounds(10, 11, 172, 32);
@@ -227,13 +218,13 @@ public class OperatorFrame extends MainFrame {
         cancelBookingButton.setBounds(10, 183, 172, 32);
         contentPane.add(cancelBookingButton);
         leftButtons.add(cancelBookingButton);
-        /// endregion
+
 
         addDateTimeToStatusBar();
 
         center();
 
-        /// region menuOrderPanel
+
         menuOrderPanel = new JPanel();
         menuOrderPanel.setBorder(new LineBorder(Color.GRAY));
         menuOrderPanel.setBounds(0, 0, 592, 549);
@@ -366,15 +357,12 @@ public class OperatorFrame extends MainFrame {
         orderMenuAddButton.setEnabled(false);
 
         orderMenuRemoveButton.setEnabled(false);
-        /// endregion
 
-        /// region bookingPanel
         bookingPanel = new JPanel();
         bookingPanel.setBounds(0, 0, 592, 549);
         bookingPanel.setBorder(new LineBorder(Color.GRAY));
         bookingPanel.setLayout(null);
 
-        /// region stepsPanel
         stepsPanel = new JPanel();
         stepsPanel.setBorder(new LineBorder(Color.GRAY));
         stepsPanel.setBounds(0, 0, 592, 48);
@@ -415,16 +403,15 @@ public class OperatorFrame extends MainFrame {
         confirmStep.setBounds(453, 0, 139, 48);
         confirmStep.setBorder(new LineBorder(Color.GRAY));
         stepsPanel.add(confirmStep);
-        /// endregion
 
-        /// region currentStepPanel
+
         currentStepPanel = new JPanel();
         currentStepPanel.setBorder(new LineBorder(Color.GRAY));
         currentStepPanel.setBounds(0, 47, 592, 458);
         bookingPanel.add(currentStepPanel);
         currentStepPanel.setLayout(null);
 
-        /// region confirmPanel
+
         confirmPanel = new JPanel();
         confirmPanel.setLayout(null);
         confirmPanel.setBounds(10, 11, 572, 437);
@@ -530,9 +517,8 @@ public class OperatorFrame extends MainFrame {
         confirmPriceBox.setColumns(10);
         confirmPriceBox.setBounds(250, 394, 312, 32);
         confirmPanel.add(confirmPriceBox);
-        /// endregion
 
-        /// region detailsPanel
+
         detailsPanel = new JPanel();
         detailsPanel.setBounds(10, 11, 572, 437);
         detailsPanel.setLayout(null);
@@ -601,7 +587,7 @@ public class OperatorFrame extends MainFrame {
         detHeader.setBounds(0, 0, 562, 48);
         detailsPanel.add(detHeader);
 
-        detVerifyDocBox = new JComboBox<>(new String[] { "AADHAR", "VOTER ID", "ELECTRICITY BILL"});
+        detVerifyDocBox = new JComboBox<>(new String[]{"AADHAR", "VOTER ID", "ELECTRICITY BILL"});
         detVerifyDocBox.setBounds(245, 394, 317, 32);
         detailsPanel.add(detVerifyDocBox);
 
@@ -609,9 +595,8 @@ public class OperatorFrame extends MainFrame {
         detCardGenerateButton.setFont(new Font("Tahoma", Font.BOLD, 12));
         detCardGenerateButton.setBounds(466, 76, 96, 32);
         detailsPanel.add(detCardGenerateButton);
-        /// endregion
 
-        /// region roomSelectionPanel
+
         roomSelectionPanel = new JPanel();
         roomSelectionPanel.setBounds(10, 11, 572, 437);
         roomSelectionPanel.setLayout(null);
@@ -678,9 +663,7 @@ public class OperatorFrame extends MainFrame {
         datePickerSettings(roomSelCheckOutBox);
         roomSelCheckOutBox.setDateToToday();
 
-        /// endregion
 
-        /// region datesPeoplePanel
         datesPeoplePanel = new JPanel();
         datesPeoplePanel.setLayout(null);
         datesPeoplePanel.setBounds(10, 11, 572, 437);
@@ -733,9 +716,7 @@ public class OperatorFrame extends MainFrame {
         datesPeoplePanel.add(dateCheckoutPicker);
         datePickerSettings(dateCheckoutPicker);
         dateCheckoutPicker.setDateToToday();
-        /// endregion
 
-        /// endregion
 
         bookNextStepButton = new JButton("NEXT STEP");
         bookNextStepButton.setBounds(402, 511, 180, 32);
@@ -747,9 +728,7 @@ public class OperatorFrame extends MainFrame {
         bookingPanel.add(bookCancelButton);
         bookCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-        /// endregion
 
-        /// region checkoutpanel
         checkOutPanel = new JPanel();
         checkOutPanel.setBounds(0, 0, 592, 549);
         checkOutPanel.setBorder(new LineBorder(Color.GRAY));
@@ -886,9 +865,7 @@ public class OperatorFrame extends MainFrame {
         backButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         backButton.setBounds(10, 378, 129, 32);
         billingPanel.add(backButton);
-        /// endregion
 
-        /// region checkInPanel
         checkInPanel = new JPanel();
         checkInPanel.setBounds(0, 0, 592, 549);
         checkInPanel.setBorder(new LineBorder(Color.GRAY));
@@ -915,9 +892,8 @@ public class OperatorFrame extends MainFrame {
         confirmCheckInButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCheckInButton.setBounds(288, 378, 274, 32);
         confirmCheckInPanel.add(confirmCheckInButton);
-        /// endregion
 
-        /// region cancelBookingPanel
+
         cancelBookingPanel = new JPanel();
         cancelBookingPanel.setBounds(0, 0, 592, 549);
         cancelBookingPanel.setBorder(new LineBorder(Color.GRAY));
@@ -932,9 +908,8 @@ public class OperatorFrame extends MainFrame {
         confirmCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         confirmCancelButton.setBounds(288, 378, 274, 32);
         confirmCancelPanel.add(confirmCancelButton);
-        /// endregion
 
-        /// region events
+
         orderMenuConfirmButton.addActionListener(e -> {
             if (orderMenuOrderTable.getRowCount() > 0) {
                 StringBuilder entry = new StringBuilder("FOOD ORDER: (");
@@ -1042,19 +1017,19 @@ public class OperatorFrame extends MainFrame {
                     if (typeNode.toString().equals("STARTERS")) {
                         for (Dish d : menuPackage.getStarters()) {
                             if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                                model.addRow(new Object[]{d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
                             }
                         }
                     } else if (typeNode.toString().equals("DESSERTS")) {
                         for (Dish d : menuPackage.getDesserts()) {
                             if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                                model.addRow(new Object[]{d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
                             }
                         }
                     } else if (typeNode.toString().equals("MAIN-COURSE")) {
-                        for(Dish d:menuPackage.getMaincourse()) {
+                        for (Dish d : menuPackage.getMaincourse()) {
                             if (d.getName().equals(dishNode.toString().split("\t")[0])) {
-                                model.addRow(new Object[] { d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
+                                model.addRow(new Object[]{d.getName(), plate, quantity, "₹ " + Math.floor(multiplier * quantity * d.getPrice())});
                             }
                         }
                     } else {
@@ -1065,7 +1040,8 @@ public class OperatorFrame extends MainFrame {
                     JOptionPane.showMessageDialog(OperatorFrame.this, "Invalid dish or Currently Unavailable.", "DISH NOT FOUND", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
             int totalPrice = 0;
             int invalid = 0;
             for (int i = 0; i < orderMenuOrderTable.getRowCount(); i++) {
@@ -1121,7 +1097,7 @@ public class OperatorFrame extends MainFrame {
                 if (ind > -1) {
                     MenuPackage menuPackage = MenuHelper.menuPackages.get(ind);
                     if (typeNode.toString().equals("STARTERS")) {
-                        for(Dish d:menuPackage.getStarters()) {
+                        for (Dish d : menuPackage.getStarters()) {
                             if (d.getName().equals(dishNode.toString().split("\t")[0])) {
                                 orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
                                 orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
@@ -1147,7 +1123,7 @@ public class OperatorFrame extends MainFrame {
                             }
                         }
                     } else if (typeNode.toString().equals("DESSERTS")) {
-                        for(Dish d:menuPackage.getDesserts()) {
+                        for (Dish d : menuPackage.getDesserts()) {
                             if (d.getName().equals(dishNode.toString().split("\t")[0])) {
                                 orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
                                 orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
@@ -1173,7 +1149,7 @@ public class OperatorFrame extends MainFrame {
                             }
                         }
                     } else if (typeNode.toString().equals("MAIN-COURSE")) {
-                        for(Dish d:menuPackage.getMaincourse()) {
+                        for (Dish d : menuPackage.getMaincourse()) {
                             if (d.getName().equals(dishNode.toString().split("\t")[0])) {
                                 orderMenuTypeHalfPriceBox.setText("₹ " + Math.ceil(.7 * d.getPrice()));
                                 orderMenuTypeSinglePriceBox.setText("₹ " + Math.ceil(d.getPrice()));
@@ -1222,13 +1198,15 @@ public class OperatorFrame extends MainFrame {
                     orderMenuTypeDoubleOption.setEnabled(false);
                     orderMenuAddButton.setEnabled(false);
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         });
+
         confirmCheckInButton.addActionListener(e -> {
-            for(RoomClass rc:RoomHelper.roomClasses){
-                for(Room r:rc.getRooms()){
-                    for(Booking b:r.getBookings()){
-                        if(bookId.getText().equals(b.getId())){
+            for (RoomClass rc : RoomHelper.roomClasses) {
+                for (Room r : rc.getRooms()) {
+                    for (Booking b : r.getBookings()) {
+                        if (bookId.getText().equals(b.getId())) {
                             if (b.getBookingstate().equals("CANCELLED") || b.getBookingstate().equals("CHECKED OUT") || b.getBookingstate().equals("CHECKED IN")) {
                                 JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING ALREADY CHECKED IN, CHECKED OUT OR CANCELLED!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
                                 return;
@@ -1243,9 +1221,9 @@ public class OperatorFrame extends MainFrame {
                     }
                 }
             }
-            for(Visitor vs:VisitorHelper.visitors){
-                for(Booking b:vs.getBookings()){
-                    if(bookId.getText().equals(b.getId())) {
+            for (Visitor vs : VisitorHelper.visitors) {
+                for (Booking b : vs.getBookings()) {
+                    if (bookId.getText().equals(b.getId())) {
                         b.setBookingstate("CHECKED IN");
                         break;
                     }
@@ -1258,10 +1236,10 @@ public class OperatorFrame extends MainFrame {
         });
 
         confirmCancelButton.addActionListener(e -> {
-            for(RoomClass rc:RoomHelper.roomClasses){
-                for(Room r:rc.getRooms()){
-                    for(Booking b:r.getBookings()){
-                        if(bookId.getText().equals(b.getId())){
+            for (RoomClass rc : RoomHelper.roomClasses) {
+                for (Room r : rc.getRooms()) {
+                    for (Booking b : r.getBookings()) {
+                        if (bookId.getText().equals(b.getId())) {
                             if (b.getBookingstate().equals("CANCELLED") || b.getBookingstate().equals("CHECKED OUT") || b.getBookingstate().equals("CHECKED IN")) {
                                 JOptionPane.showMessageDialog(OperatorFrame.this, "BOOKING ALREADY CHECKED IN, CHECKED OUT OR CANCELLED!", "ERROR IN BOOKING STATUS", JOptionPane.ERROR_MESSAGE);
                                 return;
@@ -1276,9 +1254,9 @@ public class OperatorFrame extends MainFrame {
                     }
                 }
             }
-            for(Visitor vs:VisitorHelper.visitors){
-                for(Booking b:vs.getBookings()){
-                    if(bookId.getText().equals(b.getId())) {
+            for (Visitor vs : VisitorHelper.visitors) {
+                for (Booking b : vs.getBookings()) {
+                    if (bookId.getText().equals(b.getId())) {
                         b.setBookingstate("CANCELLED");
                         break;
                     }
@@ -1300,7 +1278,7 @@ public class OperatorFrame extends MainFrame {
 
             ArrayList<Transaction> trans = new ArrayList<>();
 
-            for(RoomClass rc:RoomHelper.roomClasses) {
+            for (RoomClass rc : RoomHelper.roomClasses) {
                 for (Room r : rc.getRooms()) {
                     for (Booking b : r.getBookings()) {
                         if (bookId.getText().equals(b.getId())) {
@@ -1313,20 +1291,20 @@ public class OperatorFrame extends MainFrame {
                                 return;
                             }
                             b.setBookingstate("CHECKED OUT");
-                            for (Transaction t:b.getTransactions()) {
+                            for (Transaction t : b.getTransactions()) {
                                 packageprice += t.getValue();
                                 if (t.getDetails().contains("[PAID]")) {
                                     paidprice += t.getValue();
                                 }
                             }
-                            trans.add(new Transaction("", b.getId(), packageprice, b.getBookingdate(),"[PACKAGE] " + rc.getType()));
+                            trans.add(new Transaction("", b.getId(), packageprice, b.getBookingdate(), "[PACKAGE] " + rc.getType()));
                             break;
                         }
                     }
                 }
             }
 
-            for(Visitor vs:VisitorHelper.visitors) {
+            for (Visitor vs : VisitorHelper.visitors) {
                 for (Booking b : vs.getBookings()) {
                     if (bookId.getText().equals(b.getId())) {
                         b.setBookingstate("CHECKED OUT");
@@ -1398,12 +1376,11 @@ public class OperatorFrame extends MainFrame {
         });
         bookNextStepButton.addActionListener(e -> {
             if (datesPeopleStep.isEnabled()) {
-                if((int)dateAdults.getValue() <= 0) {
-                    JOptionPane.showMessageDialog(this,"PLEASE SELECT ADULTS","ERROR",JOptionPane.ERROR_MESSAGE);
+                if ((int) dateAdults.getValue() <= 0) {
+                    JOptionPane.showMessageDialog(this, "PLEASE SELECT ADULTS", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-                else if(!dateCheckoutPicker.getDate().isAfter(dateCheckInPicker.getDate())){
-                    JOptionPane.showMessageDialog(this,"PLEASE CHANGE CHECK OUT DATE","ERROR",JOptionPane.ERROR_MESSAGE);
+                } else if (!dateCheckoutPicker.getDate().isAfter(dateCheckInPicker.getDate())) {
+                    JOptionPane.showMessageDialog(this, "PLEASE CHANGE CHECK OUT DATE", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 roomSelCheckInBox.setDate(dateCheckInPicker.getDate());
@@ -1416,12 +1393,11 @@ public class OperatorFrame extends MainFrame {
                 setStep(roomSelectStep, stepsPanel);
                 setPanel(roomSelectionPanel, currentStepPanel);
             } else if (roomSelectStep.isEnabled()) {
-                if(roomselPriceBox.getText().isEmpty()){
-                    JOptionPane.showMessageDialog(this,"SEARCH FOR ROOMS FIRST","ERROR",JOptionPane.ERROR_MESSAGE);
+                if (roomselPriceBox.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "SEARCH FOR ROOMS FIRST", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-                else if(!roomSelCheckOutBox.getDate().isAfter(roomSelCheckInBox.getDate())){
-                    JOptionPane.showMessageDialog(this,"PLEASE CHANGE CHECK OUT DATE","ERROR",JOptionPane.ERROR_MESSAGE);
+                } else if (!roomSelCheckOutBox.getDate().isAfter(roomSelCheckInBox.getDate())) {
+                    JOptionPane.showMessageDialog(this, "PLEASE CHANGE CHECK OUT DATE", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -1437,27 +1413,22 @@ public class OperatorFrame extends MainFrame {
                 setStep(detailsStep, stepsPanel);
                 setPanel(detailsPanel, currentStepPanel);
             } else if (detailsStep.isEnabled()) {
-                if(detCardNumBox.getText().isEmpty() || !ValidateHelper.validateCardNumber(detCardNumBox.getText())){
-                    JOptionPane.showMessageDialog(this,"PLEASE ENTER YOUR CARD NUMBER","ERROR",JOptionPane.ERROR_MESSAGE);
+                if (detCardNumBox.getText().isEmpty() || !ValidateHelper.validateCardNumber(detCardNumBox.getText())) {
+                    JOptionPane.showMessageDialog(this, "PLEASE ENTER YOUR CARD NUMBER", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-                else if(detVisitorNameBox.getText().isEmpty())
-                {
-                    JOptionPane.showMessageDialog(this,"PLEASE ENTER YOUR NAME FIRST","ERROR",JOptionPane.ERROR_MESSAGE);
+                } else if (detVisitorNameBox.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "PLEASE ENTER YOUR NAME FIRST", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-                else if(!ValidateHelper.validatePhone("+91"+detPhoneNumBox.getText())){
-                    JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                } else if (!ValidateHelper.validatePhone("+91" + detPhoneNumBox.getText())) {
+                    JOptionPane.showMessageDialog(this, "PHONE NUMBER NOT ACCEPTED", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-                else if(!ValidateHelper.validateEmail(detEmailBox.getText()))
-                {
-                    JOptionPane.showMessageDialog(this,"EMAIL NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+                } else if (!ValidateHelper.validateEmail(detEmailBox.getText())) {
+                    JOptionPane.showMessageDialog(this, "EMAIL NOT ACCEPTED", "ERROR", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 vis_index = searchCard();
-                vis = new Visitor(detCardNumBox.getText(),detVisitorNameBox.getText(),detEmailBox.getText(),detPhoneNumBox.getText(),detAddressBox.getText(), detVerifyDocBox.getSelectedItem().toString() , new ArrayList<>());
+                vis = new Visitor(detCardNumBox.getText(), detVisitorNameBox.getText(), detEmailBox.getText(), detPhoneNumBox.getText(), detAddressBox.getText(), detVerifyDocBox.getSelectedItem().toString(), new ArrayList<>());
 
                 confirmCustNameBox.setText(detVisitorNameBox.getText());
                 confirmCardNumBox.setText(detCardNumBox.getText());
@@ -1483,16 +1454,15 @@ public class OperatorFrame extends MainFrame {
                 booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) amount, booking.getBookingdate(), "[PAID]INITIAL PAYMENT"));
                 booking.getTransactions().add(new Transaction(IDGenerator.generate().substring(7), booking.getId(), (int) (price - amount), booking.getBookingdate(), "[PENDING]REMAINING PACKAGE PRICE"));
 
-                if (vis_index  < 0) {
+                if (vis_index < 0) {
                     VisitorHelper.visitors.add(vis);
-                }
-                else {
+                } else {
                     VisitorHelper.visitors.set(vis_index, vis);
                 }
                 boolean found = false;
-                for (RoomClass rc:RoomHelper.roomClasses) {
+                for (RoomClass rc : RoomHelper.roomClasses) {
                     if (rc.getType().equals(confirmRoomPackageBox.getText())) {
-                        for (Room r:rc.getRooms()) {
+                        for (Room r : rc.getRooms()) {
                             if (r.getBookings().size() == 0) {
                                 r.getBookings().add(booking);
                                 found = true;
@@ -1552,7 +1522,8 @@ public class OperatorFrame extends MainFrame {
                 } else {
                     roomselPriceBox.setText("");
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         });
 
         backButton.addActionListener(e -> {
@@ -1605,61 +1576,79 @@ public class OperatorFrame extends MainFrame {
             setPanel(menuOrderPanel, rightPanel);
         });
 
-        checkButton.addActionListener(e ->{
-            if(bookId.getText().isEmpty()){
-                JOptionPane.showMessageDialog(this,"PLEASE ENTER BOOKING ID TO CONTINUE","ERROR",JOptionPane.ERROR_MESSAGE);
-
+        checkButton.addActionListener(e -> {
+            if (bookId.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "PLEASE ENTER BOOKING ID TO CONTINUE", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else {
-                for(RoomClass rc:RoomHelper.roomClasses){
-                    for(Room r:rc.getRooms()){
-                        for(Booking b:r.getBookings()){
-                            if(bookId.getText().equals(b.getId())) {
+            } else {
+                boolean found = false;
+                for (RoomClass rc : RoomHelper.roomClasses) {
+                    for (Room r : rc.getRooms()) {
+                        for (Booking b : r.getBookings()) {
+                            if (bookId.getText().equals(b.getId())) {
                                 checkInDate.setText(b.getCheckindate());
                                 checkOutDate.setText(b.getCheckoutdate());
                                 roomPackage.setText(rc.getType());
                                 int initial = 0;
                                 int total = 0;
-                                for (Transaction t:b.getTransactions()) {
+                                for (Transaction t : b.getTransactions()) {
                                     if (t.getDetails().startsWith("[PAID]")) {
                                         initial += t.getValue();
                                     }
                                     total += t.getValue();
                                 }
-                                totalPrice.setText(""+total);
-                                initPaymentBox.setText ("" + initial);
-                                roomNumBox.setText(""+r.getRoomNo());
-                                int x=(total*28/100);
-                                gstBox.setText(""+x);
-                                amountBox.setText(""+(x+total-initial));
+                                totalPrice.setText("" + total);
+                                initPaymentBox.setText("" + initial);
+                                roomNumBox.setText("" + r.getRoomNo());
+                                int x = (total * 28 / 100);
+                                gstBox.setText("" + x);
+                                amountBox.setText("" + (x + total - initial));
+                                found = true;
                                 break;
                             }
                         }
+                        if (found) break;
                     }
+                    if (found) break;
                 }
-                for(Visitor vs:VisitorHelper.visitors){
-                    for(Booking b:vs.getBookings()){
-                        if(bookId.getText().equals(b.getId())){
+                if (!found) {
+                    JOptionPane.showMessageDialog(this, "PLEASE ENTER CORRECT BOOKING ID TO CONTINUE", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    backButton.setBounds(20, 495, 129, 32);
+                    if (checkOutHeader.getText().equals("CHECK IN")) {
+                        confirmCheckInPanel.setVisible(false);
+                        confirmCheckInPanel.add(backButton);
+                    } else if (checkOutHeader.getText().equals("CHECK OUT")) {
+                        billingPanel.setVisible(false);
+                        billingPanel.add(backButton);
+                    } else {
+                        confirmCancelPanel.setVisible(false);
+                        confirmCancelPanel.add(backButton);
+                    }
+                    return;
+                }
+                for (Visitor vs : VisitorHelper.visitors) {
+                    for (Booking b : vs.getBookings()) {
+                        if (bookId.getText().equals(b.getId())) {
                             custName.setText(vs.getName());
                             break;
                         }
                     }
                 }
-               if (checkOutHeader.getText().equals("CHECK IN") ) {
+                backButton.setBounds(10, 378, 129, 32);
+                if (checkOutHeader.getText().equals("CHECK IN")) {
                     confirmCheckInPanel.setVisible(true);
-               }
-               else if(checkOutHeader.getText().equals("CHECK OUT")){
+                    confirmCheckInPanel.add(backButton);
+                } else if (checkOutHeader.getText().equals("CHECK OUT")) {
                     billingPanel.setVisible(true);
-               }
-               else {
-                   confirmCancelPanel.setVisible(true);
-               }
+                    billingPanel.add(backButton);
+                } else {
+                    confirmCancelPanel.setVisible(true);
+                    confirmCancelPanel.add(backButton);
+                }
             }
         });
 
         detCardNumBox.getDocument().addDocumentListener(new DocumentListener() {
-
             @Override
             public void insertUpdate(DocumentEvent e) {
                 populateVisitor(searchCard());
@@ -1683,8 +1672,8 @@ public class OperatorFrame extends MainFrame {
         roomSelSearchBtn.addActionListener(e -> {
             ArrayList<RoomClass> classes = new ArrayList<>();
 
-            for (RoomClass rc:RoomHelper.roomClasses) {
-                for (Room r:rc.getRooms()) {
+            for (RoomClass rc : RoomHelper.roomClasses) {
+                for (Room r : rc.getRooms()) {
                     boolean found = false;
                     if (r.getBookings().size() == 0) {
                         classes.add(rc);
@@ -1704,55 +1693,13 @@ public class OperatorFrame extends MainFrame {
                             }
                         }
                     }
-                    if (found) { break; }
+                    if (found) {
+                        break;
+                    }
                 }
             }
             RoomHelper.loadClassesInTree(roomSelRoomTypesTree, classes);
         });
-
-          /// region stepsEvents
-//        datesPeopleStep.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                bookNextStepButton.setText("NEXT STEP");
-//
-//                setStep(datesPeopleStep, stepsPanel);
-//                setPanel(datesPeoplePanel, currentStepPanel);
-//            }
-//        });
-//
-//        roomSelectStep.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                bookNextStepButton.setText("NEXT STEP");
-//
-//                setStep(roomSelectStep, stepsPanel);
-//                setPanel(roomSelectionPanel, currentStepPanel);
-//            }
-//        });
-//
-//        detailsStep.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                bookNextStepButton.setText("NEXT STEP");
-//
-//                setStep(detailsStep, stepsPanel);
-//                setPanel(detailsPanel, currentStepPanel);
-//            }
-//        });
-//
-//        confirmStep.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                bookNextStepButton.setText("CONFIRM BOOKING");
-//
-//                setStep(confirmStep, stepsPanel);
-//                setPanel(confirmPanel, currentStepPanel);
-//            }
-//        });
-          /// endregion
-
-        /// endregion
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -1760,6 +1707,11 @@ public class OperatorFrame extends MainFrame {
                 RoomHelper.writeToFile();
             }
         });
+    }
+
+    public static void main(String[] args) {
+        OperatorFrame frame = new OperatorFrame();
+        frame.setVisible(true);
     }
 
     public static void setStep(Container step, Container panel) {
@@ -1779,105 +1731,104 @@ public class OperatorFrame extends MainFrame {
         outer.repaint();
         outer.revalidate();
     }
-    private static void datePickerSettings(DatePicker db){
-        DatePickerSettings ds=new DatePickerSettings();
+
+    private static void datePickerSettings(DatePicker db) {
+        DatePickerSettings ds = new DatePickerSettings();
         db.setSettings(ds);
         ds.setDateRangeLimits(LocalDate.now(), null);
         db.setDateToToday();
     }
 
-   public int searchCard(){
-        for(int i=0;i<VisitorHelper.visitors.size();i++){
-            Visitor vs=VisitorHelper.visitors.get(i);
-            if(vs.getCardId().equals(detCardNumBox.getText())){
-               return i;
+    public int searchCard() {
+        for (int i = 0; i < VisitorHelper.visitors.size(); i++) {
+            Visitor vs = VisitorHelper.visitors.get(i);
+            if (vs.getCardId().equals(detCardNumBox.getText())) {
+                return i;
             }
         }
         return -1;
-   }
+    }
 
-   void populateVisitor(int i) {
-       if(i==-1){
-           detVisitorNameBox.setText("");
-           detPhoneNumBox.setText("");
-           detEmailBox.setText("");
-           detAddressBox.setText("");
-           return;
-       }
-       Visitor vs = VisitorHelper.visitors.get(i);
-       detVisitorNameBox.setText(vs.getName());
-       detPhoneNumBox.setText(vs.getContactNo());
-       detEmailBox.setText(vs.getEmailId());
-       detAddressBox.setText(vs.getAddress());
-   }
-   Visitor vis;
-   int vis_index;
-   double price;
+    void populateVisitor(int i) {
+        if (i == -1) {
+            detVisitorNameBox.setText("");
+            detPhoneNumBox.setText("");
+            detEmailBox.setText("");
+            detAddressBox.setText("");
+            return;
+        }
+        Visitor vs = VisitorHelper.visitors.get(i);
+        detVisitorNameBox.setText(vs.getName());
+        detPhoneNumBox.setText(vs.getContactNo());
+        detEmailBox.setText(vs.getEmailId());
+        detAddressBox.setText(vs.getAddress());
+    }
 
-   protected void resetPanels() {
-       roomSelCheckInBox.setDateToToday();
-       roomSelCheckOutBox.setDateToToday();
-       dateCheckInPicker.setDateToToday();
-       dateCheckoutPicker.setDateToToday();
-       dateAdults.setModel(new SpinnerNumberModel(0, 0, null, 1));
-       dateChildren.setModel(new SpinnerNumberModel(0, 0, null, 1));
-       orderMenuQuantityBox.setModel(new SpinnerNumberModel(0, 0, null, 1));
-       ((DefaultTableModel) orderMenuOrderTable.getModel()).setRowCount(0);
-       orderMenuPackageTree = ComponentHelper.setupTree(orderMenuPackageTree, "MENU");
-       roomSelRoomTypesTree = ComponentHelper.setupTree(roomSelRoomTypesTree, "ROOM");
-       detVerifyDocBox.setSelectedIndex(0);
-       confirmRoomPackageBox.setText("");
-       confirmCardNumBox.setText("");
-       confirmCustNameBox.setText("");
-       confirmCheckInBox.setText("");
-       confirmCheckOutBox.setText("");
-       confirmAdultsBox.setText("");
-       confirmChildrenBox.setText("");
-       confirmPriceBox.setText("");
-       detCardNumBox.setText("");
-       detVisitorNameBox.setText("");
-       detEmailBox.setText("");
-       detPhoneNumBox.setText("");
-       roomselPriceBox.setText("");
-       roomSelRoomNoBox.setText("");
-       bookId.setText("");
-       initPaymentBox.setText("");
-       gstBox.setText("");
-       amountBox.setText("");
-       roomNumBox.setText("");
-       orderMenuTypeHalfPriceBox.setText("");
-       orderMenuTypeDoublePriceBox.setText("");
-       orderMenuTypeSinglePriceBox.setText("");
-       orderMenuTotalBox.setText("");
-       detAddressBox.setText("");
-       orderMenuTypeHalfOption.setSelected(false);
-       orderMenuTypeSingleOption.setSelected(false);
-       orderMenuTypeDoubleOption.setSelected(false);
-       custName.setText("");
-       roomPackage.setText("");
-       checkInDate.setText("");
-       checkOutDate.setText("");
-       totalPrice.setText("");
+    protected void resetPanels() {
+        roomSelCheckInBox.setDateToToday();
+        roomSelCheckOutBox.setDateToToday();
+        dateCheckInPicker.setDateToToday();
+        dateCheckoutPicker.setDateToToday();
+        dateAdults.setModel(new SpinnerNumberModel(0, 0, null, 1));
+        dateChildren.setModel(new SpinnerNumberModel(0, 0, null, 1));
+        orderMenuQuantityBox.setModel(new SpinnerNumberModel(0, 0, null, 1));
 
-       rightPanel.removeAll();
-       rightPanel.repaint();
-       rightPanel.revalidate();
+        ((DefaultTableModel) orderMenuOrderTable.getModel()).setRowCount(0);
+        orderMenuPackageTree = ComponentHelper.setupTree(orderMenuPackageTree, "MENU");
+        roomSelRoomTypesTree = ComponentHelper.setupTree(roomSelRoomTypesTree, "ROOM");
+        detVerifyDocBox.setSelectedIndex(0);
+        confirmRoomPackageBox.setText("");
+        confirmCardNumBox.setText("");
+        confirmCustNameBox.setText("");
+        confirmCheckInBox.setText("");
+        confirmCheckOutBox.setText("");
+        confirmAdultsBox.setText("");
+        confirmChildrenBox.setText("");
+        confirmPriceBox.setText("");
+        detCardNumBox.setText("");
+        detVisitorNameBox.setText("");
+        detEmailBox.setText("");
+        detPhoneNumBox.setText("");
+        roomselPriceBox.setText("");
+        roomSelRoomNoBox.setText("");
+        bookId.setText("");
+        initPaymentBox.setText("");
+        gstBox.setText("");
+        amountBox.setText("");
+        roomNumBox.setText("");
+        orderMenuTypeHalfPriceBox.setText("");
+        orderMenuTypeDoublePriceBox.setText("");
+        orderMenuTypeSinglePriceBox.setText("");
+        orderMenuTotalBox.setText("");
+        detAddressBox.setText("");
+        orderMenuTypeHalfOption.setSelected(false);
+        orderMenuTypeSingleOption.setSelected(false);
+        orderMenuTypeDoubleOption.setSelected(false);
+        custName.setText("");
+        roomPackage.setText("");
+        checkInDate.setText("");
+        checkOutDate.setText("");
+        totalPrice.setText("");
 
-       ComponentHelper.setEnabled(leftButtons, true);
+        rightPanel.removeAll();
+        rightPanel.repaint();
+        rightPanel.revalidate();
 
-       MenuHelper.loadDishesInTree(orderMenuPackageTree);
-       ((DefaultTableModel) orderMenuOrderTable.getModel()).setColumnIdentifiers(Dish.getOrderColumns());
+        ComponentHelper.setEnabled(leftButtons, true);
 
-       orderMenuQuantityBox.setEnabled(false);
-       orderMenuTypeHalfOption.setEnabled(false);
-       orderMenuTypeSingleOption.setEnabled(false);
-       orderMenuTypeDoubleOption.setEnabled(false);
-       orderMenuAddButton.setEnabled(false);
+        MenuHelper.loadDishesInTree(orderMenuPackageTree);
+        ((DefaultTableModel) orderMenuOrderTable.getModel()).setColumnIdentifiers(Dish.getOrderColumns());
 
-       orderMenuRemoveButton.setEnabled(false);
-       roomSelectStep.setEnabled(false);
-       detailsStep.setEnabled(false);
-       confirmStep.setEnabled(false);
-   }
+        orderMenuQuantityBox.setEnabled(false);
+        orderMenuTypeHalfOption.setEnabled(false);
+        orderMenuTypeSingleOption.setEnabled(false);
+        orderMenuTypeDoubleOption.setEnabled(false);
+        orderMenuAddButton.setEnabled(false);
+
+        orderMenuRemoveButton.setEnabled(false);
+        roomSelectStep.setEnabled(false);
+        detailsStep.setEnabled(false);
+        confirmStep.setEnabled(false);
+    }
 }
 

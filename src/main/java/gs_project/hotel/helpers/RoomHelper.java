@@ -8,16 +8,19 @@ import gs_project.hotel.types.Transaction;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.*;
-import java.awt.print.Book;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
 
 public class RoomHelper {
     public final static String FILENAME = "roomclasses";
+    public static ArrayList<RoomClass> roomClasses = new ArrayList<>();
 
     public static void readFromFile() {
         System.out.print("Reading database file: \"" + FILENAME + "\" ...");
@@ -29,7 +32,9 @@ public class RoomHelper {
             e.printStackTrace();
         }
 
-        if (roomClasses == null) { roomClasses = new ArrayList<>(); }
+        if (roomClasses == null) {
+            roomClasses = new ArrayList<>();
+        }
     }
 
     public static void writeToFile() {
@@ -43,17 +48,15 @@ public class RoomHelper {
         }
     }
 
-    public static ArrayList<RoomClass> roomClasses = new ArrayList<>();
-
     public static void loadClassesInTree(JTree tree) {
-        for (RoomClass rc: roomClasses) {
+        for (RoomClass rc : roomClasses) {
             buildTreeFromType((DefaultTreeModel) tree.getModel(), rc.getType());
         }
         ComponentHelper.expandTree(tree);
     }
 
     public static void loadClassesInTree(JTree tree, ArrayList<RoomClass> classes) {
-        for (RoomClass rc: classes) {
+        for (RoomClass rc : classes) {
             buildTreeFromType((DefaultTreeModel) tree.getModel(), rc.getType());
         }
         ComponentHelper.expandTree(tree);
@@ -69,8 +72,8 @@ public class RoomHelper {
     }
 
     public static ArrayList<Room> buildRoomList(int start, int end) {
-        for (RoomClass rc: roomClasses) {
-            for (Room r: rc.getRooms()) {
+        for (RoomClass rc : roomClasses) {
+            for (Room r : rc.getRooms()) {
                 if (r.getRoomNo() >= start && r.getRoomNo() <= end) {
                     return null;
                 }
@@ -83,7 +86,7 @@ public class RoomHelper {
         return rooml;
     }
 
-    public static List<Integer> getClassIndices (TreePath path) {
+    public static List<Integer> getClassIndices(TreePath path) {
         String type = pathToType(path);
         List<Integer> indices = new ArrayList<>();
         for (int i = 0; i < roomClasses.size(); i++) {
@@ -98,10 +101,10 @@ public class RoomHelper {
     public static void buildTreeFromType(final DefaultTreeModel model, final String str) {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 
-        String [] strings = str.split(":");
+        String[] strings = str.split(":");
         DefaultMutableTreeNode node = root;
 
-        for (String s: strings) {
+        for (String s : strings) {
             int index = childIndex(node, s);
             if (index < 0) {
                 DefaultMutableTreeNode newChild = new DefaultMutableTreeNode(s);
@@ -142,11 +145,11 @@ public class RoomHelper {
 
     public static void loadTransactions(JTable table, LocalDate dateStart, LocalDate dateEnd) {
         ArrayList<Transaction> transactions = new ArrayList<>();
-        for (RoomClass rc:roomClasses) {
-            for (Room r: rc.getRooms()) {
+        for (RoomClass rc : roomClasses) {
+            for (Room r : rc.getRooms()) {
                 for (Booking b : r.getBookings()) {
-                    for (Transaction t: b.getTransactions()) {
-                        LocalDate date =LocalDate.parse(t.getDate());
+                    for (Transaction t : b.getTransactions()) {
+                        LocalDate date = LocalDate.parse(t.getDate());
                         if ((date.isAfter(dateStart) || date.isEqual(dateStart)) && (date.isBefore(dateEnd) || date.isEqual(dateEnd))) {
                             transactions.add(t);
                         }
@@ -160,6 +163,5 @@ public class RoomHelper {
 
     public static void loadCurrentBookings(JTable table, LocalDate dateStart, LocalDate dateEnd) {
         ((DefaultTableModel) table.getModel()).setDataVector(RoomClass.toBookingObjectsArray(RoomHelper.roomClasses), RoomClass.getBookingColumns());
-        //((DefaultTableModel) table.getModel()).setDataVector(Booking.toObjectsArray(bookings), Booking.getColumns());
     }
 }

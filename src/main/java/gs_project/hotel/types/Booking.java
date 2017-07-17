@@ -1,6 +1,5 @@
 package gs_project.hotel.types;
 
-import java.awt.print.Book;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -24,10 +23,22 @@ public class Booking implements Serializable {
     }
 
     public Booking(String id, String bookingdate, String checkindate, String checkoutdate, String bookingstate) {
-        this (id, bookingdate, checkindate, checkoutdate, bookingstate, new ArrayList<>());
+        this(id, bookingdate, checkindate, checkoutdate, bookingstate, new ArrayList<>());
     }
 
-    ///region getter and setter
+    public static Object[] getColumns() {
+        return new Object[]{"BOOKING ID", "DATE", "CHECK IN", "CHECK OUT", "STATUS"};
+    }
+
+    public static Object[][] toObjectsArray(java.util.List<Booking> bookings) {
+        Object[][] objects = new Object[bookings.size()][];
+        int i = 0;
+        for (Booking s : bookings) {
+            objects[i++] = s.toObjects();
+        }
+        return objects;
+    }
+
     public String getId() {
         return id;
     }
@@ -75,22 +86,8 @@ public class Booking implements Serializable {
     public void setTransactions(ArrayList<Transaction> transactions) {
         this.transactions = transactions;
     }
-    ///endregion
 
     public Object[] toObjects() {
-        return new Object[] {id, bookingdate, checkindate, checkoutdate, bookingstate};
-    }
-
-    public static Object[] getColumns() {
-        return new Object[] { "BOOKING ID", "DATE", "CHECK IN", "CHECK OUT", "STATUS" };
-    }
-
-    public static Object[][] toObjectsArray(java.util.List<Booking> bookings) {
-        Object[][] objects = new Object[bookings.size()][];
-        int i = 0;
-        for (Booking s:bookings) {
-            objects[i++] = s.toObjects();
-        }
-        return objects;
+        return new Object[]{id, bookingdate, checkindate, checkoutdate, bookingstate};
     }
 }

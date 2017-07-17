@@ -8,17 +8,16 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
 
 public class MenuHelper {
     public final static String FILENAME = "menupackages";
+    public static ArrayList<MenuPackage> menuPackages = new ArrayList<>();
 
     public static void readFromFile() {
         System.out.print("Reading database file: \"" + FILENAME + "\" ...");
@@ -30,18 +29,22 @@ public class MenuHelper {
             e.printStackTrace();
         }
 
-        if (menuPackages == null) { menuPackages = new ArrayList<>(); }
+        if (menuPackages == null) {
+            menuPackages = new ArrayList<>();
+        }
     }
 
     public static ArrayList<Dish> tableToDishList(JTable table) {
         ArrayList<Dish> dishes = new ArrayList<>();
-        DefaultTableModel model = (DefaultTableModel)table.getModel();
-        for (int i = 0 ; i < table.getRowCount(); i++) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        for (int i = 0; i < table.getRowCount(); i++) {
             String name = model.getValueAt(i, 0).toString();
             int minQua = Integer.valueOf(model.getValueAt(i, 1).toString());
             int maxQua = Integer.valueOf(model.getValueAt(i, 2).toString());
             int price = Integer.valueOf(model.getValueAt(i, 3).toString());
-            if (name.isEmpty() || minQua <= 0 || maxQua <= 0 || minQua > maxQua || price <= 0) { return  null; }
+            if (name.isEmpty() || minQua <= 0 || maxQua <= 0 || minQua > maxQua || price <= 0) {
+                return null;
+            }
             dishes.add(new Dish(name, minQua, maxQua, price));
         }
         return dishes;
@@ -167,21 +170,21 @@ public class MenuHelper {
 
                     if (mpack.getStarters().size() > 0) {
                         DefaultMutableTreeNode starters = new DefaultMutableTreeNode("STARTERS");
-                        for (Dish d:mpack.getStarters()) {
+                        for (Dish d : mpack.getStarters()) {
                             starters.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + "]"));
                         }
                         childNode.add(starters);
                     }
                     if (mpack.getMaincourse().size() > 0) {
                         DefaultMutableTreeNode maincourse = new DefaultMutableTreeNode("MAIN-COURSE");
-                        for (Dish d:mpack.getMaincourse()) {
+                        for (Dish d : mpack.getMaincourse()) {
                             maincourse.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + "]"));
                         }
                         childNode.add(maincourse);
                     }
                     if (mpack.getDesserts().size() > 0) {
                         DefaultMutableTreeNode desserts = new DefaultMutableTreeNode("DESSERTS");
-                        for (Dish d:mpack.getDesserts()) {
+                        for (Dish d : mpack.getDesserts()) {
                             desserts.add(new DefaultMutableTreeNode(d.getName() + "\t[₹ " + d.getPrice() + "]"));
                         }
                         childNode.add(desserts);
@@ -191,10 +194,8 @@ public class MenuHelper {
         }
     }
 
-    public static ArrayList<MenuPackage> menuPackages = new ArrayList<>();
-
     public static void loadClassesInTree(JTree tree) {
-        for (MenuPackage rc: menuPackages) {
+        for (MenuPackage rc : menuPackages) {
             buildTreeFromType((DefaultTreeModel) tree.getModel(), rc.getType());
         }
         ComponentHelper.expandTree(tree);
@@ -210,7 +211,7 @@ public class MenuHelper {
     }
 
 
-    public static List<Integer> getClassIndices (TreePath path) {
+    public static List<Integer> getClassIndices(TreePath path) {
         String type = pathToType(path);
         List<Integer> indices = new ArrayList<>();
         for (int i = 0; i < menuPackages.size(); i++) {
@@ -225,10 +226,10 @@ public class MenuHelper {
     public static void buildTreeFromType(final DefaultTreeModel model, final String str) {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 
-        String [] strings = str.split(":");
+        String[] strings = str.split(":");
         DefaultMutableTreeNode node = root;
 
-        for (String s: strings) {
+        for (String s : strings) {
             int index = childIndex(node, s);
             if (index < 0) {
                 DefaultMutableTreeNode newChild = new DefaultMutableTreeNode(s);

@@ -17,6 +17,23 @@ public class Dish implements Serializable {
         this.price = price;
     }
 
+    public static Object[] getColumns() {
+        return new Object[]{"NAME", "MIN. QUANTITY", "MAX. QUANTITY", "PRICE"};
+    }
+
+    public static Object[] getOrderColumns() {
+        return new Object[]{"DISH NAME", "PLATE TYPE", "QUANTITY", "TOTAL PRICE"};
+    }
+
+    public static Object[][] toObjectsArray(java.util.List<Dish> dishes) {
+        Object[][] objects = new Object[dishes.size()][];
+        int i = 0;
+        for (Dish s : dishes) {
+            objects[i++] = s.toObjects();
+        }
+        return objects;
+    }
+
     public String getName() {
         return name;
     }
@@ -50,23 +67,6 @@ public class Dish implements Serializable {
     }
 
     public Object[] toObjects() {
-        return new Object[] { name, minQuantity, maxQuantity, price};
-    }
-
-    public static Object[] getColumns() {
-        return new Object[] { "NAME", "MIN. QUANTITY", "MAX. QUANTITY", "PRICE"};
-    }
-
-    public static Object[] getOrderColumns() {
-        return new Object[] { "DISH NAME", "PLATE TYPE", "QUANTITY", "TOTAL PRICE"};
-    }
-
-    public static Object[][] toObjectsArray(java.util.List<Dish> dishes) {
-        Object[][] objects = new Object[dishes.size()][];
-        int i = 0;
-        for (Dish s:dishes) {
-            objects[i++] = s.toObjects();
-        }
-        return objects;
+        return new Object[]{name, minQuantity, maxQuantity, price};
     }
 }

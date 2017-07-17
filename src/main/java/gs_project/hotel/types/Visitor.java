@@ -24,7 +24,20 @@ public class Visitor implements Serializable {
         this.bookings = bookings;
     }
 
-    ///region getter and setter
+    public static Object[] getColumns() {
+        return new Object[]{"CARD ID", "NAME", "EMAIL", "CONTACT NO.", "ADDRESS", "VERIFY DOC"};
+    }
+
+    public static Object[][] toObjectsArray(java.util.List<Visitor> visitors) {
+        Object[][] objects = new Object[visitors.size()][];
+        int i = 0;
+        for (Visitor s : visitors) {
+            objects[i++] = s.toObjects();
+        }
+        return objects;
+    }
+
+
     public String getCardId() {
         return cardId;
     }
@@ -73,6 +86,7 @@ public class Visitor implements Serializable {
         this.bookings = bookings;
     }
 
+
     public String getDocument() {
         return document;
     }
@@ -80,22 +94,8 @@ public class Visitor implements Serializable {
     public void setDocument(String document) {
         this.document = document;
     }
-    ///endregion
 
     public Object[] toObjects() {
-        return new Object[] {cardId, name, emailId, contactNo, address, document};
-    }
-
-    public static Object[] getColumns() {
-        return new Object[] { "CARD ID", "NAME", "EMAIL", "CONTACT NO.", "ADDRESS", "VERIFY DOC" };
-    }
-
-    public static Object[][] toObjectsArray(java.util.List<Visitor> visitors) {
-        Object[][] objects = new Object[visitors.size()][];
-        int i = 0;
-        for (Visitor s:visitors) {
-            objects[i++] = s.toObjects();
-        }
-        return objects;
+        return new Object[]{cardId, name, emailId, contactNo, address, document};
     }
 }

@@ -1,9 +1,7 @@
 package gs_project.hotel.types;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class Room implements Serializable {
     private static final long serialVersionUID = 4551019941238523542L;
@@ -15,12 +13,12 @@ public class Room implements Serializable {
         this.roomNo = roomNo;
         bookings = new ArrayList<>();
     }
+
     public Room(int roomNo, ArrayList<Booking> bookings) {
         this.roomNo = roomNo;
         this.bookings = bookings;
     }
 
-    ///region getter and setter
     public int getRoomNo() {
         return roomNo;
     }
@@ -36,5 +34,4 @@ public class Room implements Serializable {
     public void setBookings(ArrayList<Booking> bookings) {
         this.bookings = bookings;
     }
-    ///endregion
 }

@@ -12,6 +12,7 @@ import static gs_project.hotel.types.Operator.toObjectsArray;
 
 public class OperatorHelper {
     public final static String FILENAME = "operators";
+    public static ArrayList<Operator> operators = new ArrayList<>();
 
     public static void readFromFile() {
         System.out.print("Reading database file: \"" + FILENAME + "\" ...");
@@ -23,7 +24,9 @@ public class OperatorHelper {
             e.printStackTrace();
         }
 
-        if (operators == null) { operators = new ArrayList<>(); }
+        if (operators == null) {
+            operators = new ArrayList<>();
+        }
     }
 
     public static void writeToFile() {
@@ -37,9 +40,7 @@ public class OperatorHelper {
         }
     }
 
-    public static ArrayList<Operator> operators = new ArrayList<>();
-
     public static void updateTable(JTable table) {
-        ((DefaultTableModel)table.getModel()).setDataVector(toObjectsArray(operators), Operator.getColumns());
+        ((DefaultTableModel) table.getModel()).setDataVector(toObjectsArray(operators), Operator.getColumns());
     }
 }

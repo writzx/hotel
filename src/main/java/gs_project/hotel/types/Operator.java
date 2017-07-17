@@ -12,14 +12,6 @@ public class Operator implements Serializable {
     private String phoneNumber;
     private String address;
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
     public Operator(String uid, String password, String name, String email, String phoneNumber, String address) {
         this.uid = uid;
         this.password = password;
@@ -27,6 +19,27 @@ public class Operator implements Serializable {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
+    }
+
+    public static Object[] getColumns() {
+        return new Object[]{"USER ID", "NAME", "EMAIL", "PASSWORD", "CONTACT NO.", "ADDRESS"};
+    }
+
+    public static Object[][] toObjectsArray(java.util.List<Operator> operators) {
+        Object[][] objects = new Object[operators.size()][];
+        int i = 0;
+        for (Operator s : operators) {
+            objects[i++] = s.toObjects();
+        }
+        return objects;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getAddress() {
@@ -69,21 +82,7 @@ public class Operator implements Serializable {
         this.email = email;
     }
 
-
     public Object[] toObjects() {
-        return new Object[] { uid, name, email, password, phoneNumber, address };
-    }
-
-    public static Object[] getColumns() {
-        return new Object[] { "USER ID", "NAME","EMAIL","PASSWORD","CONTACT NO.","ADDRESS" };
-    }
-
-    public static Object[][] toObjectsArray(java.util.List<Operator> operators) {
-        Object[][] objects = new Object[operators.size()][];
-        int i = 0;
-        for (Operator s:operators) {
-            objects[i++] = s.toObjects();
-        }
-        return objects;
+        return new Object[]{uid, name, email, password, phoneNumber, address};
     }
 }

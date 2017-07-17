@@ -2,13 +2,9 @@ package gs_project.hotel;
 
 import gs_project.hotel.types.Operator;
 
-import java.awt.EventQueue;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import java.awt.Font;
-
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -21,14 +17,6 @@ public class LoginFrame extends MainFrame {
     private JPasswordField pass;
 
     private ArrayList<Operator> operators = new ArrayList<>();
-
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        LoginFrame frame = new LoginFrame();
-        frame.setVisible(true);
-    }
 
     /**
      * Create the frame.
@@ -101,7 +89,7 @@ public class LoginFrame extends MainFrame {
                 if (uid.getText().isEmpty() || passw.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "PLEASE ENTER BOTH UID AND PASSWORD", "ENTER DETAILS", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    for (Operator o: operators) {
+                    for (Operator o : operators) {
                         if (uid.getText().equals(o.getUid()) && passw.equals(o.getPassword())) {
                             this.hideFrame();
                             OperatorFrame operatorFrame = new OperatorFrame();
@@ -110,10 +98,9 @@ public class LoginFrame extends MainFrame {
                         }
                     }
                     JOptionPane.showMessageDialog(this, "WRONG UID OR PASSWORD!", "LOGIN ERROR", JOptionPane.ERROR_MESSAGE);
-                    // else show operator pane
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "PLEASE SELECT ONE OPTION: ADMIN OR OPERATOR","CHOOSE OPTION!",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "PLEASE SELECT ONE OPTION: ADMIN OR OPERATOR", "CHOOSE OPTION!", JOptionPane.ERROR_MESSAGE);
             }
         });
         login.setBounds(129, 174, 147, 48);
@@ -136,5 +123,13 @@ public class LoginFrame extends MainFrame {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        LoginFrame frame = new LoginFrame();
+        frame.setVisible(true);
     }
 }

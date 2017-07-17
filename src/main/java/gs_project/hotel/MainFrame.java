@@ -9,29 +9,19 @@ import java.awt.*;
 import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
-    // ContentPane // should not be changed
-    private JPanel conPane = new JPanel(new BorderLayout());
-
-    // Main Pane // should be changed before calling **setVisible**
-    protected Container mainConPanel;
-
     protected final JPanel statusPanel;
 
-    // used by all the subclasses
     protected final JLabel dateStatus;
     protected final JLabel timeStatus;
 
+    protected Container mainConPanel;
 
-    public static void main(String... args) {
-        new BookingFrame("WRITWICK", "ADMIN").showFrame();
-    }
+    private JPanel conPane = new JPanel(new BorderLayout());
+
 
     public MainFrame(String title) {
         super(title);
-        // should be set by only the root form
-        // setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        // default properties
         setResizable(true);
         super.setSize(800, 600);
         center();
@@ -52,6 +42,14 @@ public class MainFrame extends JFrame {
         conPane.add(statusPanel, BorderLayout.SOUTH);
     }
 
+    private static String formattedDate() {
+        return LocalDate.now().toString("dd/MM/yyyy");
+    }
+
+    private static String formattedTime(String current) {
+        return LocalTime.now().toString(current.contains(".") ? "hh:mm:ss aa" : "hh.mm.ss aa");
+    }
+
     @Override
     public void setContentPane(Container contentPane) {
         mainConPanel = contentPane;
@@ -59,9 +57,13 @@ public class MainFrame extends JFrame {
         super.setContentPane(conPane);
     }
 
-    public void close() { dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); }
+    public void close() {
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }
 
-    public void hideFrame() { setVisible(false); }
+    public void hideFrame() {
+        setVisible(false);
+    }
 
     public void showFrame() {
         setVisible(true);
@@ -71,18 +73,9 @@ public class MainFrame extends JFrame {
     public void setSize(int width, int height) {
         super.setSize(width, height + dateStatus.getPreferredSize().height);
     }
-
-    // should be called after setSize()
+    
     public void center() {
         setLocationRelativeTo(null);
-    }
-
-    private static String formattedDate() {
-        return LocalDate.now().toString("dd/MM/yyyy");
-    }
-
-    private static String formattedTime(String current) {
-        return LocalTime.now().toString(current.contains(".") ? "hh:mm:ss aa" : "hh.mm.ss aa" );
     }
 
     protected void addDateTimeToStatusBar() {

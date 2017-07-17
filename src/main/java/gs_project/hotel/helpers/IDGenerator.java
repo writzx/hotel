@@ -4,7 +4,9 @@ import java.util.Random;
 
 public final class IDGenerator {
     private static Random random = new Random();
-    private IDGenerator() { }
+
+    private IDGenerator() {
+    }
 
     public static String generate() {
         char[] chars = "43VRHQZLYTK17WU2506GOFECDIJ8MXBNAPS9".toCharArray();

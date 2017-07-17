@@ -7,7 +7,8 @@ import gs_project.hotel.types.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -31,10 +32,6 @@ public class AdminFrame extends OperatorFrame {
     private final JPanel reportsButtonPanel;
 
     private final JScrollPane reportsScrollPane;
-
-    private JTable operatorTable;
-    private JTable reportsTable;
-
     private final JLabel operatorIdLabel;
     private final JLabel operatorNameLabel;
     private final JLabel operatorPasswordLabel;
@@ -51,7 +48,6 @@ public class AdminFrame extends OperatorFrame {
     private final JLabel editOperatorAddressLabel;
     private final JLabel reportsHeader;
     private final JLabel reportsDateRangeLabel;
-
     private final JTextField operatorIdBox;
     private final JTextField operatorNameBox;
     private final JTextField operatorEmailBox;
@@ -66,7 +62,6 @@ public class AdminFrame extends OperatorFrame {
     private final JPasswordField operatorConfirmPasswordBox;
     private final JPasswordField editOperatorPasswordBox;
     private final JPasswordField editOperatorConfirmPasswordBox;
-
     private final JButton operatorDeleteButton;
     private final JButton operatorUpdateButton;
     private final JButton operatorFormClearBtn;
@@ -77,17 +72,11 @@ public class AdminFrame extends OperatorFrame {
     private final JButton transactionReportButton;
     private final JButton visitorDatabaseButton;
     private final JButton currentBookingsButton;
-
     private final DatePicker reportsStartDatePicker;
     private final DatePicker reportsEndDatePicker;
     private final JPanel menuEditorPanel;
     private final JPanel menuEditorLeftPanel;
     private final JPanel menuEditorRightPanel;
-    private JTable menuEditorStartersTable;
-    private JTable menuEditorMainCourseTable;
-    private JTable menuEditorDessertTable;
-    private JTree dishesMenuTree;
-    private JTree roomPackageTree;
     private final JButton addPackageButton;
     private final JButton editPackageButton;
     private final JButton removePackageButton;
@@ -121,17 +110,17 @@ public class AdminFrame extends OperatorFrame {
     private final JScrollPane menuEditorDessertScroller;
     private final JButton menuEditorSaveButton;
     private final JButton menuEditorCancelButton;
-
-    public static void main(String[] args) {
-        AdminFrame frame = new AdminFrame();
-        frame.setVisible(true);
-    }
+    private JTable operatorTable;
+    private JTable reportsTable;
+    private JTable menuEditorStartersTable;
+    private JTable menuEditorMainCourseTable;
+    private JTable menuEditorDessertTable;
+    private JTree dishesMenuTree;
+    private JTree roomPackageTree;
 
     public AdminFrame() {
         super("Admin Landing Page");
 
-        /// region leftButtons
-        /// region operatorButtons (Bounds)
         bookButton.setBounds(10, 269, 172, 32);
 
         checkInButton.setBounds(10, 312, 172, 32);
@@ -141,9 +130,6 @@ public class AdminFrame extends OperatorFrame {
         foodOrderButton.setBounds(10, 398, 172, 32);
 
         cancelBookingButton.setBounds(10, 441, 172, 32);
-        /// endregion
-
-        /// region adminButtons
         operatorManageButton = new JButton("Manage Operators");
         operatorManageButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         operatorManageButton.setBounds(10, 11, 172, 32);
@@ -179,10 +165,7 @@ public class AdminFrame extends OperatorFrame {
         currentBookingsButton.setBounds(10, 226, 172, 32);
         contentPane.add(currentBookingsButton);
         leftButtons.add(currentBookingsButton);
-        /// endregion
-        /// endregion
 
-        /// region operatorManagePanel
         operatorManagePanel = new JPanel();
         operatorManagePanel.setBounds(0, 0, 592, 549);
         operatorManagePanel.setBorder(new LineBorder(Color.GRAY));
@@ -192,7 +175,6 @@ public class AdminFrame extends OperatorFrame {
         operatorTableScrollPane.setBounds(10, 283, 572, 255);
         operatorManagePanel.add(operatorTableScrollPane);
 
-        /// region operatorTable
         operatorTable = ComponentHelper.createNewTable();
         ((DefaultTableModel) operatorTable.getModel()).setColumnIdentifiers(Operator.getColumns());
         operatorTable.getColumnModel().getColumn(0).setResizable(false);
@@ -225,7 +207,7 @@ public class AdminFrame extends OperatorFrame {
         operatorTable.setFont(new Font("Tahoma", Font.BOLD, 14));
         operatorTableScrollPane.setViewportView(operatorTable);
         operatorTable.setFillsViewportHeight(true);
-        /// endregion
+
 
         manageOperatorTabPanel = new JTabbedPane(JTabbedPane.TOP);
         manageOperatorTabPanel.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -413,9 +395,7 @@ public class AdminFrame extends OperatorFrame {
         operatorUpdateButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         operatorUpdateButton.setBounds(429, 202, 128, 32);
         editRemoveOperatorPanel.add(operatorUpdateButton);
-        /// endregion
 
-        /// region roomEditorPanel
         roomEditorPanel = new JPanel();
         roomEditorPanel.setLayout(new BorderLayout());
         roomEditorPanel.setBounds(0, 0, 592, 549);
@@ -515,9 +495,7 @@ public class AdminFrame extends OperatorFrame {
         roomPackageTree = ComponentHelper.setupTree(roomPackageTree, "ROOM");
         RoomHelper.loadClassesInTree(roomPackageTree);
 
-        /// endregion
 
-        /// region menuEditorPanel
         menuEditorPanel = new JPanel();
         menuEditorPanel.setLayout(new BorderLayout());
         menuEditorPanel.setBounds(0, 0, 592, 549);
@@ -551,7 +529,7 @@ public class AdminFrame extends OperatorFrame {
         menuEditorRightPanel = new JPanel();
         menuEditorRightPanel.setLayout(null);
 
-        /// region menuEditorRightPanel
+
         JPanel menuEditorRightPanel = new JPanel();
         menuEditorRightPanel.setLayout(null);
 
@@ -566,7 +544,7 @@ public class AdminFrame extends OperatorFrame {
         menuEditorRightPanel.add(menuEditorStarterScroller);
 
         menuEditorStartersTable = ComponentHelper.createNewTable();
-        ((DefaultTableModel)menuEditorStartersTable.getModel()).setColumnIdentifiers(Dish.getColumns());
+        ((DefaultTableModel) menuEditorStartersTable.getModel()).setColumnIdentifiers(Dish.getColumns());
         menuEditorStartersTable.setFillsViewportHeight(true);
         menuEditorStarterScroller.setViewportView(menuEditorStartersTable);
 
@@ -596,7 +574,7 @@ public class AdminFrame extends OperatorFrame {
         menuEditorRightPanel.add(menuEditorMainCourseScroller);
 
         menuEditorMainCourseTable = ComponentHelper.createNewTable();
-        ((DefaultTableModel)menuEditorMainCourseTable.getModel()).setColumnIdentifiers(Dish.getColumns());
+        ((DefaultTableModel) menuEditorMainCourseTable.getModel()).setColumnIdentifiers(Dish.getColumns());
         menuEditorMainCourseTable.setFillsViewportHeight(true);
         menuEditorMainCourseScroller.setViewportView(menuEditorMainCourseTable);
 
@@ -619,7 +597,7 @@ public class AdminFrame extends OperatorFrame {
         menuEditorRightPanel.add(menuEditorDessertScroller);
 
         menuEditorDessertTable = ComponentHelper.createNewTable();
-        ((DefaultTableModel)menuEditorDessertTable.getModel()).setColumnIdentifiers(Dish.getColumns());
+        ((DefaultTableModel) menuEditorDessertTable.getModel()).setColumnIdentifiers(Dish.getColumns());
         menuEditorDessertTable.setFillsViewportHeight(true);
         menuEditorDessertScroller.setViewportView(menuEditorDessertTable);
 
@@ -632,7 +610,7 @@ public class AdminFrame extends OperatorFrame {
         menuEditorCancelButton.setBounds(12, 410, 128, 32);
         menuEditorCancelButton.setFont(new Font("Tahoma", Font.BOLD, 14));
         menuEditorRightPanel.add(menuEditorCancelButton);
-        /// endregion
+
 
         ComponentHelper.setEnabled(menuEditorRightPanel, false, backButton);
 
@@ -641,9 +619,7 @@ public class AdminFrame extends OperatorFrame {
 
         dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
         MenuHelper.loadClassesInTree(dishesMenuTree);
-        /// endregion
 
-        /// region reportsCommonPanel
         reportsPanel = new JPanel();
         reportsPanel.setBorder(new LineBorder(Color.GRAY));
         reportsPanel.setBounds(0, 0, 592, 549);
@@ -683,10 +659,7 @@ public class AdminFrame extends OperatorFrame {
         reportsDateRangeLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         reportsDateRangeLabel.setBounds(152, 12, 72, 32);
         reportsButtonPanel.add(reportsDateRangeLabel);
-        /// endregion
 
-        /// region events
-        /// region menuEditor events
         menuEditorDessertAddButton.addActionListener(e -> {
             Dish d = MenuHelper.takeDishInput(AdminFrame.this);
 
@@ -748,12 +721,13 @@ public class AdminFrame extends OperatorFrame {
                     menuEditorRemoveMenuButton.setEnabled(node != null && !node.isRoot());
                 }
 
-                if (node.isLeaf() && ind >=0) {
+                if (node.isLeaf() && ind >= 0) {
                     menuEditorAddMenuButton.setEnabled(false);
                 } else {
                     menuEditorAddMenuButton.setEnabled(true);
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         });
 
         menuEditorAddMenuButton.addActionListener(e -> {
@@ -904,9 +878,7 @@ public class AdminFrame extends OperatorFrame {
             ComponentHelper.setEnabled(menuEditorRightPanel, false);
             ComponentHelper.setEnabled(menuEditorLeftPanel, true);
         });
-        /// endregion
 
-        /// region roomEditor events
         roomPackageTree.addTreeSelectionListener(e -> {
             try {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) roomPackageTree.getSelectionPath().getLastPathComponent();
@@ -934,7 +906,8 @@ public class AdminFrame extends OperatorFrame {
                 } else {
                     addPackageButton.setEnabled(true);
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         });
 
         addPackageButton.addActionListener(e -> {
@@ -1075,7 +1048,6 @@ public class AdminFrame extends OperatorFrame {
             editPackageButton.setEnabled(false);
             removePackageButton.setEnabled(false);
         });
-        /// endregion
 
         detCardNumBox.addFocusListener(new FocusAdapter() {
             @Override
@@ -1092,32 +1064,26 @@ public class AdminFrame extends OperatorFrame {
         });
 
         operatorAddButton.addActionListener(e -> {
-            if(operatorIdBox.getText().isEmpty()){
-                JOptionPane.showMessageDialog(this,"ID CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+            if (operatorIdBox.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "ID CANNOT BE BLANK", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(operatorNameBox.getText().isEmpty()){
-                JOptionPane.showMessageDialog(this,"PLEASE ENTER OPERATOR NAME","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (operatorNameBox.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "PLEASE ENTER OPERATOR NAME", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(operatorPasswordBox.getPassword().length==0){
-                JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (operatorPasswordBox.getPassword().length == 0) {
+                JOptionPane.showMessageDialog(this, "PASSWORD CANNOT BE BLANK", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(operatorConfirmPasswordBox.getPassword().length==0){
-                JOptionPane.showMessageDialog(this,"CONFIRM PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (operatorConfirmPasswordBox.getPassword().length == 0) {
+                JOptionPane.showMessageDialog(this, "CONFIRM PASSWORD CANNOT BE BLANK", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(!ValidateHelper.validatePhone("+91"+operatorPhoneBox.getText())){
-                JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (!ValidateHelper.validatePhone("+91" + operatorPhoneBox.getText())) {
+                JOptionPane.showMessageDialog(this, "PHONE NUMBER NOT ACCEPTED", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(!ValidateHelper.validateEmail(operatorEmailBox.getText())){
-                JOptionPane.showMessageDialog(this,"EMAIL ID NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (!ValidateHelper.validateEmail(operatorEmailBox.getText())) {
+                JOptionPane.showMessageDialog(this, "EMAIL ID NOT ACCEPTED", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if (Arrays.equals(operatorPasswordBox.getPassword(),operatorConfirmPasswordBox.getPassword())){
-                Operator nOp = new Operator(operatorIdBox.getText(),new String(operatorPasswordBox.getPassword()), operatorNameBox.getText(), operatorEmailBox.getText(),operatorPhoneBox.getText(),operatorAddressBox.getText());
+            } else if (Arrays.equals(operatorPasswordBox.getPassword(), operatorConfirmPasswordBox.getPassword())) {
+                Operator nOp = new Operator(operatorIdBox.getText(), new String(operatorPasswordBox.getPassword()), operatorNameBox.getText(), operatorEmailBox.getText(), operatorPhoneBox.getText(), operatorAddressBox.getText());
                 OperatorHelper.operators.add(nOp);
                 operatorIdBox.setText("");
                 operatorPasswordBox.setText("");
@@ -1128,65 +1094,58 @@ public class AdminFrame extends OperatorFrame {
                 operatorPhoneBox.setText("");
                 OperatorHelper.updateTable(operatorTable);
 
-                JOptionPane.showMessageDialog(this,"OPERATOR ADDED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
-            }
-            else{
-                JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "OPERATOR ADDED SUCCESSFULLY", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         });
-        operatorUpdateButton.addActionListener(e ->{
-             if(editOperatorPasswordBox.getPassword().length == 0){
-                JOptionPane.showMessageDialog(this,"PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+        operatorUpdateButton.addActionListener(e -> {
+            if (editOperatorPasswordBox.getPassword().length == 0) {
+                JOptionPane.showMessageDialog(this, "PASSWORD CANNOT BE BLANK", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(editOperatorConfirmPasswordBox.getPassword().length==0){
-                JOptionPane.showMessageDialog(this,"CONFIRM PASSWORD CANNOT BE BLANK","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (editOperatorConfirmPasswordBox.getPassword().length == 0) {
+                JOptionPane.showMessageDialog(this, "CONFIRM PASSWORD CANNOT BE BLANK", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(!ValidateHelper.validatePhone("+91"+editOperatorPhoneBox.getText())){
-                JOptionPane.showMessageDialog(this,"PHONE NUMBER NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (!ValidateHelper.validatePhone("+91" + editOperatorPhoneBox.getText())) {
+                JOptionPane.showMessageDialog(this, "PHONE NUMBER NOT ACCEPTED", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(!ValidateHelper.validateEmail(editOperatorEmailBox.getText())){
-                JOptionPane.showMessageDialog(this,"EMAIL ID NOT ACCEPTED","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (!ValidateHelper.validateEmail(editOperatorEmailBox.getText())) {
+                JOptionPane.showMessageDialog(this, "EMAIL ID NOT ACCEPTED", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            else if(Arrays.equals(editOperatorPasswordBox.getPassword(),editOperatorConfirmPasswordBox.getPassword())){
-                 for (int i = 0; i < OperatorHelper.operators.size(); i++) {
-                     Operator op = OperatorHelper.operators.get(i);
-                     if (op.getUid().equals(editOperatorIdBox.getText())) {
-                         op.setName(editOperatorNameBox.getText());
-                         op.setEmail(editOperatorEmailBox.getText());
-                         op.setPassword(new String(editOperatorPasswordBox.getPassword()));
-                         op.setPhoneNumber(editOperatorPhoneBox.getText());
-                         OperatorHelper.operators.set(i, op);
-                         OperatorHelper.updateTable(operatorTable);
-                         editOperatorIdBox.setText("");
-                         editOperatorNameBox.setText("");
-                         editOperatorPasswordBox.setText("");
-                         editOperatorConfirmPasswordBox.setText("");
-                         editOperatorEmailBox.setText("");
-                         editOperatorPhoneBox.setText("");
-                         editOperatorAddressBox.setText("");
-                         return;
-                     }
-                 }
-                JOptionPane.showMessageDialog(this,"OPERATOR UPDATED SUCCESSFULLY","SUCCESS",JOptionPane.INFORMATION_MESSAGE);
-            }
-            else{
-                JOptionPane.showMessageDialog(this,"PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN","ERROR",JOptionPane.ERROR_MESSAGE);
+            } else if (Arrays.equals(editOperatorPasswordBox.getPassword(), editOperatorConfirmPasswordBox.getPassword())) {
+                for (int i = 0; i < OperatorHelper.operators.size(); i++) {
+                    Operator op = OperatorHelper.operators.get(i);
+                    if (op.getUid().equals(editOperatorIdBox.getText())) {
+                        op.setName(editOperatorNameBox.getText());
+                        op.setEmail(editOperatorEmailBox.getText());
+                        op.setPassword(new String(editOperatorPasswordBox.getPassword()));
+                        op.setPhoneNumber(editOperatorPhoneBox.getText());
+                        OperatorHelper.operators.set(i, op);
+                        OperatorHelper.updateTable(operatorTable);
+                        editOperatorIdBox.setText("");
+                        editOperatorNameBox.setText("");
+                        editOperatorPasswordBox.setText("");
+                        editOperatorConfirmPasswordBox.setText("");
+                        editOperatorEmailBox.setText("");
+                        editOperatorPhoneBox.setText("");
+                        editOperatorAddressBox.setText("");
+                        return;
+                    }
+                }
+                JOptionPane.showMessageDialog(this, "OPERATOR UPDATED SUCCESSFULLY", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "PASSWORD'S DO NOT MATCH.PLEASE TRY AGAIN", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         });
-        operatorTable.getSelectionModel().addListSelectionListener(e ->{
-            if(operatorTable.getSelectedRow()<0){
+        operatorTable.getSelectionModel().addListSelectionListener(e -> {
+            if (operatorTable.getSelectedRow() < 0) {
                 return;
             }
-            String opid=String.valueOf(operatorTable.getValueAt(operatorTable.getSelectedRow(),0));
-            for(Operator os:OperatorHelper.operators)
-            {
-                if(os.getUid().equals(opid)){
+            String opid = String.valueOf(operatorTable.getValueAt(operatorTable.getSelectedRow(), 0));
+            for (Operator os : OperatorHelper.operators) {
+                if (os.getUid().equals(opid)) {
                     editOperatorIdBox.setText(os.getUid());
                     editOperatorNameBox.setText(os.getName());
                     editOperatorPasswordBox.setText(os.getPassword());
@@ -1197,9 +1156,9 @@ public class AdminFrame extends OperatorFrame {
                 }
             }
         });
-        operatorDeleteButton.addActionListener(e ->{
-            for(Operator op:OperatorHelper.operators){
-                if(editOperatorIdBox.getText().equals(op.getUid())) {
+        operatorDeleteButton.addActionListener(e -> {
+            for (Operator op : OperatorHelper.operators) {
+                if (editOperatorIdBox.getText().equals(op.getUid())) {
                     OperatorHelper.operators.remove(op);
                     OperatorHelper.updateTable(operatorTable);
                     editOperatorIdBox.setText("");
@@ -1270,7 +1229,7 @@ public class AdminFrame extends OperatorFrame {
             reportsDateRangeLabel.setVisible(true);
 
 
-            ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
             RoomHelper.loadTransactions(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
 
             setPanel(reportsPanel, rightPanel);
@@ -1310,7 +1269,7 @@ public class AdminFrame extends OperatorFrame {
             reportsEndDatePicker.setVisible(true);
             reportsDateRangeLabel.setVisible(true);
 
-            ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
+            ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
             RoomHelper.loadCurrentBookings(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
 
             setPanel(reportsPanel, rightPanel);
@@ -1321,7 +1280,7 @@ public class AdminFrame extends OperatorFrame {
                 ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
                 RoomHelper.loadCurrentBookings(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
             } else if (reportsHeader.getText().equals("RECENT TRANSACTIONS")) {
-                ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
+                ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
                 RoomHelper.loadTransactions(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
             }
         });
@@ -1330,11 +1289,10 @@ public class AdminFrame extends OperatorFrame {
                 ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
                 RoomHelper.loadCurrentBookings(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
             } else if (reportsHeader.getText().equals("RECENT TRANSACTIONS")) {
-                ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
+                ((DefaultTableModel) reportsTable.getModel()).setRowCount(0);
                 RoomHelper.loadTransactions(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
             }
         });
-        /// endregion
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -1347,6 +1305,11 @@ public class AdminFrame extends OperatorFrame {
 
         reportsStartDatePicker.setDateToToday();
         reportsEndDatePicker.setDateToToday();
+    }
+
+    public static void main(String[] args) {
+        AdminFrame frame = new AdminFrame();
+        frame.setVisible(true);
     }
 
     @Override
@@ -1374,7 +1337,7 @@ public class AdminFrame extends OperatorFrame {
         roomEditorAdultSpinner.setModel(new SpinnerNumberModel());
         roomEditorChildSpinner.setModel(new SpinnerNumberModel());
 
-        /// region operatorTable
+
         operatorTable = ComponentHelper.createNewTable();
         ((DefaultTableModel) operatorTable.getModel()).setColumnIdentifiers(Operator.getColumns());
         operatorTable.getColumnModel().getColumn(0).setResizable(false);
@@ -1404,7 +1367,6 @@ public class AdminFrame extends OperatorFrame {
 
         operatorTable.setShowGrid(false);
         operatorTable.setShowHorizontalLines(false);
-        /// endregion
 
         ComponentHelper.setEnabled(managePackageButtonPanel, false);
         ComponentHelper.setEnabled(roomEditorRightPanel, false, backButton);
@@ -1426,6 +1388,8 @@ public class AdminFrame extends OperatorFrame {
 
         dishesMenuTree = ComponentHelper.setupTree(dishesMenuTree, "MENU");
         MenuHelper.loadClassesInTree(dishesMenuTree);
+
+        OperatorHelper.updateTable(operatorTable);
 
         reportsStartDatePicker.setDateToToday();
         reportsEndDatePicker.setDateToToday();
