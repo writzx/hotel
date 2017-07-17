@@ -71,9 +71,7 @@ public class Transaction implements Serializable {
         Object[][] objects = new Object[transactions.size()][];
         int i = 0;
         for (Transaction s:transactions) {
-            if (s.getDetails().startsWith("[PAID]")) {
-                objects[i++] = s.toObjects();
-            }
+            objects[i++] = s.toObjects();
         }
         return objects;
     }

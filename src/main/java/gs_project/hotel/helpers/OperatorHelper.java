@@ -40,7 +40,6 @@ public class OperatorHelper {
     public static ArrayList<Operator> operators = new ArrayList<>();
 
     public static void updateTable(JTable table) {
-        Object[][] data = toObjectsArray(operators);
-        ((DefaultTableModel)table.getModel()).setDataVector(data, Operator.getColumns());
+        ((DefaultTableModel)table.getModel()).setDataVector(toObjectsArray(operators), Operator.getColumns());
     }
 }

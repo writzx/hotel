@@ -1264,9 +1264,11 @@ public class AdminFrame extends OperatorFrame {
             reportsButtonPanel.add(backButton);
 
             reportsHeader.setText("RECENT TRANSACTIONS");
+
             reportsStartDatePicker.setVisible(true);
             reportsEndDatePicker.setVisible(true);
             reportsDateRangeLabel.setVisible(true);
+
 
             ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
             RoomHelper.loadTransactions(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
@@ -1303,6 +1305,7 @@ public class AdminFrame extends OperatorFrame {
             reportsButtonPanel.add(backButton);
 
             reportsHeader.setText("CURRENT BOOKINGS");
+
             reportsStartDatePicker.setVisible(true);
             reportsEndDatePicker.setVisible(true);
             reportsDateRangeLabel.setVisible(true);
@@ -1328,7 +1331,7 @@ public class AdminFrame extends OperatorFrame {
                 RoomHelper.loadCurrentBookings(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
             } else if (reportsHeader.getText().equals("RECENT TRANSACTIONS")) {
                 ((DefaultTableModel)reportsTable.getModel()).setRowCount(0);
-                RoomHelper.loadTransactions(reportsTable,reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
+                RoomHelper.loadTransactions(reportsTable, reportsStartDatePicker.getDate(), reportsEndDatePicker.getDate());
             }
         });
         /// endregion
@@ -1418,8 +1421,6 @@ public class AdminFrame extends OperatorFrame {
 
         menuEditorDessertTable = ComponentHelper.createNewTable();
         ((DefaultTableModel) menuEditorDessertTable.getModel()).setColumnIdentifiers(Dish.getColumns());
-
-        reportsTable = ComponentHelper.createNewTable();
 
         ComponentHelper.setEnabled(menuEditorRightPanel, false, backButton);
 
