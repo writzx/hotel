@@ -107,17 +107,4 @@ public class Receipt extends JFrame {
 
         printButton.addActionListener(new PrintUIWindow(receiptPanel, OrientationRequested.LANDSCAPE));
     }
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    Receipt frame = new Receipt("BOOKING ID", "CARD NUMBER", 4000, "ECONOMY:AC:BALCONY");
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
 }

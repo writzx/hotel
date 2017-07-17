@@ -1,5 +1,6 @@
 package gs_project.hotel;
 
+import gs_project.hotel.helpers.OperatorHelper;
 import gs_project.hotel.types.Operator;
 
 import javax.swing.*;
@@ -7,20 +8,14 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class LoginFrame extends MainFrame {
+    public static LoginFrame frame;
 
     private JPanel contentPane;
     private JTextField uid;
     private JPasswordField pass;
 
-    private ArrayList<Operator> operators = new ArrayList<>();
-
-    /**
-     * Create the frame.
-     */
     public LoginFrame() {
         super("Login");
         setResizable(false);
@@ -89,10 +84,10 @@ public class LoginFrame extends MainFrame {
                 if (uid.getText().isEmpty() || passw.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "PLEASE ENTER BOTH UID AND PASSWORD", "ENTER DETAILS", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    for (Operator o : operators) {
+                    for (Operator o : OperatorHelper.operators) {
                         if (uid.getText().equals(o.getUid()) && passw.equals(o.getPassword())) {
                             this.hideFrame();
-                            OperatorFrame operatorFrame = new OperatorFrame();
+                            OperatorFrame operatorFrame = new OperatorFrame(uid.getText());
                             operatorFrame.showFrame();
                             return;
                         }
@@ -116,20 +111,11 @@ public class LoginFrame extends MainFrame {
 
         center();
 
-        System.out.println("Reading database file...");
-        try {
-            operators = FileHandler.readFile("operators");
-            System.out.println("DONE!");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        OperatorHelper.readFromFile();
     }
 
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        LoginFrame frame = new LoginFrame();
+    public static void main(String... args) {
+        frame = new LoginFrame();
         frame.setVisible(true);
     }
 }

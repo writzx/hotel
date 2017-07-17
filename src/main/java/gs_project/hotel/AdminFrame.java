@@ -119,7 +119,7 @@ public class AdminFrame extends OperatorFrame {
     private JTree roomPackageTree;
 
     public AdminFrame() {
-        super("Admin Landing Page");
+        super("Admin Landing Page", "");
 
         bookButton.setBounds(10, 269, 172, 32);
 
@@ -1307,11 +1307,6 @@ public class AdminFrame extends OperatorFrame {
         reportsEndDatePicker.setDateToToday();
     }
 
-    public static void main(String[] args) {
-        AdminFrame frame = new AdminFrame();
-        frame.setVisible(true);
-    }
-
     @Override
     protected void resetPanels() {
         super.resetPanels();
@@ -1337,8 +1332,6 @@ public class AdminFrame extends OperatorFrame {
         roomEditorAdultSpinner.setModel(new SpinnerNumberModel());
         roomEditorChildSpinner.setModel(new SpinnerNumberModel());
 
-
-        operatorTable = ComponentHelper.createNewTable();
         ((DefaultTableModel) operatorTable.getModel()).setColumnIdentifiers(Operator.getColumns());
         operatorTable.getColumnModel().getColumn(0).setResizable(false);
         operatorTable.getColumnModel().getColumn(0).setPreferredWidth(96);

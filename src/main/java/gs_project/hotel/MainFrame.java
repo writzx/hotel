@@ -1,14 +1,18 @@
 package gs_project.hotel;
 
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class MainFrame extends JFrame {
+    private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
+    private static DateTimeFormatter timeFormatterDot = DateTimeFormatter.ofPattern("hh.mm.ss a");
+
     protected final JPanel statusPanel;
 
     protected final JLabel dateStatus;
@@ -43,11 +47,11 @@ public class MainFrame extends JFrame {
     }
 
     private static String formattedDate() {
-        return LocalDate.now().toString("dd/MM/yyyy");
+        return LocalDate.now().format(dateFormatter);
     }
 
     private static String formattedTime(String current) {
-        return LocalTime.now().toString(current.contains(".") ? "hh:mm:ss aa" : "hh.mm.ss aa");
+        return LocalTime.now().format(current.contains(".") ? timeFormatter : timeFormatterDot);
     }
 
     @Override
@@ -73,7 +77,7 @@ public class MainFrame extends JFrame {
     public void setSize(int width, int height) {
         super.setSize(width, height + dateStatus.getPreferredSize().height);
     }
-    
+
     public void center() {
         setLocationRelativeTo(null);
     }

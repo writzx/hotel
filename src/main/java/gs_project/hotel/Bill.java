@@ -8,8 +8,6 @@ import javax.print.attribute.standard.OrientationRequested;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class Bill extends JFrame {
 
@@ -212,26 +210,6 @@ public class Bill extends JFrame {
         thankLabel.setBounds(10, 660, 420, 36);
         printPanel.add(thankLabel);
         thankLabel.setFont(new Font("DejaVu Serif Condensed", Font.BOLD | Font.ITALIC, 12));
-    }
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    Bill frame = new Bill("VISITOR NAME", "CARD NUMBER", "2017-16-18", "2017-16-18", 4000, 3000, 2000);
-                    frame.setVisible(true);
-                    frame.addWindowListener(new WindowAdapter() {
-                        public void windowClosing(WindowEvent e) {
-                            System.exit(0);
-                        }
-                    });
-
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     public JTable getTransactionTable() {

@@ -144,7 +144,8 @@ public class OperatorFrame extends MainFrame {
     protected final DatePicker roomSelCheckInBox;
     protected final DatePicker roomSelCheckOutBox;
     protected final JSpinner dateAdults;
-
+    protected final JLabel loginUsernameLabel;
+    protected final JButton logoutButton;
     protected final JSpinner dateChildren;
     protected final JSpinner orderMenuQuantityBox;
     protected final DatePicker dateCheckInPicker;
@@ -153,6 +154,7 @@ public class OperatorFrame extends MainFrame {
     protected final ButtonGroup buttonGroup = new ButtonGroup();
     protected final JComboBox<String> detVerifyDocBox;
     protected final ArrayList<JButton> leftButtons = new ArrayList<>();
+    protected String loginUserName;
     protected JPanel menuOrderPanel;
     protected JScrollPane orderMenuPackageScroller;
     protected JScrollPane orderMenuOrderScroller;
@@ -162,11 +164,11 @@ public class OperatorFrame extends MainFrame {
     int vis_index;
     double price;
 
-    public OperatorFrame() {
-        this("Operator Landing Page");
+    public OperatorFrame(String username) {
+        this("Operator Landing Page", username);
     }
 
-    public OperatorFrame(String title) {
+    public OperatorFrame(String title, String username) {
         super(title);
 
         RoomHelper.readFromFile();
@@ -175,8 +177,13 @@ public class OperatorFrame extends MainFrame {
         OperatorHelper.readFromFile();
 
         setResizable(false);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(800, 600);
+
+        if (username.isEmpty()) {
+            loginUserName = "LOGGED IN AS: [ADMIN]";
+        } else {
+            loginUserName = "LOGGED IN AS: " + username + " [OPERATOR]";
+        }
 
         contentPane = new JPanel();
         setContentPane(contentPane);
@@ -219,11 +226,17 @@ public class OperatorFrame extends MainFrame {
         contentPane.add(cancelBookingButton);
         leftButtons.add(cancelBookingButton);
 
+        loginUsernameLabel = new JLabel(loginUserName);
+        logoutButton = new JButton("LOG OUT");
+
+        statusPanel.add(Box.createHorizontalStrut(4));
+        statusPanel.add(loginUsernameLabel);
+        statusPanel.add(Box.createHorizontalStrut(8));
+        statusPanel.add(logoutButton);
 
         addDateTimeToStatusBar();
 
         center();
-
 
         menuOrderPanel = new JPanel();
         menuOrderPanel.setBorder(new LineBorder(Color.GRAY));
@@ -1707,11 +1720,11 @@ public class OperatorFrame extends MainFrame {
                 RoomHelper.writeToFile();
             }
         });
-    }
 
-    public static void main(String[] args) {
-        OperatorFrame frame = new OperatorFrame();
-        frame.setVisible(true);
+        logoutButton.addActionListener(e -> {
+            this.close();
+            LoginFrame.main();
+        });
     }
 
     public static void setStep(Container step, Container panel) {
