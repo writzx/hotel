@@ -1368,13 +1368,13 @@ public class AdminFrame extends OperatorFrame {
         roomPackageTree = ComponentHelper.setupTree(roomPackageTree, "ROOM");
         RoomHelper.loadClassesInTree(roomPackageTree);
 
-        menuEditorStartersTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel) menuEditorStartersTable.getModel()).setRowCount(0);
         ((DefaultTableModel) menuEditorStartersTable.getModel()).setColumnIdentifiers(Dish.getColumns());
 
-        menuEditorMainCourseTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel) menuEditorStartersTable.getModel()).setRowCount(0);
         ((DefaultTableModel) menuEditorMainCourseTable.getModel()).setColumnIdentifiers(Dish.getColumns());
 
-        menuEditorDessertTable = ComponentHelper.createNewTable();
+        ((DefaultTableModel) menuEditorDessertTable.getModel()).setRowCount(0);
         ((DefaultTableModel) menuEditorDessertTable.getModel()).setColumnIdentifiers(Dish.getColumns());
 
         ComponentHelper.setEnabled(menuEditorRightPanel, false, backButton);

@@ -171,6 +171,8 @@ public class OperatorFrame extends MainFrame {
     public OperatorFrame(String title, String username) {
         super(title);
 
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         RoomHelper.readFromFile();
         MenuHelper.readFromFile();
         VisitorHelper.readFromFile();
@@ -1722,8 +1724,9 @@ public class OperatorFrame extends MainFrame {
         });
 
         logoutButton.addActionListener(e -> {
-            this.close();
+            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             LoginFrame.main();
+            this.close();
         });
     }
 

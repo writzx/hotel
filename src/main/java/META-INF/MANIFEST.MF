@@ -1,5 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: LGoodDatePicker-10.3.1.jar hamcrest-core-1.3.jar joda-time
- -2.9.9.jar junit-4.12.jar
+Class-Path: LGoodDatePicker-10.3.1.jar
 Main-Class: gs_project.hotel.LoginFrame
 
